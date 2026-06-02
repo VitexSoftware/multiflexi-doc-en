@@ -3,6 +3,12 @@
 Kubernetes Integration
 ======================
 
+
+.. image:: ../_static/images/components/multiflexi-executor-k8s.svg
+   :width: 96px
+   :align: right
+   :alt: multiflexi-executor-k8s
+
 .. contents::
    :local:
    :depth: 2

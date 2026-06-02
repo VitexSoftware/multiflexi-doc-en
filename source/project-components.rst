@@ -3,6 +3,95 @@ Project Components and Architecture
 
 This section describes the individual projects that make up the MultiFlexi ecosystem, their purposes, and how developers should work with them.
 
+.. list-table::
+   :widths: 8 22 8 22 8 22
+   :class: component-icons
+
+   * - .. image:: _static/images/components/multiflexi-common.svg
+          :width: 48px
+          :alt: multiflexi-common
+     - multiflexi-common
+     - .. image:: _static/images/components/multiflexi-web.svg
+          :width: 48px
+          :alt: multiflexi-web
+     - multiflexi-web
+     - .. image:: _static/images/components/multiflexi-cli.svg
+          :width: 48px
+          :alt: multiflexi-cli
+     - multiflexi-cli
+   * - .. image:: _static/images/components/multiflexi-tui.svg
+          :width: 48px
+          :alt: multiflexi-tui
+     - multiflexi-tui
+     - .. image:: _static/images/components/multiflexi-scheduler.svg
+          :width: 48px
+          :alt: multiflexi-scheduler
+     - multiflexi-scheduler
+     - .. image:: _static/images/components/multiflexi-executor.svg
+          :width: 48px
+          :alt: multiflexi-executor
+     - multiflexi-executor
+   * - .. image:: _static/images/components/multiflexi-executor-docker.svg
+          :width: 48px
+          :alt: multiflexi-executor-docker
+     - multiflexi-executor-docker
+     - .. image:: _static/images/components/multiflexi-executor-podman.svg
+          :width: 48px
+          :alt: multiflexi-executor-podman
+     - multiflexi-executor-podman
+     - .. image:: _static/images/components/multiflexi-executor-k8s.svg
+          :width: 48px
+          :alt: multiflexi-executor-k8s
+     - multiflexi-executor-k8s
+   * - .. image:: _static/images/components/multiflexi-executor-azure.svg
+          :width: 48px
+          :alt: multiflexi-executor-azure
+     - multiflexi-executor-azure
+     - .. image:: _static/images/components/multiflexi-eventor.svg
+          :width: 48px
+          :alt: multiflexi-eventor
+     - multiflexi-event-processor
+     - .. image:: _static/images/components/multiflexi-probe.svg
+          :width: 48px
+          :alt: multiflexi-probe
+     - multiflexi-probe
+   * - .. image:: _static/images/components/multiflexi-abraflexi.svg
+          :width: 48px
+          :alt: multiflexi-abraflexi
+     - multiflexi-abraflexi
+     - .. image:: _static/images/components/multiflexi-csas.svg
+          :width: 48px
+          :alt: multiflexi-csas
+     - multiflexi-csas
+     - .. image:: _static/images/components/multiflexi-raiffeisenbank.svg
+          :width: 48px
+          :alt: multiflexi-raiffeisenbank
+     - multiflexi-raiffeisenbank
+   * - .. image:: _static/images/components/multiflexi-mail.svg
+          :width: 48px
+          :alt: multiflexi-mail
+     - multiflexi-mail
+     - .. image:: _static/images/components/multiflexi-mserver.svg
+          :width: 48px
+          :alt: multiflexi-mserver
+     - multiflexi-mserver
+     - .. image:: _static/images/components/multiflexi-eu.svg
+          :width: 48px
+          :alt: multiflexi-eu
+     - multiflexi-eu
+   * - .. image:: _static/images/components/multiflexi-mysql.svg
+          :width: 48px
+          :alt: multiflexi-mysql
+     - multiflexi-mysql
+     - .. image:: _static/images/components/multiflexi-pgsql.svg
+          :width: 48px
+          :alt: multiflexi-pgsql
+     - multiflexi-pgsql
+     - .. image:: _static/images/components/multiflexi-sqlite.svg
+          :width: 48px
+          :alt: multiflexi-sqlite
+     - multiflexi-sqlite
+
 Core Components
 ---------------
 
@@ -56,6 +145,11 @@ php-vitexsoftware-multiflexi-core
 multiflexi-database
 ~~~~~~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-sqlite.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-sqlite
 **Location**: ``~/Projects/Multi/multiflexi-database``
 
 **Purpose**: Database schema definitions, migration scripts, and database maintenance tools for MultiFlexi platform.
@@ -162,6 +256,11 @@ CLI and Execution Components
 multiflexi-cli
 ~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-cli.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-cli
 **Location**: ``~/Projects/Multi/multiflexi-cli``
 
 **Purpose**: Command-line interface for managing MultiFlexi resources and operations.
@@ -191,6 +290,11 @@ multiflexi-cli
 multiflexi-executor
 ~~~~~~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-executor.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-executor
 **Location**: ``~/Projects/Multi/multiflexi-executor``
 
 **Purpose**: Dedicated service for executing jobs and tasks in isolated environments.
@@ -239,6 +343,11 @@ MultiFlexi (main web UI)
 multiflexi-web
 ~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-web.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-web
 **Location**: ``https://github.com/VitexSoftware/multiflexi-web/``
 
 **Purpose**: Web assets and frontend package (Bootstrap 5 styles, compiled JS/CSS).
@@ -270,6 +379,11 @@ Monitoring & Observability
 multiflexi-probe
 ~~~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-probe.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-probe
 **Location**: ``~/Projects/Multi/multiflexi-probe``
 
 **Purpose**: Testing and debugging tool for the MultiFlexi task launcher. Executes a simple health-check to verify the execution pipeline works end-to-end.
@@ -310,21 +424,41 @@ Each of the following packages provides a **CredentialPrototype** — a JSON-def
 multiflexi-abraflexi
 ~~~~~~~~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-abraflexi.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-abraflexi
 AbraFlexi ERP credential prototype. Fields: ``ABRAFLEXI_URL``, ``ABRAFLEXI_USER``, ``ABRAFLEXI_PASSWORD``, ``ABRAFLEXI_COMPANY``.
 
 multiflexi-csas
 ~~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-csas.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-csas
 Česká Spořitelna / ČSAS / Erste API credential prototype.
 
 multiflexi-raiffeisenbank
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-raiffeisenbank.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-raiffeisenbank
 Raiffeisenbank Premium API credential prototype.
 
 multiflexi-mail
 ~~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-mail.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-mail
 SMTP/e-mail credential prototype (Symfony Mailer). Fields: ``SMTP_HOST``, ``SMTP_PORT``, ``SMTP_USER``, ``SMTP_PASSWORD``, ``MAIL_FROM``.
 
 multiflexi-database-connection
@@ -372,6 +506,11 @@ Event-Driven Processing
 multiflexi-event-processor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-eventor.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-eventor
 **Location**: ``~/Projects/Multi/multiflexi-event-processor``
 
 **Purpose**: Event-driven job triggering daemon (``multiflexi-eventor``). Complements the time-based scheduler by firing jobs in response to external events.
@@ -404,6 +543,11 @@ Terminal User Interface
 multiflexi-tui
 ~~~~~~~~~~~~~~
 
+
+.. image:: _static/images/components/multiflexi-tui.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-tui
 **Location**: ``~/Projects/Multi/multiflexi-tui``
 
 **Purpose**: A modern terminal UI frontend for ``multiflexi-cli``, built with the `Charmbracelet Bubbletea <https://github.com/charmbracelet/bubbletea>`_ framework (Go).
