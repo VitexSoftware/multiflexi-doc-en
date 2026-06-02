@@ -111,6 +111,27 @@ This endpoint is used to list all available endpoints.
 
 - **GET /index.{suffix}**: Endpoints listing
 
+Authentication
+==============
+
+The API uses HTTP Basic Authentication. Pass credentials in the standard
+``Authorization`` header:
+
+.. code-block:: bash
+
+    curl -u username:password https://your-server/api/v1/apps.json
+    # or equivalently:
+    curl -H "Authorization: Basic $(echo -n 'username:password' | base64)" \
+         https://your-server/api/v1/apps.json
+
+.. note::
+
+   Credentials embedded in the URL (``user:pass@host``) are **not** supported.
+   Always use the ``Authorization: Basic`` header.
+
+The following paths are exempt from authentication and accessible without
+credentials: ``/ping``, ``/login``, and the API index root (``/``).
+
 API Documentation
 =================
 

@@ -121,6 +121,16 @@ Phase 3: Job Queuing
 - Polls ``schedule`` table every N seconds (configurable via ``MULTIFLEXI_CYCLE_PAUSE``)
 - Query: ``SELECT * FROM schedule WHERE after < NOW() ORDER BY after ASC``
 - Respects parallel execution limit (``MULTIFLEXI_MAX_PARALLEL``)
+- **Per-RunTemplate serialisation**: if a job from the same RunTemplate is already
+  in flight, the daemon skips the queued entry and picks it up on the next polling
+  cycle. This prevents duplicate side-effects (e.g. double bank-statement imports)
+  when a long-running job overlaps its next scheduled trigger.
+
+**Scheduler single-instance guard:**
+
+The scheduler daemon acquires an exclusive ``flock`` lock on a pidfile at startup.
+A second instance launched while the first is running exits immediately, preventing
+the same RunTemplate from being queued twice due to a restart or misconfigured cron.
 
 **What Happens:**
 

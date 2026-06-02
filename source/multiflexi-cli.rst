@@ -13,17 +13,17 @@ The CLI is included with MultiFlexi and available as:
 .. code-block:: bash
 
     # System-wide installation
-    multiflexi-cli <command> [action] [options]
-    
+    multiflexi-cli <command:action> [options]
+
     # Local installation
-    ./cli/multiflexi-cli <command> [action] [options]
+    ./cli/multiflexi-cli <command:action> [options]
 
 General Usage
 -------------
 
 .. code-block:: bash
 
-    multiflexi-cli <command> [action] [options]
+    multiflexi-cli <command:action> [options]
 
 **Global Options:**
 
@@ -39,57 +39,47 @@ Use the ``-e`` or ``--environment`` option to specify a custom .env file:
 
 .. code-block:: bash
 
-    multiflexi-cli -e /path/to/custom/.env command action
+    multiflexi-cli -e /path/to/custom/.env command:action
+
 
 Commands Overview
 -----------------
 
 The MultiFlexi CLI provides the following main commands:
 
-- **application** - Manage applications (import, export, configuration)
-- **artifact** - Manage job artifacts (list, get, save)
-- **company** - Manage companies and their settings
-- **job** - Manage job execution and monitoring
-- **runtemplate** - Manage run templates and scheduling
-- **user** - User account management
-- **token** - API token management
-- **credtype** - Credential type operations
-- **companyapp** - Manage company-application relations
-- **queue** - Job queue operations
-- **status** - System status information (includes database, Zabbix, and OpenTelemetry monitoring)
-- **telemetry:test** - Test OpenTelemetry metrics export
-- **describe** - List all available commands and their parameters
-- **prune** - Prune logs and jobs, keeping only the latest N records (default: 1000)
-- **retention** - GDPR data retention management (calculate, cleanup, reporting)
-- **completion** - Dump the shell completion script
+- **application:\***     - Manage applications (list, get, create, update, delete, import/export/remove JSON, show config)
+- **company:\***         - Manage companies and their settings
+- **company-app:\***     - Manage company-application relations (list, assign, unassign)
+- **job:\***             - Manage job execution and monitoring
+- **run-template:\***    - Manage run templates, scheduling, and credential assignment
+- **user:\***            - User account management
+- **user-erasure:\***    - GDPR user data erasure management
+- **token:\***           - API token management
+- **credential-type:\*** - Credential type operations
+- **credential:\***      - Credential management
+- **event-source:\***    - Manage event sources
+- **event-rule:\***      - Manage event rules
+- **artifact:\***        - Manage job artifacts
+- **encryption:\***      - Manage encryption keys
+- **queue:\***           - Job queue operations
+- **status**             - System status information (encryption, Zabbix, OpenTelemetry)
+- **telemetry:test**     - Test OpenTelemetry metrics export
+- **describe**           - List all available commands and their parameters
+- **prune**              - Prune logs and jobs, keeping only the latest N records (default: 1000)
+- **completion**         - Dump the shell completion script
 
 Detailed Command Reference
---------------------------
+-------------------------
 
 .. contents::
    :local:
    :depth: 2
 
+
 application
 -----------
 
 Manage applications (list, get, create, update, delete, import/export/remove JSON, show configuration fields).
-
-.. code-block:: bash
-
-    multiflexi-cli application <action> [options]
-
-Actions:
-- list:   List all applications.
-- get:    Get application details by ID or UUID.
-- create: Create a new application (requires --name, --uuid).
-- update: Update an existing application (requires --id or --uuid).
-- delete: Delete an application (requires --id).
-- import-json: Import application from JSON file (requires --file).
-- export-json: Export application to JSON file (requires --id, --file).
-- remove-json: Remove application from JSON file (requires --file).
-- validate-json: Validate application JSON file (requires --file).
-- showconfig: Show defined configuration fields for application (requires --id or --uuid).
 
 Options:
   --id           Application ID
@@ -101,7 +91,7 @@ Options:
   --ociimage     OCI Image
   --requirements Requirements
   --homepage     Homepage URL
-  --file         Path to JSON file for import/export/remove/validate
+  --file         Path to JSON file for import/export/remove
   --appversion   Application Version
   -f, --format   Output format: text or json (default: text)
 
@@ -109,34 +99,35 @@ Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli application list
-    multiflexi-cli application get --id=1
-    multiflexi-cli application create --name="App1" --uuid="uuid-123"
-    multiflexi-cli application update --id=1 --name="App1 Updated"
-    multiflexi-cli application delete --id=1
-    multiflexi-cli application import-json --file=app.json
-    multiflexi-cli application export-json --id=1 --file=app.json
-    multiflexi-cli application showconfig --id=1
-    multiflexi-cli application validate-json --file=app.json
+    multiflexi-cli application:list
+    multiflexi-cli application:get --id=1
+    multiflexi-cli application:get --uuid=uuid-123
+    multiflexi-cli application:get --name="App1"
+    multiflexi-cli application:create --name="App1" --uuid="uuid-123"
+    multiflexi-cli application:update --id=1 --name="App1 Updated"
+    multiflexi-cli application:delete --id=1
+    multiflexi-cli application:import-json --file=app.json
+    multiflexi-cli application:export-json --id=1 --file=app.json
+    multiflexi-cli application:show-config --id=1
 
-artifact
---------
+company-app
+-----------
 
-Manage job artifacts (list, get, save).
+Manage company-application relations (list, assign, unassign).
 
-.. code-block:: bash
+Output columns for ``company-app:list``:
 
-    multiflexi-cli artifact <action> [options]
-
-Actions:
-- list: List all artifacts or artifacts for a specific job.
-- get:  Get artifact details by ID.
-- save: Save artifact content to a file.
+- **id** – RunTemplate ID
+- **company_id**, **company_name**, **company_slug** – company details
+- **app_id**, **app_name**, **app_uuid** – application details
 
 Options:
-  --id           Artifact ID
-  --job_id       Job ID to filter artifacts
-  --file         File path to save artifact content to
+  --company_id   Company ID (optional filter)
+  --app_id       Application ID (optional filter)
+  --app_uuid     Application UUID (optional filter; resolved to app_id)
+  --limit        Limit number of results
+  --offset       Offset for pagination
+  --order        Sort order: A (ascending) or D (descending)
   --fields       Comma-separated list of fields to display
   -f, --format   Output format: text or json (default: text)
 
@@ -144,27 +135,95 @@ Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli artifact list
-    multiflexi-cli artifact list --job_id=123
-    multiflexi-cli artifact get --id=456
-    multiflexi-cli artifact save --id=456 --file=output.txt
-    multiflexi-cli artifact list --fields=id,name,size --format=json
+    multiflexi-cli company-app:list
+    multiflexi-cli company-app:list --company_id=1
+    multiflexi-cli company-app:list --company_id=1 --app_id=2
+    multiflexi-cli company-app:list --company_id=1 --app_id=2 --limit=10 --offset=0 --order=D
+    multiflexi-cli company-app:list --format=json
+    multiflexi-cli company-app:assign --company_id=1 --app_id=2
+    multiflexi-cli company-app:assign --company_id=1 --app_uuid=uuid-123 --format=json
+    multiflexi-cli company-app:unassign --company_id=1 --app_id=2
+
+credential-type
+---------------
+
+Credential type operations (list, get, create, update, delete, import-json, export-json, remove-json, validate-json).
+
+Options:
+  --id           Credential Type ID
+  --uuid         Credential Type UUID
+  --name         Name
+  --file         Path to JSON file for import/export/remove/validate operations
+  -f, --format   Output format: text or json (default: text)
+
+Examples:
+
+.. code-block:: bash
+
+    multiflexi-cli credential-type:list
+    multiflexi-cli credential-type:get --id=1
+    multiflexi-cli credential-type:get --uuid="d3d3ae58-d64a-4ab4-afb5-ba439ffc8587"
+    multiflexi-cli credential-type:update --id=1 --name="Updated API Key"
+
+    # JSON Operations
+    multiflexi-cli credential-type:validate-json --file new-credtype.json
+    multiflexi-cli credential-type:import-json --file credential-type.json
+    multiflexi-cli credential-type:export-json --id=1 --file exported-credtype.json
+
+**JSON Import Features:**
+
+- **Schema Validation**: All JSON files are validated against the MultiFlexi credential type schema before import
+- **Duplicate Detection**: Prevents importing credential types with existing UUIDs
+- **Localization Support**: Supports multi-language names and descriptions
+- **Field Definition Import**: Automatically creates field definitions with proper types and validation
+- **Error Reporting**: Detailed error messages for validation failures and import issues
+
+**Credential Type JSON Structure:**
+
+The JSON file must conform to the MultiFlexi credential type schema and include:
+
+- ``uuid``: Unique identifier for the credential type
+- ``code``: Short code for the credential type
+- ``name``: Name (can be localized object or string)
+- ``description``: Description (can be localized object or string)
+- ``fields``: Array of field definitions with keyword, name, type, description, and requirements
+
+Example credential type JSON:
+
+.. code-block:: json
+
+    {
+      "uuid": "d3d3ae58-d64a-4ab4-afb5-ba439ffc8587",
+      "code": "ProbeAPI",
+      "name": {
+        "en": "Probe API Credentials",
+        "cs": "Přihlašovací údaje pro Probe API"
+      },
+      "description": {
+        "en": "Credential type for probe integrations.",
+        "cs": "Typ přihlašovacích údajů pro sondy."
+      },
+      "fields": [
+        {
+          "keyword": "PROBE_API_KEY",
+          "name": {
+            "en": "API Key",
+            "cs": "API klíč"
+          },
+          "type": "secret",
+          "description": {
+            "en": "API key for authentication.",
+            "cs": "API klíč pro autentizaci."
+          },
+          "required": true
+        }
+      ]
+    }
 
 company
 -------
 
 Manage companies (list, get, create, update, remove).
-
-.. code-block:: bash
-
-    multiflexi-cli company <action> [options]
-
-Actions:
-- list:   List all companies.
-- get:    Get company details by ID.
-- create: Create a new company (requires --name).
-- update: Update an existing company (requires --id).
-- remove: Remove a company (requires --id).
 
 Options:
   --id           Company ID
@@ -178,116 +237,127 @@ Options:
   --DatUpdate    Updated date (date-time)
   --email        Email
   --slug         Company Slug
-  --fields       Comma-separated list of fields to display
-  --zabbix_host  Zabbix Host
   -f, --format   Output format: text or json (default: text)
 
 Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli company list
-    multiflexi-cli company get --id=1
-    multiflexi-cli company create --name="Acme Corp" --customer="CustomerX"
-    multiflexi-cli company remove --id=1
+    multiflexi-cli company:list
+    multiflexi-cli company:get --id=1
+    multiflexi-cli company:create --name="Acme Corp" --customer="CustomerX"
+    multiflexi-cli company:remove --id=1
 
 job
 ---
 
-Manage jobs (list, get, create, update, delete).
-
-.. code-block:: bash
-
-    multiflexi-cli job <action> [options]
-
-Actions:
-- status: Show job status aggregation.
-- list:   List all jobs.
-- get:    Get job details by ID.
-- create: Create a new job (requires --runtemplate_id and --scheduled).
-- update: Update an existing job (requires --id).
-- delete: Delete a job by its ID.
+Manage jobs (list, get, create, update, delete, status).
 
 Options:
-  --id           Job ID
+  --id             Job ID
   --runtemplate_id RunTemplate ID
-  --scheduled    Scheduled datetime
-  --executor     Executor
-  --schedule_type Schedule type
-  --app_id       App ID
-  --fields       Comma-separated list of fields to display
-  -f, --format   Output format: text or json (default: text)
+  --scheduled      Scheduled datetime
+  --executor       Executor
+  --schedule_type  Schedule type
+  --app_id         App ID
+  --limit          Limit number of results
+  --offset         Offset for pagination
+  --order          Sort order: A (ascending) or D (descending)
+  --status         Filter by job state: ``failed``, ``success``, ``running``, ``pending``
+
+                 - ``failed``  – completed with non-zero exit code
+                 - ``success`` – completed successfully (``exitcode = 0``)
+                 - ``running`` – started but not yet finished
+                 - ``pending`` – scheduled but not yet started
+
+  --fields         Comma-separated list of fields to display
+  -f, --format     Output format: text or json (default: text)
 
 Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli job status
-    multiflexi-cli job list
-    multiflexi-cli job get --id=123
-    multiflexi-cli job create --runtemplate_id=5 --scheduled="2024-07-01 12:00"
-    multiflexi-cli job update --id=123 --executor=Native
-    multiflexi-cli job delete --id=123
+    multiflexi-cli job:list
+    multiflexi-cli job:list --limit=10 --order=D
+    multiflexi-cli job:list --status=failed
+    multiflexi-cli job:list --status=pending --format=json
+    multiflexi-cli job:get --id=123
+    multiflexi-cli job:status --id=123
+    multiflexi-cli job:create --runtemplate_id=5 --scheduled="2024-07-01 12:00"
+    multiflexi-cli job:update --id=123 --executor=Native
+    multiflexi-cli job:delete --id=123
 
-runtemplate
------------
+run-template
+------------
 
-Manage runtemplates (list, get, create, update, delete, schedule).
+Manage run templates (list, get, create, update, delete, schedule, and credential assignment).
 
 .. code-block:: bash
 
-    multiflexi-cli runtemplate <action> [options]
+    multiflexi-cli run-template:list [options]
+    multiflexi-cli run-template:get --id=<id> [options]
+    multiflexi-cli run-template:create --name=<name> --app_id=<id> --company_id=<id> [options]
+    multiflexi-cli run-template:update --id=<id> [options]
+    multiflexi-cli run-template:delete --id=<id>
+    multiflexi-cli run-template:schedule --id=<id> [options]
+    multiflexi-cli run-template:assign-credential --id=<id> --credential_id=<id> [options]
+    multiflexi-cli run-template:unassign-credential --id=<id> --credential_id=<id> [options]
+    multiflexi-cli run-template:list-credentials --id=<id> [options]
 
-Actions:
-- list:   List all runtemplates.
-- get:    Get runtemplate details by ID.
-- create: Create a new runtemplate (requires --name, --app_id, --company_id).
-- update: Update an existing runtemplate (requires --id).
-- delete: Delete a runtemplate (requires --id).
-- schedule: Schedule a runtemplate launch as a job (requires --id).
-
-Options:
+Common options:
   --id           RunTemplate ID
   --name         Name
   --app_id       App ID
-  --app_uuid     App UUID
   --company_id   Company ID
-  --company      Company slug (string) or ID (integer)
   --interv       Interval code
-  --cron         Crontab expression for scheduling
   --active       Active
-  --config       Application config key=value (repeatable)
-  --schedule_time Schedule time for launch (Y-m-d H:i:s or "now")
-  --executor     Executor to use for launch
-  --env          Environment override key=value (repeatable)
-  --fields       Comma-separated list of fields to display
+  --config       Config key=value, saved persistently to run-template (repeatable, used with create/update)
   -f, --format   Output format: text or json (default: text)
+
+Schedule-specific options:
+  --env          One-time environment override key=value — passed to the job but NOT saved to run-template (repeatable)
+  --schedule_time Schedule time (Y-m-d H:i:s or "now", default: now)
+  --executor     Executor to use for this job
+
+Credential assignment options:
+  --id             RunTemplate ID (for run-template:assign/unassign/list-credentials)
+  --credential_id   Credential ID
+
+.. note::
+
+   Use ``--env`` when scheduling to pass one-time environment variable overrides.
+   ``--config`` is for persistent run-template configuration (create/update).
+   This distinction prevents accidentally leaving a temporary override saved in the run-template.
 
 Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli runtemplate create --name="Import Yesterday" --app_id=19 --company_id=1 --config=IMPORT_SCOPE=yesterday --config=ANOTHER_KEY=foo
-    multiflexi-cli runtemplate update --id=230 --config=IMPORT_SCOPE=yesterday --config=ANOTHER_KEY=foo
-    multiflexi-cli runtemplate get --id=230 --format=json
-    multiflexi-cli runtemplate create --name="Import" --app_id=6e2b2c2e-7c2a-4b1a-8e2d-123456789abc --company_id=1
-    multiflexi-cli runtemplate schedule --id=123 --schedule_time="2025-07-01 10:00:00" --executor=Native --env=FOO=bar --env=BAZ=qux
+    multiflexi-cli run-template:create --name="Import Yesterday" --app_id=19 --company_id=1 --config=IMPORT_SCOPE=yesterday --config=ANOTHER_KEY=foo
+    multiflexi-cli run-template:update --id=230 --config=IMPORT_SCOPE=yesterday --config=ANOTHER_KEY=foo
+    multiflexi-cli run-template:get --id=230 --format=json
+    multiflexi-cli run-template:create --name="Import" --app_id=6e2b2c2e-7c2a-4b1a-8e2d-123456789abc --company_id=1
+
+    # One-time backfill with a custom IMPORT_SCOPE — value is NOT saved to run-template:
+    multiflexi-cli run-template:schedule --id=167 --env=IMPORT_SCOPE=2025-11-1>2026-01-07
+
+    # Regular schedule with future time:
+    multiflexi-cli run-template:schedule --id=123 --schedule_time="2025-07-01 10:00:00" --executor=Native --env=FOO=bar --env=BAZ=qux
+
+    # Assign a credential to a run template:
+    multiflexi-cli run-template:assign-credential --id=5 --credential_id=12
+
+    # Remove a credential assignment from a run template:
+    multiflexi-cli run-template:unassign-credential --id=5 --credential_id=12
+
+    # List all credentials assigned to a run template:
+    multiflexi-cli run-template:list-credentials --id=5
+    multiflexi-cli run-template:list-credentials --id=5 --format=json
 
 user
 ----
 
 Manage users (list, get, create, update, delete).
-
-.. code-block:: bash
-
-    multiflexi-cli user <action> [options]
-
-Actions:
-- list:   List all users.
-- get:    Get user details by ID.
-- create: Create a new user (requires --login, --firstname, --lastname, --email, --password).
-- update: Update an existing user (requires --id).
-- delete: Delete a user (requires --id).
 
 Options:
   --id           User ID
@@ -304,63 +374,79 @@ Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli user list
-    multiflexi-cli user get --id=1
-    multiflexi-cli user create --login="jsmith" --firstname="John" --lastname="Smith" --email="jsmith@example.com" --password="secret"
-    multiflexi-cli user update --id=1 --email="john.smith@example.com"
-    multiflexi-cli user delete --id=1
+    multiflexi-cli user:list
+    multiflexi-cli user:get --id=1
+    multiflexi-cli user:create --login="jsmith" --firstname="John" --lastname="Smith" --email="jsmith@example.com" --plaintext="secret"
+    multiflexi-cli user:update --id=1 --email="john.smith@example.com"
+    multiflexi-cli user:delete --id=1
 
-credtype
---------
+user:data-erasure
+-----------------
 
-Credential type operations (list, get, update, import, import-json, export-json, remove-json, validate-json).
+Manage GDPR user data erasure requests under Article 17 (Right to Erasure).
 
 .. code-block:: bash
 
-    multiflexi-cli credtype <action> [options]
+    multiflexi-cli user:data-erasure <action> [options]
 
 Actions:
-- list: List all credential types.
-- get: Get credential type details by ID or UUID.
-- update: Update an existing credential type (requires --id or --uuid).
-- import: Import credential type from file.
-- import-json: Import credential type from JSON file (requires --file).
-- export-json: Export credential type to JSON file (requires --id or --uuid, --file).
-- remove-json: Remove credential type from JSON file (requires --file).
-- validate-json: Validate credential type JSON file (requires --file).
+- list:     List deletion requests (optionally filtered by status).
+- create:   Create a new deletion request for a user.
+- approve:  Approve a pending deletion request (requires admin).
+- reject:   Reject a pending deletion request (requires admin).
+- process:  Process an approved deletion request.
+- audit:    Show audit trail for a deletion request.
+- cleanup:  Clean up old audit logs (7-year retention).
 
 Options:
-  --id           Credential Type ID
-  --uuid         Credential Type UUID
-  --name         Name
-  --file         Path to JSON file for import/export/remove/validate
-  -f, --format   Output format: text or json (default: text)
+  --user-id          Target user ID for the operation
+  --user-login       Target user login for the operation
+  --request-id       Deletion request ID
+  --deletion-type    Deletion type: soft, hard, anonymize (default: soft)
+  --reason           Reason for the deletion request
+  --notes            Review notes for approval/rejection
+  --force            Force operation without confirmation
+  --export-audit     Export audit trail to CSV file
+  --status           Filter requests by status: pending, approved, rejected, completed
+  -f, --format       Output format: text or json (default: text)
+
+Deletion Types:
+- **soft**: Disable user account, anonymize personal data, preserve data structures
+- **hard**: Permanently delete user data and account (requires approval)
+- **anonymize**: Replace personal data with anonymized values, disable account
 
 Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli credtype list
-    multiflexi-cli credtype get --id=1
-    multiflexi-cli credtype import-json --file=credtype.json
-    multiflexi-cli credtype export-json --id=1 --file=credtype.json
-    multiflexi-cli credtype validate-json --file=credtype.json
+    # List all pending deletion requests
+    multiflexi-cli user:data-erasure list --status=pending
+    
+    # Create a soft deletion request for user ID 123
+    multiflexi-cli user:data-erasure create --user-id=123 --deletion-type=soft --reason="User requested account deletion"
+    
+    # Create a hard deletion request by user login
+    multiflexi-cli user:data-erasure create --user-login=jsmith --deletion-type=hard --reason="Legal compliance requirement"
+    
+    # Approve a deletion request with review notes
+    multiflexi-cli user:data-erasure approve --request-id=456 --notes="Verified user identity and legal basis"
+    
+    # Reject a deletion request
+    multiflexi-cli user:data-erasure reject --request-id=789 --reason="Insufficient documentation provided"
+    
+    # Process an approved deletion request
+    multiflexi-cli user:data-erasure process --request-id=456
+    
+    # Show audit trail and export to CSV
+    multiflexi-cli user:data-erasure audit --request-id=456 --export-audit=/tmp/audit_456.csv
+    
+    # Clean up old audit logs (7-year retention)
+    multiflexi-cli user:data-erasure cleanup
 
 token
 -----
 
-Manage tokens (list, get, create, generate, update).
-
-.. code-block:: bash
-
-    multiflexi-cli token <action> [options]
-
-Actions:
-- list:   List all tokens.
-- get:    Get token details by ID.
-- create: Create a new token (requires --user).
-- generate: Generate a new token value (requires --user).
-- update: Update an existing token (requires --id).
+Manage tokens (list, get, create, generate, update, delete).
 
 Options:
   --id           Token ID
@@ -372,67 +458,184 @@ Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli token list
-    multiflexi-cli token get --id=1
-    multiflexi-cli token create --user=2
-    multiflexi-cli token generate --user=2
-    multiflexi-cli token update --id=1 --token=NEWVALUE
+    multiflexi-cli token:list
+    multiflexi-cli token:get --id=1
+    multiflexi-cli token:create --user=2
+    multiflexi-cli token:generate --user=2
+    multiflexi-cli token:update --id=1 --token=NEWVALUE
+    multiflexi-cli token:delete --id=1
 
-companyapp
+encryption
 ----------
 
-Manage company-application relations (list, get, create, update, delete).
-
-.. code-block:: bash
-
-    multiflexi-cli companyapp <action> [options]
-
-Actions:
-- list: List all company-application relations.
-- get: Get company-application relation details by ID.
-- create: Create a new company-application relation (requires --company_id and --app_id or --app_uuid).
-- update: Update an existing company-application relation (requires --id).
-- delete: Delete a company-application relation (requires --id).
+Manage encryption keys for secure credential storage. MultiFlexi uses AES-256 encryption to protect sensitive data (passwords, API keys, tokens) in the database.
 
 Options:
-  --id           Relation ID
-  --company_id   Company ID
-  --app_id       Application ID
-  --app_uuid     Application UUID
   -f, --format   Output format: text or json (default: text)
 
-Examples:
+Configuration
+^^^^^^^^^^^^^
+
+MultiFlexi encryption requires ``ENCRYPTION_MASTER_KEY`` to be configured in one of the following ways (checked in priority order):
+
+1. Environment variable: ``ENCRYPTION_MASTER_KEY``
+2. Environment variable: ``MULTIFLEXI_MASTER_KEY`` (backward compatibility)
+3. Configuration file: ``/etc/multiflexi/multiflexi.env``
+
+**Automatic Setup**: During installation of the ``multiflexi-common`` package, a master key is automatically generated and stored in ``/etc/multiflexi/multiflexi.env``.
+
+**Manual Configuration**:
 
 .. code-block:: bash
 
-    multiflexi-cli companyapp list
-    multiflexi-cli companyapp get --id=1
-    multiflexi-cli companyapp create --company_id=1 --app_id=5
-    multiflexi-cli companyapp create --company_id=1 --app_uuid=6e2b2c2e-7c2a-4b1a-8e2d-123456789abc
-    multiflexi-cli companyapp delete --id=1
+    # Generate a secure 256-bit key
+    openssl rand -base64 32
+    
+    # Add to /etc/multiflexi/multiflexi.env
+    echo "ENCRYPTION_MASTER_KEY=<generated-key>" | sudo tee -a /etc/multiflexi/multiflexi.env
+
+**Important Security Notes**:
+
+- Backup ``/etc/multiflexi/multiflexi.env`` - without the master key, encrypted credentials cannot be recovered
+- Never commit the master key to version control
+- If the master key is lost, all encrypted credentials become permanently inaccessible
+- The master key is used to encrypt database encryption keys (key wrapping)
+
+Status Action
+^^^^^^^^^^^^^
+
+Check the encryption system status:
+
+.. code-block:: bash
+
+    multiflexi-cli encryption:status
+
+    # JSON output for automation
+    multiflexi-cli encryption:status -f json
+
+Sample output:
+
+.. code-block:: text
+
+    Encryption Status
+    Master Key: configured
+    Total Keys: 3
+    Active Keys: 3
+    
+    Keys:
+    +-------------+-------------+--------+---------------------+---------+
+    | Key Name    | Algorithm   | Status | Created             | Rotated |
+    +-------------+-------------+--------+---------------------+---------+
+    | credentials | aes-256-gcm | active | 2025-10-30 09:00:00 | never   |
+    | default     | aes-256-gcm | active | 2025-10-29 10:00:00 | never   |
+    | personal    | aes-256-gcm | active | 2025-10-28 08:00:00 | never   |
+    +-------------+-------------+--------+---------------------+---------+
+
+JSON output includes:
+
+.. code-block:: json
+
+    {
+        "success": true,
+        "message": "Encryption status retrieved",
+        "data": {
+            "master_key": "configured",
+            "total_keys": 3,
+            "active_keys": 3,
+            "keys": [
+                {
+                    "key_name": "credentials",
+                    "algorithm": "aes-256-gcm",
+                    "created_at": "2025-10-30 09:00:00",
+                    "rotated_at": null,
+                    "is_active": true
+                }
+            ]
+        }
+    }
+
+Init Action
+^^^^^^^^^^^
+
+Re-initialize encryption keys:
+
+.. code-block:: bash
+
+    # Re-initialize encryption keys
+    multiflexi-cli encryption:init
+
+    # Re-initialize with JSON output
+    multiflexi-cli encryption:init -f json
+
+Sample output:
+
+.. code-block:: text
+
+    Encryption key initialized successfully
+    Key name: credentials
+    Algorithm: aes-256-gcm
+    WARNING: All existing encrypted credentials are now invalid and must be re-entered
+
+**Warning**: Re-initializing encryption keys will invalidate all previously encrypted credentials. All sensitive data must be re-entered after running this command. Use this command only during:
+
+- Initial system setup
+- After master key rotation
+- Security incident response
+- Explicit security policy requirements
+
+**Error Handling**:
+
+If ``ENCRYPTION_MASTER_KEY`` is not configured, the init command will fail:
+
+.. code-block:: text
+
+    ERROR: ENCRYPTION_MASTER_KEY is not configured. Set it in .env file or as environment variable.
 
 queue
 -----
 
-Queue operations (list, truncate).
-
-.. code-block:: bash
-
-    multiflexi-cli queue <action> [options]
-
-Actions:
-- list:     Show all scheduled jobs in the queue.
-- truncate: Remove all scheduled jobs from the queue.
+Queue operations (overview, list, fix, truncate).
 
 Options:
-  -f, --format   Output format: text or json (default: text)
+  -f, --format     Output format: text or json (default: text)
+  --limit          Limit number of results
+  --order          Sort field: "after", "id"
+  --direction      Sort direction: "ASC", "DESC", "A", "D" (default: ASC)
+  --fields         Comma-separated list of fields to display
+
+**queue:list features:**
+
+- **Schedule Type**: Human-readable schedule types converted from interval codes
+- **Waiting Time**: Human-readable time remaining (e.g., "2h 45m", "overdue")
+- **Complete Job Details**: RunTemplate name, Application name, Company information
 
 Examples:
 
 .. code-block:: bash
 
-    multiflexi-cli queue list -f json
-    multiflexi-cli queue truncate -f json
+    # Show overview metrics
+    multiflexi-cli queue:overview
+
+    # Basic queue listing
+    multiflexi-cli queue:list
+
+    # Order by scheduled time (earliest first)
+    multiflexi-cli queue:list --order after --limit 10
+
+    # Order by scheduled time (latest first)
+    multiflexi-cli queue:list --order after --direction DESC --limit 10
+
+    # Show only specific fields
+    multiflexi-cli queue:list --fields "id,after,schedule_type,runtemplate_name" --limit 5
+
+    # JSON output for automation
+    multiflexi-cli queue:list --format json --limit 20
+
+    # Fix orphaned jobs and queue inconsistencies
+    multiflexi-cli queue:fix
+
+    # Truncate all jobs
+    multiflexi-cli queue:truncate
 
 prune
 -----
@@ -456,70 +659,6 @@ Examples:
     multiflexi-cli prune --jobs --keep=500
     multiflexi-cli prune --logs --jobs --keep=2000
 
-retention
----------
-
-GDPR data retention management commands for automated data lifecycle management.
-
-.. code-block:: bash
-
-    multiflexi-cli retention:cleanup <action> [options]
-
-Actions:
-- **calculate**: Calculate retention expiration dates for all data types
-- **cleanup**: Execute scheduled cleanup (with optional --dry-run)
-- **grace-period**: Process grace period cleanup (final deletions)
-- **archive-cleanup**: Clean up expired archives (requires --days)
-- **report**: Generate compliance reports (supports --format and --output)
-- **status**: Show current retention status
-
-Options:
-  --dry-run      Execute cleanup in dry-run mode (show what would be deleted)
-  --days         Number of days for archive cleanup
-  --format       Output format: json, csv, html (default: text)
-  --output       Output file path for reports
-  -f, --format   Output format: text or json (default: text)
-
-Examples:
-
-.. code-block:: bash
-
-    # Calculate retention expiration dates
-    multiflexi-cli retention:cleanup calculate
-    
-    # Run cleanup in dry-run mode to preview actions
-    multiflexi-cli retention:cleanup cleanup --dry-run
-    
-    # Execute actual cleanup
-    multiflexi-cli retention:cleanup cleanup
-    
-    # Process grace period deletions
-    multiflexi-cli retention:cleanup grace-period
-    
-    # Clean archives older than 7 years (2555 days)
-    multiflexi-cli retention:cleanup archive-cleanup --days=2555
-    
-    # Generate compliance report in JSON format
-    multiflexi-cli retention:cleanup report --format=json --output=compliance-report.json
-    
-    # Check retention status
-    multiflexi-cli retention:cleanup status
-    
-    # Validate application JSON against GDPR schema
-    multiflexi-cli application validate-json --file multiflexi/app.json
-
-**GDPR Compliance Integration**
-
-The retention commands integrate with MultiFlexi's comprehensive GDPR compliance framework:
-
-- **Automated Scheduling**: Set up cron jobs for regular cleanup execution
-- **Audit Trails**: All retention actions are logged for compliance evidence
-- **Grace Periods**: Configurable grace periods before final data deletion
-- **Archive Management**: Secure archival with integrity verification
-- **Compliance Reporting**: Generate reports for regulatory requirements
-
-For complete GDPR compliance documentation, see :doc:`gdpr-compliance`.
-
 completion
 ----------
 
@@ -528,9 +667,6 @@ Dump the shell completion script for bash, zsh, or fish.
 .. code-block:: bash
 
     multiflexi-cli completion [shell]
-
-Arguments:
-  shell          The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given
 
 Options:
   --debug        Tail the completion debug log
@@ -542,7 +678,6 @@ Examples:
     multiflexi-cli completion bash
     multiflexi-cli completion zsh
     multiflexi-cli completion fish
-    multiflexi-cli completion --debug
 
 describe
 --------
@@ -553,104 +688,143 @@ List all available commands and their parameters.
 
     multiflexi-cli describe
 
+
 status
 ------
 
-Prints MultiFlexi system status including database configuration, migrations, system services, entity counts, Zabbix monitoring, and OpenTelemetry telemetry configuration.
+Show current MultiFlexi system status, including version, database, PHP, OS, resource usage, monitoring systems (Zabbix, OpenTelemetry), encryption, and service health.
 
 .. code-block:: bash
 
-    multiflexi-cli status [--format=text|json]
+    multiflexi-cli status
+    multiflexi-cli status --format json
 
-Options:
-  -f, --format   Output format: text or json (default: text)
-
-Example Output:
+Sample output:
 
 .. code-block:: text
 
-    db_host: localhost
-    db_port: 3306
-    db_database: multiflexi
-    db_driver: mysql
-    migrations_path: /home/vitex/Projects/Multi/multiflexi-database/db/migrations
-    migrations_executed: 42
-    multiflexi_server: running
-    multiflexi_scheduler: running
-    multiflexi_executor: running
-    applications: 15
-    companies: 8
-    runtemplates: 23
-    jobs: 156
+    version-cli: dev-main
+    db-migration: RuntemplateCron
+    php: 8.4.11
+    os: Linux
+    memory: 4071888
+    companies: 4
+    apps: 22
+    runtemplates: 177
+    topics: 27
+    credentials: 129
+    credential types: 9
+    database: mysql Localhost via UNIX socket Uptime: 12711  Threads: 12  Questions: 2010  Slow queries: 0  Opens: 113  Open tables: 103  Queries per second avg: 0.158 11.8.2-MariaDB-1 from Debian
+    encryption: active (3 keys)
     zabbix: multiflexi-server => zabbix.example.com
     telemetry: enabled (multiflexi, http://otel-collector:4318, http/json)
+    executor: active
+    scheduler: inactive
+    timestamp: 2025-08-04T14:14:17+00:00
 
-Field Descriptions:
+Field descriptions:
 
-- **db_*** - Database connection parameters
-- **migrations_*** - Database migration status
-- **multiflexi_*** - Status of MultiFlexi system services (running, stopped, or not found)
-- **applications/companies/runtemplates/jobs** - Count of entities in the system
-- **zabbix** - Zabbix monitoring status (see below)
-- **telemetry** - OpenTelemetry configuration status (see below)
+- **version-cli**: CLI version (branch or tag)
+- **db-migration**: Latest database migration applied
+- **php**: PHP version
+- **os**: Operating system
+- **memory**: Current PHP memory usage (bytes)
+- **companies**: Number of companies in the system
+- **apps**: Number of applications
+- **runtemplates**: Number of runtemplates
+- **topics**: Number of topics
+- **credentials**: Number of credentials
+- **credential types**: Number of credential types
+- **database**: Database driver and connection info
+- **encryption**: Encryption system status (see below)
+- **zabbix**: Zabbix monitoring status (see below)
+- **telemetry**: OpenTelemetry status (see below)
+- **executor**: Status of the multiflexi-executor service
+- **scheduler**: Status of the multiflexi-scheduler service
+- **timestamp**: ISO 8601 timestamp of the status report
+
+Encryption Status Values:
+
+- **disabled**: Encryption is turned off (``DATA_ENCRYPTION_ENABLED=false``)
+- **active (N keys)**: Encryption is working with N active encryption keys
+- **broken (no master key)**: ``ENCRYPTION_MASTER_KEY`` not configured
+- **broken (no active keys)**: Master key configured but no active keys in database
+- **broken (table missing)**: ``encryption_keys`` table doesn't exist
+- **unknown (error: ...)**: Database error occurred
 
 Zabbix Status Values:
 
-- ``disabled`` - Zabbix monitoring is not configured
-- ``monitored_hostname => zabbix_server`` - Monitoring is active, showing the monitored host and Zabbix server
+- **disabled**: Zabbix monitoring is not configured (no ``ZABBIX_SERVER``)
+- **hostname => server**: Monitoring active, e.g. ``multiflexi-server => zabbix.example.com``
+- Uses ``ZABBIX_HOST`` config or system hostname as monitored hostname
 
 OpenTelemetry Status Values:
 
-- ``disabled`` - OpenTelemetry is not enabled
-- ``enabled (SDK not installed)`` - Enabled but SDK packages are missing
-- ``enabled (service_name, endpoint, protocol)`` - Fully configured and operational
+- **disabled**: OpenTelemetry is not enabled (``OTEL_ENABLED=false`` or not set)
+- **enabled (service, endpoint, protocol)**: Active configuration, e.g. ``enabled (multiflexi, http://otel-collector:4318, http/json)``
+- **enabled (SDK not installed)**: Enabled but OpenTelemetry PHP SDK is not installed
 
 telemetry:test
 --------------
 
-Test OpenTelemetry metrics export by sending sample metrics to the configured OTLP endpoint. This command helps verify that OpenTelemetry integration is working correctly.
+Test OpenTelemetry metrics export functionality by sending test metrics to the configured OTLP endpoint.
 
 .. code-block:: bash
 
-    multiflexi-cli telemetry:test [--endpoint=URL] [--disable-gauges] [--format=text|json]
-
-Options:
-  --endpoint        Override OTLP endpoint URL (default: from OTEL_EXPORTER_OTLP_ENDPOINT)
-  --disable-gauges  Disable observable gauge metrics (useful for testing without full system state)
-  -f, --format      Output format: text or json (default: text)
-
-Example:
-
-.. code-block:: bash
-
-    # Test with default configuration
     multiflexi-cli telemetry:test
-    
-    # Test with custom endpoint
-    multiflexi-cli telemetry:test --endpoint=http://localhost:4318
-    
-    # Test without gauge metrics
+    multiflexi-cli telemetry:test --endpoint http://custom:4318
     multiflexi-cli telemetry:test --disable-gauges
 
-This command will:
+Options:
+  -e, --endpoint     Override OTLP endpoint URL
+  --disable-gauges   Disable observable gauges (test only counters/histograms)
 
-1. Check if OpenTelemetry SDK is installed
-2. Attempt to export sample metrics (counters, histograms, and optionally gauges)
-3. Report success or failure with detailed error information
+This command:
 
-For complete OpenTelemetry integration documentation, see :doc:`opentelemetry`.
+1. Checks if OpenTelemetry is enabled (``OTEL_ENABLED=true``)
+2. Displays current configuration (service name, endpoint, protocol)
+3. Initializes the OTel Metrics Exporter
+4. Sends test metrics:
+   - Job start metric (job_id=99999)
+   - Job end metrics (success and failure)
+   - Observable gauges (jobs.running, applications.total, etc.)
+5. Flushes metrics to the OTLP endpoint
 
-Credential Type Import
-----------------------
+Example output:
 
-MultiFlexi supports importing credential type definitions via the CLI. This allows administrators to define new credential types in JSON format and load them into the system for use in app and integration configurations.
+.. code-block:: text
 
-.. code-block:: bash
+    Testing OpenTelemetry Metrics Export
 
-    multiflexi-cli credtype import --file example.credential-type.json
+    Configuration:
+      Service Name: multiflexi
+      Endpoint: http://localhost:4318
+      Protocol: http/json
 
-- The command reads the credential type from the specified file and imports it into MultiFlexi.
-- The JSON file must conform to the :ref:`credential-type-schema`.
-- Imported credential types are available for assignment to apps and integrations.
+    Initializing OTel Metrics Exporter...
+    ✓ Exporter initialized successfully
 
-See :doc:`credential-type` for schema details and examples.
+    Testing job start metric...
+    ✓ Job start metric recorded
+
+    Testing job end metrics...
+      ✓ Success metric (exitcode=0, duration=5.5s)
+      ✓ Failure metric (exitcode=1, duration=2.3s)
+
+    Testing observable gauges (real-time metrics)...
+      ✓ multiflexi.jobs.running
+      ✓ multiflexi.applications.total
+      ✓ multiflexi.companies.total
+
+    Flushing metrics to OTLP endpoint...
+    ✓ Metrics flushed successfully
+
+    Test completed successfully!
+
+Available metrics:
+
+- **Counters**: ``multiflexi.jobs.total``, ``multiflexi.jobs.success``, ``multiflexi.jobs.failed``
+- **Histogram**: ``multiflexi.job.duration`` (seconds)
+- **Gauges**: ``multiflexi.jobs.running``, ``multiflexi.applications.{total,enabled}``, ``multiflexi.companies.total``, ``multiflexi.runtemplates.total``
+
+See the `OpenTelemetry documentation <https://multiflexi.readthedocs.io/en/latest/opentelemetry.html>`_ for complete integration guide.

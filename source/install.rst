@@ -90,6 +90,14 @@ During installation, the ``dbconfig-common`` tools will prompt you to configure 
 
     Configuration settings are automatically saved to ``/etc/multiflexi/multiflexi.env``.
 
+.. note::
+
+   **SQLite-only installs**: when you install ``multiflexi-sqlite`` without the
+   full ``multiflexi`` web package, the ``multiflexi.env`` file is created
+   automatically from ``database.env`` by the post-install script. This ensures
+   ``multiflexi-cli`` can locate its configuration immediately after the
+   database backend is set up, without requiring a manual copy step.
+
 Step 4: Install Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

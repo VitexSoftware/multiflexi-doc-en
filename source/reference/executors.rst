@@ -31,6 +31,14 @@ The job command line is constructed from the application's ``executable`` and
 ``cmdparams`` fields, with environment variables resolved from the runtemplate
 configuration.
 
+.. note::
+
+   **Environment variable precedence**: job-level configuration (runtemplate
+   config and one-time ``--env`` overrides) takes precedence over any matching
+   variable already present in the system environment. This prevents ambient
+   system variables (e.g. ``DB_HOST`` set by another service) from silently
+   overriding job-specific credentials.
+
 Docker Executor
 ---------------
 
