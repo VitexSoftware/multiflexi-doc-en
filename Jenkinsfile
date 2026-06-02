@@ -1,13 +1,20 @@
 #!groovy
 
+// Current version of this Pipeline https://github.com/VitexSoftware/BuildImages/blob/main/Test/Jenkinsfile
+
 String[] distributions = [
-    'debian:bookworm',
-    'debian:trixie',
-    'ubuntu:jammy',
-    'ubuntu:noble'
+			'debian:bookworm', 
+			'debian:trixie', 
+			// 'debian:forky', // Disabled: Forky is still unstable/research-only.
+			//                 // The full Debian package ecosystem is not yet available for Forky.
+			//                 // Re-enable once the stack builds cleanly for Forky.
+			'ubuntu:jammy', 
+			'ubuntu:noble',
+			'ubuntu:resolute',
 ]
 
 String vendor = 'vitexsoftware'
+//String distroFamily = ''
 
 properties([
     copyArtifactPermission('*'),
@@ -18,20 +25,23 @@ properties([
         blockingJobs: 'RebulidDEBRepoByAnsible'
     )
 ])
-
 node() {
     ansiColor('xterm') {
         stage('SCM Checkout') {
+            sh 'sudo chown -R jenkins:jenkins . 2>/dev/null || true'
             checkout scm
         }
     }
 }
 
 def branches = [:]
-
 distributions.each { distro ->
     branches[distro] = {
-        def dist = distro.split(':')
+        def distroName = distro
+        println  "Dist:" + distroName
+
+        def dist = distroName.split(':')
+        def distroFamily = dist[0]
         def distroCode = dist[1]
         def buildImage = ''
         def artifacts = []
@@ -39,57 +49,112 @@ distributions.each { distro ->
 
         node {
             ansiColor('xterm') {
-                stage('Checkout ' + distro) {
+                stage('Checkout ' + distroName) {
+                    sh 'sudo chown -R jenkins:jenkins . 2>/dev/null || true'
                     checkout scm
-                    buildImage = docker.image(vendor + '/' + distro)
+                    def imageName = vendor + '/' + distro
+                    buildImage = docker.image(imageName)
                     sh 'git checkout debian/changelog'
-                    def version = sh(
+                    def version = sh (
                         script: 'dpkg-parsechangelog --show-field Version',
                         returnStdout: true
                     ).trim()
-                    buildVer = version + '.' + env.BUILD_NUMBER + '~' + distroCode
+                    buildVer = version + '.' + env.BUILD_NUMBER  + '~' + distroCode
                 }
-
-                stage('Build ' + distro) {
+                stage('Build ' + distroName) {
                     buildImage.inside {
-                        sh 'dch -b -v ' + buildVer + ' "' + env.BUILD_TAG + '"'
+                        // Set unique build directories for this parallel build to avoid conflicts
+                        def uniqueBuildId = env.BUILD_NUMBER + '-' + distroCode + '-' + env.EXECUTOR_NUMBER
+                        sh '''
+                            export DH_INTERNAL_BUILDDIR="/tmp/debhelper-build-''' + uniqueBuildId + '''"
+                            export TMPDIR="/tmp/build-''' + uniqueBuildId + '''"
+                            mkdir -p "$DH_INTERNAL_BUILDDIR" "$TMPDIR"
+                        '''
+                        sh 'dch -b -v ' + buildVer  + ' "' + env.BUILD_TAG  + '"'
                         sh 'sudo apt-get update --allow-releaseinfo-change'
                         sh 'sudo chown jenkins:jenkins ..'
-                        sh 'debuild-pbuilder -i -us -uc -b'
+                        sh 'sudo rm -rf debian/$(dpkg-parsechangelog --show-field Source)/ debian/.debhelper/ debian/tmp/'
+                        sh '''
+                            export DH_INTERNAL_BUILDDIR="/tmp/debhelper-build-''' + uniqueBuildId + '''"
+                            export TMPDIR="/tmp/build-''' + uniqueBuildId + '''"
+                            debuild-pbuilder -r"sudo -E" -i -us -uc -b
+                        '''
                         sh 'mkdir -p $WORKSPACE/dist/debian/ ; rm -rf $WORKSPACE/dist/debian/* ; for deb in $(cat debian/files | awk \'{print $1}\'); do mv "../$deb" $WORKSPACE/dist/debian/; done'
-                        artifacts = sh(
+                        artifacts = sh (
                             script: "cat debian/files | awk '{print \$1}'",
                             returnStdout: true
                         ).trim().split('\n')
                     }
                 }
 
-                stage('Test ' + distro) {
+                stage('Test ' + distroName) {
                     buildImage.inside {
+                        def debconf_debug = 0 //Set to "5" or "developer" to debug debconf
                         sh 'cd $WORKSPACE/dist/debian/ ; dpkg-scanpackages . /dev/null > Packages; gzip -9c Packages > Packages.gz; cd $WORKSPACE'
                         sh 'echo "deb [trusted=yes] file://///$WORKSPACE/dist/debian/ ./" | sudo tee /etc/apt/sources.list.d/local.list'
                         sh 'sudo apt-get update --allow-releaseinfo-change'
-                        artifacts.each { deb_file ->
+                        sh 'echo "INSTALATION"'
+                      
+                        def installOrder = [
+//                        '',
+                        ]
+
+                    def sorted_artifacts = artifacts.toList()
+                    
+                    // If installOrder is empty, install all produced packages
+                    if (installOrder.isEmpty()) {
+                        sorted_artifacts.each { deb_file ->
                             if (deb_file.endsWith('.deb')) {
                                 def pkgName = deb_file.tokenize('/')[-1].replaceFirst(/_.*/, '')
-                                sh 'sudo DEBIAN_FRONTEND=noninteractive apt-get -y install ' + pkgName + ' || sudo apt-get -y -f install'
+                                sh 'echo -e "${GREEN} installing ' + pkgName + ' on `lsb_release -sc` ${ENDCOLOR} "'
+                                sh 'sudo DEBIAN_FRONTEND=noninteractive DEBCONF_DEBUG=' + debconf_debug + ' apt-get -y install ' + pkgName
+                            }
+                        }
+                    } else {
+                        // Install packages in specified order
+                        installOrder.each { pkgPrefix ->
+                            def debFile = null
+                            for (item in sorted_artifacts) {
+                                def itemStr = item.toString()
+                                if (itemStr.startsWith(pkgPrefix) && itemStr.endsWith('.deb')) {
+                                    debFile = itemStr
+                                    break
+                                }
+                            }
+                            if (debFile) {
+                                def pkgName = debFile.tokenize('/')[-1].replaceFirst(/_.*/, '')
+                                sh 'echo -e "${GREEN} installing ' + pkgName + ' on `lsb_release -sc` ${ENDCOLOR} "'
+                                sh 'sudo DEBIAN_FRONTEND=noninteractive DEBCONF_DEBUG=' + debconf_debug + ' apt-get -y install ' + pkgName
                             }
                         }
                     }
-                }
 
-                stage('Archive ' + distro) {
+                }
+                stage('Archive artifacts ' + distroName ) {
+                    // Only run if previous stages (Build and Test) succeeded
                     buildImage.inside {
+                        // Archive all produced artifacts listed in debian/files
                         artifacts.each { deb_file ->
+                            println "Archiving artifact: " + deb_file
                             archiveArtifacts artifacts: 'dist/debian/' + deb_file
                         }
+
+                        // Cleanup: remove any produced files named in debian/files
+                        // Try both the dist location and any potential original locations referenced by debian/files
+                        def uniqueBuildId = env.BUILD_NUMBER + '-' + distroCode + '-' + env.EXECUTOR_NUMBER
                         sh '''
+                            set -e
                             if [ -f debian/files ]; then
                               while read -r file _; do
                                 [ -n "$file" ] || continue
-                                rm -f "dist/debian/$file" "../../$file" || true
+                                rm -f "dist/debian/$file" || true
+                                rm -f "../$file" || true
+                                rm -f "$WORKSPACE/$file" || true
                               done < debian/files
                             fi
+                            # Cleanup temporary build directories
+                            rm -rf "/tmp/debhelper-build-''' + uniqueBuildId + '''" || true
+                            rm -rf "/tmp/build-''' + uniqueBuildId + '''" || true
                         '''
                     }
                 }
@@ -97,18 +162,12 @@ distributions.each { distro ->
         }
     }
 }
+}
 
 parallel branches
 
-if (!currentBuild.result || currentBuild.result == 'SUCCESS') {
-    build job: 'MultiFlexi-publish',
-        wait: false,
-        parameters: [
-            string(name: 'UPSTREAM_JOB',    value: env.JOB_NAME),
-            string(name: 'UPSTREAM_BUILD',  value: env.BUILD_NUMBER),
-            string(name: 'REMOTE_SSH',      value: 'multirepo@repo.multiflexi.eu'),
-            string(name: 'REMOTE_REPO_DIR', value: '/var/lib/multirepo/public/multiflexi'),
-            string(name: 'COMPONENT',       value: 'main'),
-            string(name: 'DEB_DIST',        value: '')
-        ]
+node {
+    stage('Publish to Aptly') {
+	publishDebToAptly()
+    }
 }
