@@ -8,7 +8,6 @@ String[] distributions = [
 			// 'debian:forky', // Disabled: Forky is still unstable/research-only.
 			//                 // The full Debian package ecosystem is not yet available for Forky.
 			//                 // Re-enable once the stack builds cleanly for Forky.
-			'ubuntu:jammy', 
 			'ubuntu:noble',
 			'ubuntu:resolute',
 ]
