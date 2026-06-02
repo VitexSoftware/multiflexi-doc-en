@@ -9,7 +9,7 @@ shibuya._pygments.ShibuyaPygmentsBridge.dark_style_name = "github-dark"
 # -- Project information
 
 project = 'MultiFlexi'
-copyright = '2024-2025, VitexSoftware'
+copyright = '2024-2026, VitexSoftware'
 author = 'Vitex'
 
 release = '2.3.0'
