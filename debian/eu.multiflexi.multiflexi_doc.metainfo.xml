@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="addon">
+  <id>eu.multiflexi.multiflexi_doc</id>
+  <icon type="stock">multiflexi-doc</icon>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>MultiFlexi Documentation</name>
+  <summary>HTML documentation for MultiFlexi</summary>
+  <description>
+    <p>
+      Sphinx-generated HTML documentation for MultiFlexi, a PHP-based task
+      scheduling and automation framework for accounting and business system
+      integrations.
+    </p>
+    <p>
+      Covers installation, configuration, CLI reference, REST API, integration
+      guides (AbraFlexi, Pohoda, Zabbix, OpenTelemetry, Ansible, Kubernetes),
+      and application development.
+    </p>
+  </description>
+  <url type="homepage">https://multiflexi.readthedocs.io/</url>
+  <url type="bugtracker">https://github.com/VitexSoftware/multiFlexi-doc-en/issues</url>
+  <url type="vcs-browser">https://github.com/VitexSoftware/multiFlexi-doc-en</url>
+  <developer id="eu.multiflexi">
+    <name>VitexSoftware</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+</component>

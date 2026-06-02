@@ -1,2 +1,4 @@
 build/html/* /usr/share/doc/multiflexi/html
 debian/multiflexi-doc.nginx /usr/share/doc/multiflexi
+multiflexi-doc.svg usr/share/icons/hicolor/scalable/apps/
+debian/eu.multiflexi.multiflexi_doc.metainfo.xml usr/share/metainfo/
