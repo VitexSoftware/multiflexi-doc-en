@@ -1,5 +1,7 @@
 # MultiFlexi Documentation
 
+![MultiFlexi Documentation](multiflexi-doc.svg)
+
 [![Documentation Status](https://readthedocs.org/projects/multiflexi/badge/?version=latest)](https://multiflexi.readthedocs.io/en/latest/)
 [![Build Status](https://jenkins.proxy.spojenet.cz/buildStatus/icon?job=Foregin%2Fmultiflexi-doc-en)](https://jenkins.proxy.spojenet.cz/job/Foregin/job/multiflexi-doc-en/)
 
