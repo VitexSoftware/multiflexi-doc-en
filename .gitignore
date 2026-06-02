@@ -1,7 +1,11 @@
 build/
 _build/
-multiflexi-doc-en/build/
-multiflexi-doc-en/_build/
 *.pyc
 __pycache__/
 .venv/
+debian/multiflexi-doc/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/*.substvars
+debian/*.debhelper.log

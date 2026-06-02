@@ -1,3 +1,11 @@
+multiflexi-doc (2.3.0) UNRELEASED; urgency=medium
+
+  * Migrate documentation sources from multiflexi-common to dedicated repository
+  * Add .readthedocs.yaml for ReadTheDocs integration
+  * Fix debian/rules to use plain debhelper and make html
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Mon, 02 Jun 2026 12:00:00 +0200
+
 multiflexi (2.2.2) UNRELEASED; urgency=medium
 
   * Refactor and enhance various components of the MultiFlexi application

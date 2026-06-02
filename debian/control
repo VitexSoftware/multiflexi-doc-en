@@ -1,38 +1,17 @@
-Source: multiflexi
-Section: web
+Source: multiflexi-doc
+Section: doc
 Priority: optional
 Maintainer: "Vítězslav Dvořák" <info@vitexsoftware.cz>
-Build-Depends: debhelper-compat (= 13), jq, moreutils, pkg-php-tools, php-yaml, php-intl, php-simplexml, python3-sphinx, python3-shibuya-sphinx-theme
-Standards-Version: 4.1.4
-Homepage: https://github.com/VitexSoftware/MultiFlexi
-
-Package: multiflexi
-Multi-Arch: foreign
-Depends: ${misc:Depends},
- multiflexi-common,
-Recommends: multiflexi-scheduler, multiflexi-web, muliflexi-executor
-Architecture: all
-Description: Run various tools on top of not even AbraFlexi and Stormware Pohoda
- Define server, customers and its companies. Then specify
- which services/commands run upon it.
-
-Package: multiflexi-common
-Multi-Arch: foreign
-Depends: ${misc:Depends}
- locales-all,
- php-vitexsoftware-multiflexi-core,
- anacron, adduser (>= 3.11),
- php-cli,
-Replaces: multiflexi (<< 2.0.0)
-Suggests: multiflexi-cli, multiflexi-web
-Architecture: all
-Description: shared multiflexi configuration
- Create MultiFlexi user and configuration
-
+Build-Depends: debhelper-compat (= 13), python3-sphinx, python3-shibuya-sphinx-theme
+Standards-Version: 4.6.2
+Homepage: https://github.com/VitexSoftware/multiFlexi-doc-en
+Vcs-Git: https://github.com/VitexSoftware/multiFlexi-doc-en.git
+Vcs-Browser: https://github.com/VitexSoftware/multiFlexi-doc-en
 
 Package: multiflexi-doc
 Multi-Arch: foreign
 Depends: ${misc:Depends}
 Architecture: all
-Description: MultiFlexi Html Manual
-
+Description: MultiFlexi HTML documentation
+ Sphinx-generated HTML documentation for MultiFlexi, a PHP-based task
+ scheduling and automation framework for accounting system integrations.
