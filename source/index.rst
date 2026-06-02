@@ -157,6 +157,10 @@ Contents
    selenium-testing
    apps_development
    confienv
+   architecture
+   commandline
+   configuration
+   apps
 
 .. note::
 

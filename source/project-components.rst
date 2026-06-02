@@ -150,6 +150,7 @@ multiflexi-database
    :width: 64px
    :align: right
    :alt: multiflexi-sqlite
+
 **Location**: ``~/Projects/Multi/multiflexi-database``
 
 **Purpose**: Database schema definitions, migration scripts, and database maintenance tools for MultiFlexi platform.
@@ -261,6 +262,7 @@ multiflexi-cli
    :width: 64px
    :align: right
    :alt: multiflexi-cli
+
 **Location**: ``~/Projects/Multi/multiflexi-cli``
 
 **Purpose**: Command-line interface for managing MultiFlexi resources and operations.
@@ -276,10 +278,10 @@ multiflexi-cli
 .. code-block:: bash
 
     # List applications
-    multiflexi-cli application list
+    multiflexi-cli application:list
     
     # Create new company
-    multiflexi-cli company create --name "Test Company"
+    multiflexi-cli company:create --name "Test Company"
     
     # Validate application JSON
     multiflexi-cli application validate-json --json app.json
@@ -295,6 +297,7 @@ multiflexi-executor
    :width: 64px
    :align: right
    :alt: multiflexi-executor
+
 **Location**: ``~/Projects/Multi/multiflexi-executor``
 
 **Purpose**: Dedicated service for executing jobs and tasks in isolated environments.
@@ -348,6 +351,7 @@ multiflexi-web
    :width: 64px
    :align: right
    :alt: multiflexi-web
+
 **Location**: ``https://github.com/VitexSoftware/multiflexi-web/``
 
 **Purpose**: Web assets and frontend package (Bootstrap 5 styles, compiled JS/CSS).
@@ -384,6 +388,7 @@ multiflexi-probe
    :width: 64px
    :align: right
    :alt: multiflexi-probe
+
 **Location**: ``~/Projects/Multi/multiflexi-probe``
 
 **Purpose**: Testing and debugging tool for the MultiFlexi task launcher. Executes a simple health-check to verify the execution pipeline works end-to-end.
@@ -429,6 +434,7 @@ multiflexi-abraflexi
    :width: 64px
    :align: right
    :alt: multiflexi-abraflexi
+
 AbraFlexi ERP credential prototype. Fields: ``ABRAFLEXI_URL``, ``ABRAFLEXI_USER``, ``ABRAFLEXI_PASSWORD``, ``ABRAFLEXI_COMPANY``.
 
 multiflexi-csas
@@ -449,6 +455,7 @@ multiflexi-raiffeisenbank
    :width: 64px
    :align: right
    :alt: multiflexi-raiffeisenbank
+
 Raiffeisenbank Premium API credential prototype.
 
 multiflexi-mail
@@ -459,6 +466,7 @@ multiflexi-mail
    :width: 64px
    :align: right
    :alt: multiflexi-mail
+
 SMTP/e-mail credential prototype (Symfony Mailer). Fields: ``SMTP_HOST``, ``SMTP_PORT``, ``SMTP_USER``, ``SMTP_PASSWORD``, ``MAIL_FROM``.
 
 multiflexi-database-connection
@@ -511,6 +519,7 @@ multiflexi-event-processor
    :width: 64px
    :align: right
    :alt: multiflexi-eventor
+
 **Location**: ``~/Projects/Multi/multiflexi-event-processor``
 
 **Purpose**: Event-driven job triggering daemon (``multiflexi-eventor``). Complements the time-based scheduler by firing jobs in response to external events.
@@ -548,6 +557,7 @@ multiflexi-tui
    :width: 64px
    :align: right
    :alt: multiflexi-tui
+
 **Location**: ``~/Projects/Multi/multiflexi-tui``
 
 **Purpose**: A modern terminal UI frontend for ``multiflexi-cli``, built with the `Charmbracelet Bubbletea <https://github.com/charmbracelet/bubbletea>`_ framework (Go).

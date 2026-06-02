@@ -132,7 +132,7 @@ A single prototype can have multiple CredentialType instances per company — fo
 
 .. code-block:: bash
 
-   multiflexi-cli credtype create \
+   multiflexi-cli credential-type:create \
      --company=1 \
      --prototype=ABRAFLEXI \
      --label="Production AbraFlexi" \
@@ -144,7 +144,7 @@ A single prototype can have multiple CredentialType instances per company — fo
 
 .. code-block:: bash
 
-   multiflexi-cli credtype list --company=1
+   multiflexi-cli credential-type:list --company=1
 
 Tier 3: Credential (Assignment)
 ---------------------------------
@@ -167,7 +167,7 @@ See :doc:`../howto/assigning-credentials` for a detailed step-by-step guide.
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate assign-credential \
+   multiflexi-cli run-template:assign-credential \
      --runtemplate=42 \
      --credentialtype=7
 

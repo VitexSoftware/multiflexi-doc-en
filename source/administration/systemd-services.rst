@@ -177,7 +177,7 @@ Jobs are not being executed
 
    .. code-block:: bash
 
-      multiflexi-cli job list --status=pending
+      multiflexi-cli job:list --status=pending
 
 4. Check executor logs for errors: ``journalctl -u multiflexi-executor -n 200``
 

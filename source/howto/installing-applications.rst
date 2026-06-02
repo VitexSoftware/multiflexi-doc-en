@@ -37,13 +37,13 @@ Step 2: Verify the Application is Registered
 
 .. code-block:: bash
 
-   multiflexi-cli application list
+   multiflexi-cli application:list
 
 The application should appear in the list. If it does not, import it manually:
 
 .. code-block:: bash
 
-   multiflexi-cli application import-json \
+   multiflexi-cli application:import-json \
      --file /usr/share/multiflexi/apps/probe.app.json
 
 Step 3: Assign the Application to a Company
@@ -62,7 +62,7 @@ The application now appears in the company's installed applications list and you
 
 .. code-block:: bash
 
-   multiflexi-cli company assign-app \
+   multiflexi-cli company-app:assign \
      --company=ACME \
      --app=multiflexi-probe
 
@@ -90,7 +90,7 @@ Applications do not have to come from a Debian package. Any valid ``.app.json`` 
    multiflexi-cli application validate-json --file myapp.app.json
 
    # Import
-   multiflexi-cli application import-json --file myapp.app.json
+   multiflexi-cli application:import-json --file myapp.app.json
 
 The JSON must conform to the `application schema <https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json>`_. See :doc:`../reference/application-schema` for full details.
 
@@ -103,7 +103,7 @@ Updating an Application
    sudo apt install multiflexi-probe  # re-installs latest version
 
    # Re-import updated JSON
-   multiflexi-cli application import-json \
+   multiflexi-cli application:import-json \
      --file /usr/share/multiflexi/apps/probe.app.json \
      --update
 
@@ -114,7 +114,7 @@ Removing an application from a company does not delete existing job history.
 
 .. code-block:: bash
 
-   multiflexi-cli company unassign-app \
+   multiflexi-cli company-app:unassign \
      --company=ACME \
      --app=multiflexi-probe
 

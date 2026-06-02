@@ -78,7 +78,7 @@ Each company can override the Zabbix hostname using the ``zabbix_host`` field in
 
 .. code-block:: bash
 
-   multiflexi-cli company update --id=1 --zabbix_host=customer-server
+   multiflexi-cli company:update --id=1 --zabbix_host=customer-server
 
 This allows multi-tenant deployments where different companies report to different Zabbix hosts.
 
@@ -168,7 +168,7 @@ Zabbix integration is configured as a success or failure action in RunTemplates.
 .. code-block:: bash
 
    # Create RunTemplate with Zabbix action
-   multiflexi-cli runtemplate create \
+   multiflexi-cli run-template:create \
      --name="Daily Backup" \
      --app_id=5 \
      --company_id=1 \
@@ -472,13 +472,13 @@ Monitor multiple companies with separate Zabbix hosts:
 
 .. code-block:: bash
 
-   multiflexi-cli company update --id=1 --zabbix_host=customer-a-server
+   multiflexi-cli company:update --id=1 --zabbix_host=customer-a-server
 
 **Company B Configuration:**
 
 .. code-block:: bash
 
-   multiflexi-cli company update --id=2 --zabbix_host=customer-b-server
+   multiflexi-cli company:update --id=2 --zabbix_host=customer-b-server
 
 Each company's metrics are sent to their respective Zabbix host.
 
@@ -539,7 +539,7 @@ Debugging Failed Sends
    tail -f /var/log/syslog | grep -i zabbix
    
    # MultiFlexi database logs
-   multiflexi-cli job get --id=JOBID
+   multiflexi-cli job:get --id=JOBID
 
 **Common Issues:**
 

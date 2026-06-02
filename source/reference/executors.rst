@@ -116,7 +116,7 @@ Via the CLI:
 .. code-block:: bash
 
    # Set executor on an existing runtemplate
-   multiflexi-cli runtemplate update --id=<ID> --executor=Kubernetes
+   multiflexi-cli run-template:update --id=<ID> --executor=Kubernetes
 
    # Available executor values: Native, Docker, Kubernetes, Podman, Azure
 

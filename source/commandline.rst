@@ -12,7 +12,7 @@ MultiFlexi provides several command line utilities to manage and interact with t
     - Converts application configuration to JSON format.
 
 2. **multiflexi-cli**
-    - Command line interface for interacting with MultiFlexi. Includes system status command (``multiflexi-cli status``), telemetry testing (``multiflexi-cli telemetry:test``), and comprehensive entity management. For more details, see :doc:`multiflexi-cli` and :doc:`credential-type`.
+    - Command line interface for interacting with MultiFlexi. Includes system status command (``multiflexi-cli status``), telemetry testing (``multiflexi-cli telemetry:test``), and comprehensive entity management. For more details, see :doc:`reference/cli` and :doc:`credential-type`.
 
 3. **multiflexi-executor**
     - Executes scheduled jobs and tasks.
@@ -46,31 +46,31 @@ MultiFlexi provides several command line utilities to manage and interact with t
 
          multiflexi-cli status
 
-    - See :doc:`multiflexi-cli` for complete details.
+    - See :doc:`reference/cli` for complete details.
 
-12. **multiflexi-cli credtype**
+12. **multiflexi-cli credential-type**
     - Comprehensive credential type management including list, get, update, and JSON operations.
     - Key commands:
 
       .. code-block:: bash
 
          # List all credential types
-         multiflexi-cli credtype list
+         multiflexi-cli credential-type:list
          
          # Get credential type details
-         multiflexi-cli credtype get --id=1
+         multiflexi-cli credential-type:get --id=1
          
          # Validate JSON before import
-         multiflexi-cli credtype validate-json --file example.credential-type.json
+         multiflexi-cli credential-type:validate-json --file example.credential-type.json
          
          # Import credential type from JSON
-         multiflexi-cli credtype import-json --file example.credential-type.json
+         multiflexi-cli credential-type:import-json --file example.credential-type.json
          
          # Export credential type to JSON
-         multiflexi-cli credtype export-json --id=1 --file exported.json
+         multiflexi-cli credential-type:export-json --id=1 --file exported.json
 
     - Features include schema validation, duplicate detection, localization support, and comprehensive error reporting.
-    - See :doc:`credential-type` for schema details and :doc:`multiflexi-cli` for complete command reference.
+    - See :doc:`credential-type` for schema details and :doc:`reference/cli` for complete command reference.
 
 13. **multiflexi-scheduler**
     - Schedules jobs and tasks for execution.

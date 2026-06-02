@@ -55,7 +55,7 @@ Application
 **Lifecycle:**
 
 1. Packaged as Debian ``.deb`` files (e.g., ``apt install multiflexi-probe``)
-2. Installed via ``multiflexi-cli application import-json``
+2. Installed via ``multiflexi-cli application:import-json``
 3. Registered in MultiFlexi database (``application`` table)
 4. Activated per-company through the web interface
 

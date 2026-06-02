@@ -56,7 +56,7 @@ The ``multiflexi-cli`` tool allows for efficient system management directly from
 **Key Commands**
 
 - ``multiflexi-cli list``: List all registered jobs.
-- ``multiflexi-cli run <job_id>``: Manually trigger a specific job.
+- ``multiflexi-cli run-template:schedule --id=<id>``: Manually trigger a specific job.
 - ``multiflexi-cli status``: Check the health of the scheduler daemon.
 
 For a complete command reference, see- :doc:`reference/cli`

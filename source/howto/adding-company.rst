@@ -64,13 +64,13 @@ Adding a Company via CLI
 
 .. code-block:: bash
 
-   multiflexi-cli company create \
+   multiflexi-cli company:create \
      --name="Acme Corp" \
      --code=ACME \
      --email=admin@acme.example.com
 
    # List all companies
-   multiflexi-cli company list
+   multiflexi-cli company:list
 
 Company Environment Variables
 -------------------------------
@@ -98,7 +98,7 @@ Setting a company's status to **Inactive** prevents its jobs from being schedule
 
 .. code-block:: bash
 
-   multiflexi-cli company update --code=ACME --status=inactive
+   multiflexi-cli company:update --code=ACME --status=inactive
 
 Deleting a Company
 -------------------
@@ -109,7 +109,7 @@ Deleting a Company
 
 .. code-block:: bash
 
-   multiflexi-cli company delete --code=ACME
+   multiflexi-cli company:delete --code=ACME
 
 See Also
 --------

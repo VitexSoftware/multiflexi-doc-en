@@ -54,7 +54,7 @@ Application Configuration
 -------------------------
 
 Helm Chart Reference
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Each application that supports Kubernetes execution must declare a Helm chart.
 This is stored in the ``helmchart`` field of the application record and can be
@@ -90,7 +90,7 @@ set in two ways:
 
    .. code-block:: bash
 
-      multiflexi-cli application import-json --file=multiflexi/myapp.multiflexi.app.json
+      multiflexi-cli application:import-json --file=multiflexi/myapp.multiflexi.app.json
 
 2. **Direct database update** – Useful when the chart path needs to differ from
    the JSON definition (e.g. local path vs. OCI reference):
@@ -106,14 +106,14 @@ The ``helmchart`` value can be:
 - A Helm repository chart name (e.g. ``myrepo/my-app``)
 
 OCI Image
-~~~~~~~~
+~~~~~~~~~
 
 The application must also have an ``ociimage`` field set (e.g.
 ``docker.io/vitexsoftware/multiflexi-probe``).  This image is used by
 ``kubectl run`` to create the one-shot job pod.
 
 Helm Chart Structure
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 A minimal Helm chart for a MultiFlexi application should include:
 
@@ -130,19 +130,19 @@ Configuring a RunTemplate
 -------------------------
 
 Using the CLI
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 Set the executor on an existing runtemplate:
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate update --id=158 --executor=Kubernetes
+   multiflexi-cli run-template:update --id=158 --executor=Kubernetes
 
 Or create a new runtemplate with the Kubernetes executor:
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate create \
+   multiflexi-cli run-template:create \
      --app_id=23 \
      --company_id=3 \
      --name="Probe via K8s" \
@@ -152,11 +152,11 @@ Or create a new runtemplate with the Kubernetes executor:
      --active=1
 
 Scheduling Immediate Execution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate schedule --id=158 --schedule_time=now
+   multiflexi-cli run-template:schedule --id=158 --schedule_time=now
 
 When ``--executor`` is not provided on the ``schedule`` command, the executor
 is read from the runtemplate record.  The above command will use the
@@ -205,7 +205,7 @@ Check the job result:
 
 .. code-block:: bash
 
-   multiflexi-cli job get --id=159907 --format=json
+   multiflexi-cli job:get --id=159907 --format=json
 
 Key fields to verify:
 
@@ -238,7 +238,7 @@ Helm Pre-deployment Fails
   by ``multiflexi:multiflexi``.
 
 ImagePullBackOff
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 The container image tag in ``values.yaml`` doesn't exist on the registry.
 Override the tag during Helm install:
@@ -248,7 +248,7 @@ Override the tag during Helm install:
    helm upgrade --install my-app ./helm --set image.tag=latest -n multiflexi
 
 Pod Fails to Start
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Check pod events:
 
@@ -258,7 +258,7 @@ Check pod events:
    kubectl -n multiflexi get events --sort-by=.lastTimestamp
 
 Empty stdout in Job Record
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the job completes but ``stdout`` is empty:
 
@@ -268,11 +268,11 @@ If the job completes but ``stdout`` is empty:
    (``jobStdout``/``jobStderr`` instance variables in ``Kubernetes.php``)
 
 Executor Not Recognized
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 If scheduling reports ``Executor: Native`` despite setting ``Kubernetes``:
 
-- Verify the runtemplate was updated: ``multiflexi-cli runtemplate get --id=<ID> --format=json``
+- Verify the runtemplate was updated: ``multiflexi-cli run-template:get --id=<ID> --format=json``
 - Ensure ``Kubernetes.php`` is deployed at
   ``/usr/share/php/MultiFlexi/Executor/Kubernetes.php``
 - Restart the executor daemon: ``sudo systemctl restart multiflexi-executor``

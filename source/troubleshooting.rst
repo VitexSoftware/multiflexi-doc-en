@@ -99,7 +99,7 @@ No New Jobs Being Created
 .. code-block:: bash
 
    systemctl status multiflexi-scheduler
-   multiflexi-cli runtemplate list  # check Active column
+   multiflexi-cli run-template:list  # check Active column
 
 Job Fails Immediately (exit code non-zero)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,7 +115,7 @@ Job Fails Immediately (exit code non-zero)
 
    .. code-block:: bash
 
-      multiflexi-cli runtemplate env --id=<ID> --export | bash -c 'eval "$(cat)" && <executable>'
+      multiflexi-cli run-template:get --id=<ID> --export | bash -c 'eval "$(cat)" && <executable>'
 
 See :doc:`howto/debugging-failed-jobs` for a complete walkthrough.
 
@@ -145,9 +145,9 @@ Credential Fields Not Passed to Job
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate list-credentials --runtemplate=<ID>
+   multiflexi-cli run-template:list-credentials --id=<ID>
    # If empty, assign the credential:
-   multiflexi-cli runtemplate assign-credential --runtemplate=<ID> --credentialtype=<ID>
+   multiflexi-cli run-template:assign-credential --id=<ID> --credentialtype=<ID>
 
 Wrong Values in Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,10 +155,10 @@ Wrong Values in Credentials
 .. code-block:: bash
 
    # Show current values
-   multiflexi-cli credtype show --id=<ID>
+   multiflexi-cli credential-type:get --id=<ID>
 
    # Update
-   multiflexi-cli credtype update --id=<ID> --FIELD_NAME=newvalue
+   multiflexi-cli credential-type:update --id=<ID> --FIELD_NAME=newvalue
 
 Installation Issues
 --------------------

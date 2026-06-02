@@ -57,7 +57,7 @@ Step 2: Create a CredentialType for the Company
 
 .. code-block:: bash
 
-   multiflexi-cli credtype create \
+   multiflexi-cli credential-type:create \
      --company=ACME \
      --prototype=ABRAFLEXI \
      --label="Production AbraFlexi" \
@@ -66,7 +66,7 @@ Step 2: Create a CredentialType for the Company
      --ABRAFLEXI_PASSWORD=secret
 
    # List created CredentialTypes
-   multiflexi-cli credtype list --company=ACME
+   multiflexi-cli credential-type:list --company=ACME
 
 .. tip::
 
@@ -87,12 +87,12 @@ Step 3: Assign the CredentialType to a RunTemplate
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate assign-credential \
+   multiflexi-cli run-template:assign-credential \
      --runtemplate=42 \
      --credentialtype=7
 
    # Verify the assignment
-   multiflexi-cli runtemplate list-credentials --runtemplate=42
+   multiflexi-cli run-template:list-credentials --id=42
 
 How Credentials Are Used
 -------------------------
@@ -122,7 +122,7 @@ Removing a Credential Assignment
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate remove-credential \
+   multiflexi-cli run-template:unassign-credential \
      --runtemplate=42 \
      --credentialtype=7
 
@@ -139,7 +139,7 @@ If a password or API key changes, update the CredentialType (not the RunTemplate
 
 .. code-block:: bash
 
-   multiflexi-cli credtype update \
+   multiflexi-cli credential-type:update \
      --id=7 \
      --ABRAFLEXI_PASSWORD=newpassword
 

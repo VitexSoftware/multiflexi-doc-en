@@ -35,7 +35,7 @@ Verify it is registered:
 
 .. code-block:: bash
 
-   multiflexi-cli application list | grep probe
+   multiflexi-cli application:list | grep probe
 
 You should see ``multiflexi-probe`` in the output.
 
@@ -59,7 +59,7 @@ A company is the tenant for whom jobs run. We will create a demo company.
 
 .. code-block:: bash
 
-   multiflexi-cli company create \
+   multiflexi-cli company:create \
      --name="Demo Company" \
      --code=DEMO
 
@@ -79,7 +79,7 @@ Now we tell MultiFlexi that Demo Company will use the Probe application.
 
 .. code-block:: bash
 
-   multiflexi-cli company assign-app \
+   multiflexi-cli company-app:assign \
      --company=DEMO \
      --app=multiflexi-probe
 
@@ -105,7 +105,7 @@ A RunTemplate defines *how* and *when* the application runs for this company.
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate create \
+   multiflexi-cli run-template:create \
      --company=DEMO \
      --app=multiflexi-probe \
      --name="Hourly health check" \
@@ -130,7 +130,7 @@ Before waiting for the hourly schedule, run the job immediately to verify it wor
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate run --id=1
+   multiflexi-cli run-template:schedule --id=1
 
 Step 6: Inspect the Results
 -----------------------------
@@ -150,7 +150,7 @@ Step 6: Inspect the Results
 .. code-block:: bash
 
    # Show recent jobs for the RunTemplate
-   multiflexi-cli job list --runtemplate=1
+   multiflexi-cli job:list --runtemplate=1
 
    # Show stdout of the last job
    multiflexi-cli job artifacts --id=<JOB_ID> --file=stdout.txt
@@ -213,7 +213,7 @@ Troubleshooting
   Check the executor: ``systemctl status multiflexi-executor``
 
 **Application not found after apt install:**
-  Run: ``multiflexi-cli application import-json --file /usr/share/multiflexi/apps/probe.app.json``
+  Run: ``multiflexi-cli application:import-json --file /usr/share/multiflexi/apps/probe.app.json``
 
 See Also
 --------

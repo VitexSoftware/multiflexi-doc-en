@@ -20,17 +20,17 @@ Bulk Company Management
 .. code-block:: bash
 
    # Export all companies to JSON
-   multiflexi-cli company list --format=json > companies.json
+   multiflexi-cli company:list --format=json > companies.json
 
    # Create multiple companies from a CSV
    while IFS=, read -r name code email; do
-     multiflexi-cli company create --name="$name" --code="$code" --email="$email"
+     multiflexi-cli company:create --name="$name" --code="$code" --email="$email"
    done < companies.csv
 
    # Deactivate all companies matching a pattern
-   multiflexi-cli company list --format=json | \
+   multiflexi-cli company:list --format=json | \
      jq -r '.[] | select(.code | startswith("TEST")) | .code' | \
-     xargs -I{} multiflexi-cli company update --code={} --status=inactive
+     xargs -I{} multiflexi-cli company:update --code={} --status=inactive
 
 Bulk Application Assignment
 -----------------------------
@@ -40,9 +40,9 @@ Assign one application to multiple companies:
 .. code-block:: bash
 
    # Assign multiflexi-probe to all active companies
-   multiflexi-cli company list --format=json | \
+   multiflexi-cli company:list --format=json | \
      jq -r '.[] | select(.status == "active") | .code' | \
-     xargs -I{} multiflexi-cli company assign-app --company={} --app=multiflexi-probe
+     xargs -I{} multiflexi-cli company-app:assign --company={} --app=multiflexi-probe
 
 Bulk RunTemplate Creation
 --------------------------
@@ -55,8 +55,8 @@ Create the same RunTemplate configuration across multiple companies:
    # deploy-runtemplates.sh
    # Creates a daily health-check RunTemplate for every company that has multiflexi-probe
 
-   for COMPANY in $(multiflexi-cli company list --format=csv | tail -n+2 | cut -d, -f1); do
-     multiflexi-cli runtemplate create \
+   for COMPANY in $(multiflexi-cli company:list --format=csv | tail -n+2 | cut -d, -f1); do
+     multiflexi-cli run-template:create \
        --company="$COMPANY" \
        --app=multiflexi-probe \
        --name="Daily health check" \
@@ -77,7 +77,7 @@ Create the same CredentialType for a list of companies from a configuration file
    # deploy-credentials.sh
 
    while IFS=',' read -r company url user password; do
-     multiflexi-cli credtype create \
+     multiflexi-cli credential-type:create \
        --company="$company" \
        --prototype=ABRAFLEXI \
        --label="AbraFlexi Production" \
@@ -105,14 +105,14 @@ Bulk Job Management
 .. code-block:: bash
 
    # Cancel all pending jobs for a company
-   multiflexi-cli job list --status=pending --company=ACME --format=json | \
+   multiflexi-cli job:list --status=pending --company=ACME --format=json | \
      jq -r '.[].id' | \
      xargs -I{} multiflexi-cli job cancel --id={}
 
    # Re-run all failed jobs from today
-   multiflexi-cli job list --status=failed --since=today --format=json | \
+   multiflexi-cli job:list --status=failed --since=today --format=json | \
      jq -r '.[].runtemplate_id' | sort -u | \
-     xargs -I{} multiflexi-cli runtemplate run --id={}
+     xargs -I{} multiflexi-cli run-template:schedule --id={}
 
    # Clean up jobs older than 60 days
    multiflexi-cli job cleanup --older-than=60
@@ -123,7 +123,7 @@ Exporting Configuration
 .. code-block:: bash
 
    # Export all RunTemplates (for backup or migration)
-   multiflexi-cli runtemplate list --format=json > runtemplates_backup.json
+   multiflexi-cli run-template:list --format=json > runtemplates_backup.json
 
    # Export company environment variables
    multiflexi-cli company env export --company=ACME > acme_env.json

@@ -88,7 +88,7 @@ Creating a RunTemplate via CLI
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate create \
+   multiflexi-cli run-template:create \
      --company=ACME \
      --app=multiflexi-probe \
      --name="Hourly health check" \
@@ -102,10 +102,10 @@ Listing RunTemplates
 .. code-block:: bash
 
    # All RunTemplates
-   multiflexi-cli runtemplate list
+   multiflexi-cli run-template:list
 
    # For a specific company
-   multiflexi-cli runtemplate list --company=ACME
+   multiflexi-cli run-template:list --company=ACME
 
 Updating a RunTemplate
 -----------------------
@@ -113,13 +113,13 @@ Updating a RunTemplate
 .. code-block:: bash
 
    # Pause scheduling
-   multiflexi-cli runtemplate update --id=42 --active=0
+   multiflexi-cli run-template:update --id=42 --active=0
 
    # Change interval
-   multiflexi-cli runtemplate update --id=42 --interval=daily
+   multiflexi-cli run-template:update --id=42 --interval=daily
 
    # Change executor
-   multiflexi-cli runtemplate update --id=42 --executor=Docker
+   multiflexi-cli run-template:update --id=42 --executor=Docker
 
 Running a RunTemplate Immediately
 -----------------------------------
@@ -132,7 +132,7 @@ To trigger a one-off execution outside the normal schedule:
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate run --id=42
+   multiflexi-cli run-template:schedule --id=42
 
 Configuring Post-Job Actions
 ------------------------------
@@ -156,7 +156,7 @@ Deleting a RunTemplate
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate delete --id=42
+   multiflexi-cli run-template:delete --id=42
 
 See Also
 --------

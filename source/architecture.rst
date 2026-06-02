@@ -270,7 +270,7 @@ The credential management follows a hierarchical relationship:
   - **Storage**: ``credential_type`` table with UUID support
   - **Implementation**: PHP classes implementing ``CredentialTypeInterface``
   - **Scope**: Company-isolated instances
-  - **Management**: ``multiflexi-cli credtype`` commands
+  - **Management**: ``multiflexi-cli credential-type`` commands
 
 **Tier 3: Credential (Application Usage)**
   - **Purpose**: Actual credential values used by applications and jobs

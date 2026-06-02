@@ -32,7 +32,7 @@ The credential management system follows a three-tier relationship pattern:
    - **Purpose**: Company-specific implementations of credential prototypes
    - **Storage**: Database table: `credential_type` with UUID support
    - **Implementation**: PHP classes implementing `CredentialTypeInterface`
-   - **Management**: Via `credtype` CLI commands
+   - **Management**: Via `credential-type` CLI commands
    - **Scope**: Company-specific instances
    - **Relationship**: Each CredentialType references a CredentialPrototype
 
@@ -142,30 +142,30 @@ Credential types can be managed using the MultiFlexi CLI with various operations
 .. code-block:: bash
 
     # List all credential types
-    multiflexi-cli credtype list
+    multiflexi-cli credential-type:list
     
     # Get specific credential type details
-    multiflexi-cli credtype get --id=1
-    multiflexi-cli credtype get --uuid="123e4567-e89b-12d3-a456-426614174000"
+    multiflexi-cli credential-type:get --id=1
+    multiflexi-cli credential-type:get --uuid="123e4567-e89b-12d3-a456-426614174000"
     
     # Create new credential type instance
-    multiflexi-cli credtype create --company-id 1 --class AbraFlexi
+    multiflexi-cli credential-type:create --company-id 1 --class AbraFlexi
     
     # Delete credential type
-    multiflexi-cli credtype delete --id=1
+    multiflexi-cli credential-type:delete --id=1
     
     # Validate credential type JSON before import
-    multiflexi-cli credtype validate-json --file example.credential-type.json
+    multiflexi-cli credential-type:validate-json --file example.credential-type.json
     
     # Import credential type from JSON file
-    multiflexi-cli credtype import-json --file example.credential-type.json
-    multiflexi-cli credtype import-json --file example.credential-type.json --format json
+    multiflexi-cli credential-type:import-json --file example.credential-type.json
+    multiflexi-cli credential-type:import-json --file example.credential-type.json --format json
     
     # Export credential type to JSON file
-    multiflexi-cli credtype export-json --id=1 --file exported-credtype.json
+    multiflexi-cli credential-type:export-json --id=1 --file exported-credential-type.json
     
     # Update existing credential type
-    multiflexi-cli credtype update --id=1 --name="Updated Name"
+    multiflexi-cli credential-type:update --id=1 --name="Updated Name"
 
 Managing Credential Prototypes with CLI
 ---------------------------------------
@@ -252,10 +252,10 @@ Here's a complete example of the credential management workflow:
 .. code-block:: bash
 
     # Create credential type instance for Company ID 1
-    multiflexi-cli credtype create --company-id 1 --class AbraFlexi
+    multiflexi-cli credential-type:create --company-id 1 --class AbraFlexi
     
     # Verify creation
-    multiflexi-cli credtype list
+    multiflexi-cli credential-type:list
 
 **Step 3: Use in Applications**
 
@@ -281,7 +281,7 @@ Before importing, you can validate your credential type JSON:
 
 .. code-block:: bash
 
-    multiflexi-cli credtype validate-json --file new-credtype.json
+    multiflexi-cli credential-type:validate-json --file new-credential-type.json
 
 This command will check:
 

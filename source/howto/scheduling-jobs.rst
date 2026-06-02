@@ -58,10 +58,10 @@ Viewing the Job Schedule
 .. code-block:: bash
 
    # Show all pending (not yet executed) jobs
-   multiflexi-cli job list --status=pending
+   multiflexi-cli job:list --status=pending
 
    # Show next run times for all RunTemplates
-   multiflexi-cli runtemplate list
+   multiflexi-cli run-template:list
 
 Pausing Scheduling
 -------------------
@@ -74,14 +74,14 @@ To stop a RunTemplate from generating new jobs without deleting it, set it to **
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate update --id=42 --active=0
+   multiflexi-cli run-template:update --id=42 --active=0
 
 Resuming Scheduling
 --------------------
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate update --id=42 --active=1
+   multiflexi-cli run-template:update --id=42 --active=1
 
 The scheduler will calculate the next run time from now and resume scheduling.
 
@@ -96,7 +96,7 @@ To run a job right now, outside of its normal schedule:
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate run --id=42
+   multiflexi-cli run-template:schedule --id=42
 
 This creates a Job with status ``pending`` which the executor picks up within seconds.
 

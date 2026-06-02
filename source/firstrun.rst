@@ -15,7 +15,7 @@ On the very first visit to the web interface, MultiFlexi shows an account creati
 1. Open your browser and navigate to ``http://<your-server>/multiflexi``
 2. You will see the **"Create Administrator"** screen
 
-.. image:: ../../doc/novyadministrator.png
+.. image:: _static/images/screenshots/novyadministrator.png
    :alt: New Administrator creation screen
 
 3. Fill in:
@@ -35,7 +35,7 @@ Initial Dashboard
 
 After logging in you will see the main dashboard:
 
-.. image:: ../../doc/prvnispusteni.png
+.. image:: _static/images/screenshots/prvnispusteni.png
    :alt: MultiFlexi dashboard on first run
 
 The dashboard shows:

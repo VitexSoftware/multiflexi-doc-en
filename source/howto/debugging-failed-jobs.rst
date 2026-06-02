@@ -28,10 +28,10 @@ Step 1: Find the Failed Job
 .. code-block:: bash
 
    # List recent failed jobs
-   multiflexi-cli job list --status=failed --limit=20
+   multiflexi-cli job:list --status=failed --limit=20
 
    # List failed jobs for a specific company
-   multiflexi-cli job list --status=failed --company=ACME
+   multiflexi-cli job:list --status=failed --company=ACME
 
 Step 2: Inspect the Artifacts
 -------------------------------
@@ -77,7 +77,7 @@ The executor daemon logs job start/stop events and any internal errors:
 
    # Live log while re-running the job
    sudo journalctl -u multiflexi-executor -f &
-   multiflexi-cli runtemplate run --id=42
+   multiflexi-cli run-template:schedule --id=42
 
 Step 4: Verify the Environment
 --------------------------------
@@ -88,7 +88,7 @@ Most failures are caused by missing or wrong environment variables (credentials,
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate env --id=42
+   multiflexi-cli run-template:get --id=42
 
 This shows exactly what environment variables the job process will receive. Verify URLs, check for typos, confirm passwords are set.
 
@@ -97,10 +97,10 @@ This shows exactly what environment variables the job process will receive. Veri
 .. code-block:: bash
 
    # List credentials assigned to the RunTemplate
-   multiflexi-cli runtemplate list-credentials --runtemplate=42
+   multiflexi-cli run-template:list-credentials --id=42
 
    # Show CredentialType values
-   multiflexi-cli credtype show --id=7
+   multiflexi-cli credential-type:get --id=7
 
 Step 5: Run the Application Manually
 --------------------------------------
@@ -110,7 +110,7 @@ Once you have the resolved environment, you can reproduce the failure manually b
 .. code-block:: bash
 
    # Export the environment and run the executable
-   multiflexi-cli runtemplate env --id=42 --export | bash -c 'eval "$(cat)" && /usr/bin/my-application'
+   multiflexi-cli run-template:get --id=42 --export | bash -c 'eval "$(cat)" && /usr/bin/my-application'
 
    # Or manually set key variables
    export ABRAFLEXI_URL=https://erp.example.com
@@ -145,7 +145,7 @@ After fixing the root cause:
 
 .. code-block:: bash
 
-   multiflexi-cli runtemplate run --id=42
+   multiflexi-cli run-template:schedule --id=42
 
 Common Issues Quick Reference
 -------------------------------
