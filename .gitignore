@@ -1,0 +1,7 @@
+build/
+_build/
+multiflexi-doc-en/build/
+multiflexi-doc-en/_build/
+*.pyc
+__pycache__/
+.venv/

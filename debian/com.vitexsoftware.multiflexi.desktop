@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=Multi Flexi
+Comment=several accounting tools launcher
+Categories=Office;Finance;
+
+Icon=multiflexi-web
+Exec=sensible-browser http://localhost/multiflexi/
+Terminal=false
+
