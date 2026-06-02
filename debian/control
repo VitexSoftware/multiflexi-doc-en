@@ -2,7 +2,7 @@ Source: multiflexi-doc
 Section: doc
 Priority: optional
 Maintainer: "Vítězslav Dvořák" <info@vitexsoftware.cz>
-Build-Depends: debhelper-compat (= 13), python3-sphinx, python3-shibuya-sphinx-theme
+Build-Depends: debhelper-compat (= 13), python3-sphinx, python3-shibuya-sphinx-theme, dh-apache2
 Standards-Version: 4.6.2
 Homepage: https://github.com/VitexSoftware/multiFlexi-doc-en
 Vcs-Git: https://github.com/VitexSoftware/multiFlexi-doc-en.git
@@ -11,7 +11,11 @@ Vcs-Browser: https://github.com/VitexSoftware/multiFlexi-doc-en
 Package: multiflexi-doc
 Multi-Arch: foreign
 Depends: ${misc:Depends}
+Recommends: apache2 | nginx
 Architecture: all
 Description: MultiFlexi HTML documentation
  Sphinx-generated HTML documentation for MultiFlexi, a PHP-based task
  scheduling and automation framework for accounting system integrations.
+ .
+ An Apache2 configuration snippet is enabled automatically on installation.
+ An Nginx configuration snippet is installed to /usr/share/doc/multiflexi/.

@@ -1,0 +1,5 @@
+location /multiflexi-doc/ {
+    alias /usr/share/doc/multiflexi/html/;
+    index index.html;
+    try_files $uri $uri/ =404;
+}

@@ -1,1 +1,2 @@
 build/html/* /usr/share/doc/multiflexi/html
+debian/multiflexi-doc.nginx /usr/share/doc/multiflexi
