@@ -1,0 +1,19 @@
+name: Trigger ReadTheDocs build
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  rtd-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger RTD build
+        env:
+          RTD_TOKEN: ${{ secrets.RTD_TOKEN }}
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Token $RTD_TOKEN" \
+            -H "Content-Type: application/json" \
+            https://app.readthedocs.org/api/v3/projects/multiflexi/versions/latest/builds/ \
+            | jq '{id: .build.id, state: .build.state.name, url: .build._links._self}'
