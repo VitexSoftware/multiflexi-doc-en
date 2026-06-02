@@ -35,9 +35,9 @@ Getting Started
 
 New to MultiFlexi? Start here:
 
-1. **:doc:`quickstart`** - Get up and running in 15 minutes
-2. **:doc:`install`** - Detailed installation instructions
-3. **:doc:`tutorial-first-job`** - Complete end-to-end tutorial
+1. :doc:`quickstart` — Get up and running in 15 minutes
+2. :doc:`install` — Detailed installation instructions
+3. :doc:`tutorial-first-job` — Complete end-to-end tutorial
 
 Once you're comfortable with the basics, explore :doc:`concepts/system-overview` to understand MultiFlexi's architecture.
 
