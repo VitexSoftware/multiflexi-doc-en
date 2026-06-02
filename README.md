@@ -1,7 +1,7 @@
 # MultiFlexi Documentation
 
 [![Documentation Status](https://readthedocs.org/projects/multiflexi/badge/?version=latest)](https://multiflexi.readthedocs.io/en/latest/)
-[![Build Status](https://jenkins.proxy.spojenet.cz/buildStatus/icon?job=multiflexi-doc-en)](https://jenkins.proxy.spojenet.cz/job/multiflexi-doc-en/)
+[![Build Status](https://jenkins.proxy.spojenet.cz/buildStatus/icon?job=Foregin%2Fmultiflexi-doc-en)](https://jenkins.proxy.spojenet.cz/job/Foregin/job/multiflexi-doc-en/)
 
 English documentation for [MultiFlexi](https://multiflexi.eu) — a PHP-based task scheduling and automation framework for accounting and business system integrations.
 
