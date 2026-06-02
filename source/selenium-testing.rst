@@ -1,5 +1,5 @@
 Selenium Web Testing
-===================
+====================
 
 MultiFlexi includes a comprehensive Selenium-based web testing suite that provides automated end-to-end testing of the web interface. This testing framework ensures the web application works correctly across different environments and supports the project's international goals with full English localization.
 

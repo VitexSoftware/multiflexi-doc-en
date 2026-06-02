@@ -445,6 +445,7 @@ multiflexi-csas
    :width: 64px
    :align: right
    :alt: multiflexi-csas
+
 Česká Spořitelna / ČSAS / Erste API credential prototype.
 
 multiflexi-raiffeisenbank

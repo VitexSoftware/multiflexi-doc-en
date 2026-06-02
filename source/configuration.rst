@@ -1,5 +1,3 @@
-.. _configuration:
-
 Configuration
 =============
 
@@ -117,7 +115,7 @@ For enterprise observability, MultiFlexi supports OpenTelemetry.
 - **Collector Endpoint**: URL of your OTLP collector.
 - **Protocol**: gRPC or HTTP.
 
-See :doc:`opentelemetry` for configuration details.
+See :doc:`integrations/opentelemetry` for configuration details.
 
 Logging
 -------

@@ -71,35 +71,38 @@ Core Database Tables
 
 Understanding the schema helps with maintenance and debugging.
 
-+----------------------------+----------------------------------------------+
-| Table                      | Contents                                     |
-+============================+==============================================+
-| ``user``                   | Administrator and user accounts              |
-+----------------------------+----------------------------------------------+
-| ``company``                | Multi-tenant company records                 |
-+----------------------------+----------------------------------------------+
-| ``applications``           | Registered application definitions          |
-+----------------------------+----------------------------------------------+
-| ``app_to_company``         | Which apps are assigned to which companies   |
-+----------------------------+----------------------------------------------+
-| ``run_template``           | Job execution templates                      |
-+----------------------------+----------------------------------------------+
-| ``job``                    | Individual job execution records             |
-+----------------------------+----------------------------------------------+
-| ``artifacts``              | Job output files (stdout, stderr, results)   |
-+----------------------------+----------------------------------------------+
-| ``config_registry``        | RunTemplate configuration field values       |
-+----------------------------+----------------------------------------------+
-| ``company_env``            | Company-level environment variables          |
-+----------------------------+----------------------------------------------+
-| ``credential_prototype``   | Credential type definitions (JSON-based)     |
-+----------------------------+----------------------------------------------+
-| ``credential_type``        | Company-level credential instances           |
-+----------------------------+----------------------------------------------+
-| ``logger``                 | Job execution log entries                    |
-+----------------------------+----------------------------------------------+
-| ``token``                  | API authentication tokens                    |
-+----------------------------+----------------------------------------------+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Table
+     - Contents
+   * - ``user``
+     - Administrator and user accounts
+   * - ``company``
+     - Multi-tenant company records
+   * - ``applications``
+     - Registered application definitions
+   * - ``app_to_company``
+     - Which apps are assigned to which companies
+   * - ``run_template``
+     - Job execution templates
+   * - ``job``
+     - Individual job execution records
+   * - ``artifacts``
+     - Job output files (stdout, stderr, results)
+   * - ``config_registry``
+     - RunTemplate configuration field values
+   * - ``company_env``
+     - Company-level environment variables
+   * - ``credential_prototype``
+     - Credential type definitions (JSON-based)
+   * - ``credential_type``
+     - Company-level credential instances
+   * - ``logger``
+     - Job execution log entries
+   * - ``token``
+     - API authentication tokens
 
 Cleaning Up Old Data
 ---------------------

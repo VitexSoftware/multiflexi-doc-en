@@ -32,23 +32,26 @@ Prototypes are shipped as Debian packages (e.g. ``multiflexi-abraflexi``, ``mult
 
 **Standard credential prototype packages:**
 
-+----------------------------------+------------------------------------------+
-| Package                          | Description                              |
-+==================================+==========================================+
-| ``multiflexi-abraflexi``         | AbraFlexi ERP connection                 |
-+----------------------------------+------------------------------------------+
-| ``multiflexi-csas``              | Česká Spořitelna / ČSAS / Erste API      |
-+----------------------------------+------------------------------------------+
-| ``multiflexi-raiffeisenbank``    | Raiffeisenbank Premium API               |
-+----------------------------------+------------------------------------------+
-| ``multiflexi-mail``              | SMTP / e-mail (Symfony Mailer)           |
-+----------------------------------+------------------------------------------+
-| ``multiflexi-database-connection``| PDO database connection                 |
-+----------------------------------+------------------------------------------+
-| ``multiflexi-vaultwarden``       | VaultWarden / Bitwarden secrets          |
-+----------------------------------+------------------------------------------+
-| ``multiflexi-mtr``               | MTR network diagnostics                  |
-+----------------------------------+------------------------------------------+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Package
+     - Description
+   * - ``multiflexi-abraflexi``
+     - AbraFlexi ERP connection
+   * - ``multiflexi-csas``
+     - Česká Spořitelna / ČSAS / Erste API
+   * - ``multiflexi-raiffeisenbank``
+     - Raiffeisenbank Premium API
+   * - ``multiflexi-mail``
+     - SMTP / e-mail (Symfony Mailer)
+   * - ``multiflexi-database-connection``
+     - PDO database connection
+   * - ``multiflexi-vaultwarden``
+     - VaultWarden / Bitwarden secrets
+   * - ``multiflexi-mtr``
+     - MTR network diagnostics
 
 **Installing a prototype package:**
 

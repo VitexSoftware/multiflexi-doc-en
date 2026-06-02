@@ -79,6 +79,7 @@ You can find MultiFlexi applications in several ways:
 .. tip::
 
     To install all available applications at once, ask your system administrator to install the `multiflexi-all` meta package.
+
 Special Variables for Monitoring
 ---------------------------------
 
@@ -111,7 +112,7 @@ If you're interested in developing your own MultiFlexi applications, you'll find
 - Detailed examples and templates
 - Code samples in multiple languages
 
-See the :doc:`development` section for complete technical documentation.
+See the :doc:`development/architecture` section for complete technical documentation.
 
 .. note::
 

@@ -553,8 +553,7 @@ See Also
 - :doc:`data-model` - Job entity relationships
 - :doc:`execution-architecture` - Scheduler and executor daemons
 - :doc:`../howto/debugging-failed-jobs` - Troubleshooting guide
-- :doc:`../reference/cli`
- - CLI job management
+- :doc:`../reference/cli` — CLI job management
 
 .. tip::
 

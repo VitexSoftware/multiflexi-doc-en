@@ -156,23 +156,42 @@ MultiFlexi provides comprehensive support for all GDPR data subject rights:
 Default Retention Policies
 ---------------------------
 
-+----------------------------+------------------+-------------+----------------------+
-| Data Type                  | Retention Period | Action      | Legal Basis          |
-+============================+==================+=============+======================+
-| User accounts (inactive)   | 3 years          | Anonymize   | GDPR Art. 5(1)(e)    |
-+----------------------------+------------------+-------------+----------------------+
-| Session data               | 30 days          | Hard delete | Data minimization   |
-+----------------------------+------------------+-------------+----------------------+
-| Audit logs                 | 7 years          | Archive     | Legal requirements   |
-+----------------------------+------------------+-------------+----------------------+
-| Job execution logs         | 1 year           | Soft delete | Business operations  |
-+----------------------------+------------------+-------------+----------------------+
-| Application logs           | 1 year           | Hard delete | Troubleshooting      |
-+----------------------------+------------------+-------------+----------------------+
-| Company data               | 5 years          | Anonymize   | Business relationships|
-+----------------------------+------------------+-------------+----------------------+
-| Login attempts             | 90 days          | Hard delete | Security monitoring  |
-+----------------------------+------------------+-------------+----------------------+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 18 14 28
+
+   * - Data Type
+     - Retention Period
+     - Action
+     - Legal Basis
+   * - User accounts (inactive)
+     - 3 years
+     - Anonymize
+     - GDPR Art. 5(1)(e)
+   * - Session data
+     - 30 days
+     - Hard delete
+     - Data minimization
+   * - Audit logs
+     - 7 years
+     - Archive
+     - Legal requirements
+   * - Job execution logs
+     - 1 year
+     - Soft delete
+     - Business operations
+   * - Application logs
+     - 1 year
+     - Hard delete
+     - Troubleshooting
+   * - Company data
+     - 5 years
+     - Anonymize
+     - Business relationships
+   * - Login attempts
+     - 90 days
+     - Hard delete
+     - Security monitoring
 
 Web Interface Administration
 -----------------------------

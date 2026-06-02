@@ -69,7 +69,7 @@ The MultiFlexi CLI provides the following main commands:
 - **completion**         - Dump the shell completion script
 
 Detailed Command Reference
--------------------------
+--------------------------
 
 .. contents::
    :local:
@@ -89,7 +89,7 @@ Options:
   --topics       Topics
   --executable   Executable
   --ociimage     OCI Image
-  --requirements Requirements
+  --requirements  Requirements
   --homepage     Homepage URL
   --file         Path to JSON file for import/export/remove
   --appversion   Application Version
@@ -255,7 +255,7 @@ Manage jobs (list, get, create, update, delete, status).
 
 Options:
   --id             Job ID
-  --runtemplate_id RunTemplate ID
+  --runtemplate_id  RunTemplate ID
   --scheduled      Scheduled datetime
   --executor       Executor
   --schedule_type  Schedule type
@@ -264,11 +264,6 @@ Options:
   --offset         Offset for pagination
   --order          Sort order: A (ascending) or D (descending)
   --status         Filter by job state: ``failed``, ``success``, ``running``, ``pending``
-
-                 - ``failed``  – completed with non-zero exit code
-                 - ``success`` – completed successfully (``exitcode = 0``)
-                 - ``running`` – started but not yet finished
-                 - ``pending`` – scheduled but not yet started
 
   --fields         Comma-separated list of fields to display
   -f, --format     Output format: text or json (default: text)
@@ -316,7 +311,7 @@ Common options:
 
 Schedule-specific options:
   --env          One-time environment override key=value — passed to the job but NOT saved to run-template (repeatable)
-  --schedule_time Schedule time (Y-m-d H:i:s or "now", default: now)
+  --schedule_time  Schedule time (Y-m-d H:i:s or "now", default: now)
   --executor     Executor to use for this job
 
 Credential assignment options:
