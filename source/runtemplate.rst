@@ -156,8 +156,9 @@ RunTemplates can also be managed via CLI tools:
    # Create new RunTemplate from JSON
    multiflexi-run-template --create template.json
    
-   # Execute RunTemplate manually
-   multiflexi-run-template --execute template_id
+   # Schedule a RunTemplate to run now and wait for the result
+   # (the executor daemon must be running to pick up the queued job)
+   multiflexi-run-template -r <RUNTEMPLATE_ID>
 
 Best Practices
 --------------
