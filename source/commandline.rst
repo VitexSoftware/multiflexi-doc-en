@@ -14,8 +14,17 @@ MultiFlexi provides several command line utilities to manage and interact with t
 2. **multiflexi-cli**
     - Command line interface for interacting with MultiFlexi. Includes system status command (``multiflexi-cli status``), telemetry testing (``multiflexi-cli telemetry:test``), and comprehensive entity management. For more details, see :doc:`reference/cli` and :doc:`credential-type`.
 
-3. **multiflexi-executor**
-    - Executes scheduled jobs and tasks.
+3. **multiflexi-executor** / **multiflexi-run-template**
+    - Executes scheduled jobs and tasks. As a daemon it polls the schedule queue and launches due jobs. With ``-j <JOB_ID>`` it runs an existing job inline.
+    - With ``-r <RUNTEMPLATE_ID>`` (also available as ``multiflexi-run-template``) it queues a new job for the given RunTemplate to run *now*, waits for the daemon to finish it, then reproduces the job's stdout, stderr and exit code. The daemon must be running for the queued job to be picked up.
+    - Usage:
+
+      .. code-block:: bash
+
+         # Schedule a RunTemplate to run now and wait for the result
+         multiflexi-run-template -r <RUNTEMPLATE_ID> [-o <output_file>] [-t <seconds>]
+
+    - ``-t, --timeout`` sets the maximum seconds to wait for the daemon to run the job (``0`` waits forever; default ``300``, or the ``RUNTEMPLATE_WAIT_TIMEOUT`` environment variable). On timeout the command exits ``124``.
 
 4. **multiflexi-job2env**
     - Export job configuration as environment variables file.
