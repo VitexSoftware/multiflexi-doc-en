@@ -133,6 +133,7 @@ Contents
    development/architecture
    development/project-structure
    development/application-development
+   development/credential-prototype
    development/testing
    development/contributing
 
