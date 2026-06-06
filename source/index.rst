@@ -66,6 +66,7 @@ Contents
    :maxdepth: 2
    :caption: Getting Started
 
+   what-is-multiflexi
    quickstart
    install
    firstrun
