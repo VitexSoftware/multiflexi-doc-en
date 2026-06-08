@@ -26,6 +26,8 @@ On the very first visit to the web interface, MultiFlexi shows an account creati
 
 4. Click **"Create Administrator"**
 
+This first account is automatically granted the ``super_admin`` role, giving it full access to every company and all administrative functions, including managing other users' roles (see :doc:`concepts/rbac`).
+
 .. warning::
 
    There is no default password. The first user to reach the setup page becomes the administrator. Secure your server immediately after installation.
