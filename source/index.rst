@@ -66,6 +66,7 @@ Contents
    :maxdepth: 2
    :caption: Getting Started
 
+   what-is-multiflexi
    quickstart
    install
    firstrun
@@ -133,6 +134,7 @@ Contents
    development/architecture
    development/project-structure
    development/application-development
+   development/credential-prototype
    development/testing
    development/contributing
 
