@@ -138,21 +138,37 @@ Modules
 **Core Entity Management:**
 
 - ``user`` - Manage MultiFlexi users
-- ``company`` - Manage companies and organizations  
+- ``user_company`` - Manage user-company assignments
+- ``user_role`` - Manage user RBAC roles
+- ``user_erasure`` - Manage GDPR user data erasure requests
+- ``company`` - Manage companies and organizations
 - ``company_info`` - Retrieve company information
+- ``companyapp`` - Manage applications assigned to companies
 - ``application`` - Manage applications and tools
 - ``job`` - Schedule and manage execution jobs
+- ``queue`` - Manage the job queue
 - ``runtemplate`` - Configure execution templates
-- ``topic`` - Manage categorization topics
+- ``crprototype`` - Manage run template prototypes
+
+**Events & Artifacts:**
+
+- ``eventsource`` - Manage event sources
+- ``eventrule`` - Manage event rules
+- ``artifact`` - List, fetch, and save job artifacts
 
 **Authentication & Security:**
 
 - ``credential`` - Manage authentication credentials
 - ``credential_type`` - Define credential types
+- ``token`` - Manage API tokens
+- ``encryption`` - Manage encryption settings
 
-**System Information:**
+**System Information & Maintenance:**
 
 - ``multiflexi_info`` - Gather system status and facts
+- ``multiflexi_status`` - Report MultiFlexi service status
+- ``telemetry`` - Test OpenTelemetry metrics export
+- ``prune`` - Prune old jobs and records
 
 Quick Start Guide
 ------------------
