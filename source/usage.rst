@@ -42,6 +42,25 @@ Upon login, the dashboard presents:
 - **Schedule Jobs**: Define when and how applications should run.
 - **View Logs**: Inspect detailed execution history for debugging.
 
+**Slide-in Panels**
+
+Several parts of the interface use Bootstrap *offcanvas* drawers that slide in
+from the side instead of taking the user to a new page:
+
+- **Navigation drawer**: On small screens the top menu collapses into a hamburger
+  button that opens the full navigation as a drawer sliding in from the left. On
+  large screens the menu stays inline as usual.
+- **Filters**: List pages (for example **Companies**) provide a *Filters* button
+  that opens a drawer with search fields. Apply the filters to narrow the list, or
+  use *Reset* to clear them.
+- **Details**: Detail pages (for example a single **Company**) offer a *Details*
+  button that opens a drawer with the full record at a glance, so you can inspect
+  it without leaving the current view.
+- **Help**: A floating ``?`` button in the lower-right corner opens a help drawer
+  with links to the documentation, the About page, and the project source.
+
+Click the close button, press *Esc*, or click outside the drawer to dismiss it.
+
 Command Line Interface (CLI)
 ----------------------------
 
