@@ -73,6 +73,14 @@ Logging & Telemetry
 - **ENABLE_GOOGLE_ANALYTICS**: Enable Google Analytics (default: ``false``).
 - **LIVE_OUTPUT_SOCKET**: WebSocket URI for live output (e.g., ``ws://localhost:8080``).
 
+Integrations
+~~~~~~~~~~~~
+
+- **NODERED_ENABLED**: Show the Node-RED link in the web interface (default: ``false``).
+- **NODERED_URL**: Base URL of the Node-RED editor (e.g., ``http://localhost:1880``). The navbar link appears only when both ``NODERED_ENABLED`` is true and ``NODERED_URL`` is set.
+
+- **ZABBIX_URL**: Base URL of the Zabbix web frontend (e.g., ``https://zabbix.example.com/zabbix``). When set, a Zabbix entry is added to the **Integrations** menu. This is separate from ``ZABBIX_SERVER`` (see *Logging & Telemetry*), which is the trapper/proxy host used for sending metrics and is not necessarily reachable as a web frontend.
+
 Application Configuration
 -------------------------
 
