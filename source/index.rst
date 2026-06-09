@@ -80,6 +80,7 @@ Contents
    concepts/data-model
    concepts/job-lifecycle
    concepts/credential-management
+   concepts/rbac
    concepts/execution-architecture
    project-components
 
@@ -89,6 +90,7 @@ Contents
 
    howto/adding-company
    howto/installing-applications
+   howto/managing-user-access
    howto/creating-runtemplates
    howto/scheduling-jobs
    howto/assigning-credentials
@@ -105,6 +107,7 @@ Contents
    integrations/pohoda
    integrations/ansible
    integrations/kubernetes
+   integrations/node-red
 
 .. toctree::
    :maxdepth: 2

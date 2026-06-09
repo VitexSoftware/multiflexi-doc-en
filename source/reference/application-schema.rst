@@ -121,6 +121,38 @@ supported for backward compatibility).
 See :doc:`/concepts/job-lifecycle` (Phase 6) for the full artifact collection
 flow.
 
+Declaring Business Events
+-------------------------
+
+From schema version ``3.4.0`` an application may declare the business events it
+emits or consumes via the optional ``events`` block. External orchestrators such
+as Node-RED use these declarations to suggest relationships between processes.
+The block is additive and layered on top of ``produces``, ``consumes`` and
+``artifacts``.
+
+.. code-block:: json
+
+    "events": {
+      "emits": {
+        "payment.received": {
+          "description": {"en": "A matched payment was detected"},
+          "evidence": "banka",
+          "operation": "create"
+        }
+      },
+      "consumes": {
+        "payment.received": {
+          "description": {"en": "Send the confirmation when a payment is received"},
+          "format": "json"
+        }
+      }
+    }
+
+``emits`` keys describe events the application raises (optionally with the
+``evidence`` and ``operation`` that trigger them); ``consumes`` keys describe
+events the application reacts to. See :doc:`/integrations/node-red` for how these
+drive visual orchestration.
+
 Special Variables for Monitoring
 ---------------------------------
 
