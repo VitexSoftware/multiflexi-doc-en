@@ -80,6 +80,7 @@ Integrations
 - **NODERED_URL**: Base URL of the Node-RED editor (e.g., ``http://localhost:1880``). The navbar link appears only when both ``NODERED_ENABLED`` is true and ``NODERED_URL`` is set.
 
 - **ZABBIX_URL**: Base URL of the Zabbix web frontend (e.g., ``https://zabbix.example.com/zabbix``). When set, a Zabbix entry is added to the **Integrations** menu. This is separate from ``ZABBIX_SERVER`` (see *Logging & Telemetry*), which is the trapper/proxy host used for sending metrics and is not necessarily reachable as a web frontend.
+- **OTEL_DASHBOARD_URL**: Base URL of the observability dashboard (e.g., ``https://grafana.example.com``). When set and ``OTEL_ENABLED`` is true, an OpenTelemetry entry is added to the **Integrations** menu. This is separate from ``OTEL_EXPORTER_OTLP_ENDPOINT`` (see *Logging & Telemetry*), which is the OTLP ingest endpoint and is not a browsable UI.
 
 Application Configuration
 -------------------------

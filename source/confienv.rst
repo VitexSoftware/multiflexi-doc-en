@@ -77,6 +77,11 @@ Integrations
   ``ZABBIX_SERVER`` (see *Logging & Telemetry*), which is the trapper/proxy host used for sending
   metrics and is not necessarily reachable as a web frontend.
 
+- **OTEL_DASHBOARD_URL**: Base URL of the observability dashboard (e.g.,
+  ``https://grafana.example.com``). When set and ``OTEL_ENABLED`` is true, an OpenTelemetry entry
+  is added to the **Integrations** menu. This is separate from ``OTEL_EXPORTER_OTLP_ENDPOINT``
+  (see *Logging & Telemetry*), which is the OTLP ingest endpoint and is not a browsable UI.
+
 Other
 -----
 - **APP_NAME**: Application name.
