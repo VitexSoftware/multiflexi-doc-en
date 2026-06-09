@@ -61,12 +61,20 @@ pygments_style = "default"
 pygments_dark_style = "github-dark"  # Use available github-dark instead of github-dark-default
 
 html_theme_options = {
-    "github_url": "https://github.com/VitexSoftware/MultiFlexi",
+    "github_url": "https://github.com/VitexSoftware/multiFlexi-doc-en",
     "dark_code": True,
     "nav_links": [
         {
-            "title": "GitHub",
-            "url": "https://github.com/VitexSoftware/MultiFlexi",
+            "title": "Demo",
+            "url": "https://demo.multiflexi.eu/",
+        },
+        {
+            "title": "Application & Credential Hub",
+            "url": "https://multiflexi.eu/",
+        },
+        {
+            "title": "VitexSoftware",
+            "url": "https://vitexsoftware.com/",
         },
     ],
 }
