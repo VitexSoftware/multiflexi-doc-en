@@ -41,6 +41,11 @@ Information**, and **RBAC Privileges & Access** — are grouped into a collapsib
 accordion, with *Recent Jobs* expanded by default. Click a section header to
 expand it; opening one collapses the others.
 
+The same accordion pattern is used to organise other long pages: the **My
+Profile** page groups Profile Information, Update Personal Information, Change
+Password, GDPR rights, and recent data changes; and the **Cookie Policy** page
+collapses its numbered policy sections so you can jump to the one you need.
+
 **Common Actions**
 
 - **Manage Companies**: Configure tenants (companies) that MultiFlexi will interact with.
