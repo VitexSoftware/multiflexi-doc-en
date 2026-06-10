@@ -35,6 +35,12 @@ Upon login, the dashboard presents:
 - **Recent Jobs**: Status of recently executed tasks.
 - **Upcoming Schedule**: Timeline of planned executions.
 
+A welcome banner, quick-action buttons, and summary statistics stay at the top.
+The detail sections below — **Recent Jobs**, **My Recent Activity Log**, **Account
+Information**, and **RBAC Privileges & Access** — are grouped into a collapsible
+accordion, with *Recent Jobs* expanded by default. Click a section header to
+expand it; opening one collapses the others.
+
 **Common Actions**
 
 - **Manage Companies**: Configure tenants (companies) that MultiFlexi will interact with.
