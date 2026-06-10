@@ -97,6 +97,22 @@ Required Fields
 * **executable** - Name of the command to execute
 * **environment** - Environment variable definitions
 
+Environment Field Properties
+----------------------------
+
+Each entry under ``environment`` describes a single configuration option:
+
+* **type** — Value type (``string``, ``integer``, ``float``, ``bool``,
+  ``email``, ``url``, ``file-path``, ``password``, ``text`` …)
+* **description** — Localized help text
+* **defval** — Default value
+* **required** — Whether the option must be set
+* **category** — Group the option belongs to. One of ``API``, ``Database``,
+  ``Behavior``, ``Security`` or ``Other``. MultiFlexi stores the category with
+  the field (``conffield.category``) on import and uses it to group the run
+  template configuration form into sections with a Scrollspy sidebar for quick
+  navigation. When omitted, the option is shown under *Other*.
+
 Defining Output Artifacts
 --------------------------
 
