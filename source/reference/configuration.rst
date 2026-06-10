@@ -78,6 +78,9 @@ Integrations
 
 - **NODERED_ENABLED**: Show the Node-RED link in the web interface (default: ``false``).
 - **NODERED_URL**: Base URL of the Node-RED editor (e.g., ``http://localhost:1880``). The navbar link appears only when both ``NODERED_ENABLED`` is true and ``NODERED_URL`` is set.
+- **NODERED_WEBHOOK_URL**: ``multiflexi-eventor`` Node-RED bridge endpoint. When set, the event processor forwards webhook changes and finished jobs to this Node-RED HTTP-in URL. Leave empty to disable the bridge. Configurable at install time via ``dpkg-reconfigure multiflexi-eventor``.
+- **NODERED_TOKEN**: Optional shared secret sent as the ``X-MultiFlexi-Token`` header with each Node-RED bridge request.
+- **NODERED_FORWARD_CHANGES**: Forward incoming webhook changes in addition to finished jobs over the Node-RED bridge (default: ``true``).
 
 - **ZABBIX_URL**: Base URL of the Zabbix web frontend (e.g., ``https://zabbix.example.com/zabbix``). When set, a Zabbix entry is added to the **Integrations** menu. This is separate from ``ZABBIX_SERVER`` (see *Logging & Telemetry*), which is the trapper/proxy host used for sending metrics and is not necessarily reachable as a web frontend.
 - **OTEL_DASHBOARD_URL**: Base URL of the observability dashboard (e.g., ``https://grafana.example.com``). When set and ``OTEL_ENABLED`` is true, an OpenTelemetry entry is added to the **Integrations** menu. This is separate from ``OTEL_EXPORTER_OTLP_ENDPOINT`` (see *Logging & Telemetry*), which is the OTLP ingest endpoint and is not a browsable UI.

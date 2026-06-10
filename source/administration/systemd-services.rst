@@ -127,6 +127,28 @@ Monitors configured event sources and enqueues jobs in response to external trig
    If you do not use event-driven job triggering, ``multiflexi-eventor`` can be disabled:
    ``sudo systemctl disable --now multiflexi-eventor``
 
+Node-RED bridge
+^^^^^^^^^^^^^^^
+
+``multiflexi-eventor`` can forward webhook change events and finished jobs to a
+Node-RED HTTP-in endpoint. The bridge is optional and disabled by default.
+
+You are prompted for the bridge settings when the package is installed (debconf).
+To reconfigure them later, run:
+
+.. code-block:: bash
+
+   sudo dpkg-reconfigure multiflexi-eventor
+
+The answers are written to ``/etc/multiflexi/multiflexi.env``:
+
+- **NODERED_WEBHOOK_URL**: Node-RED HTTP-in endpoint URL. Leave empty to disable the bridge.
+- **NODERED_TOKEN**: Optional shared secret sent as the ``X-MultiFlexi-Token`` header.
+- **NODERED_FORWARD_CHANGES**: Forward incoming webhook changes in addition to finished jobs (default: ``true``).
+
+You can also set these variables directly in ``/etc/multiflexi/multiflexi.env``
+and restart the service.
+
 Configuration File
 -------------------
 
