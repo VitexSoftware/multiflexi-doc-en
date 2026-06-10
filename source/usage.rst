@@ -43,8 +43,9 @@ expand it; opening one collapses the others.
 
 The same accordion pattern is used to organise other long pages: the **My
 Profile** page groups Profile Information, Update Personal Information, Change
-Password, GDPR rights, and recent data changes; and the **Cookie Policy** page
-collapses its numbered policy sections so you can jump to the one you need.
+Password, GDPR rights, and recent data changes; and the **Cookie Policy** and
+**Privacy Policy** pages collapse their numbered policy sections so you can jump
+to the one you need.
 
 **Common Actions**
 
