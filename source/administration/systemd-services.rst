@@ -149,6 +149,25 @@ The answers are written to ``/etc/multiflexi/multiflexi.env``:
 You can also set these variables directly in ``/etc/multiflexi/multiflexi.env``
 and restart the service.
 
+Node-RED catalog feed
+^^^^^^^^^^^^^^^^^^^^^^
+
+Beyond forwarding events, ``multiflexi-eventor`` can publish the MultiFlexi
+*configuration catalog* — every company, every enabled run-template and every
+credential — to the ``node-red-contrib-multiflexi`` **catalog** node. The
+catalog node then builds one Node-RED palette node per entity, each carrying the
+same icon it has in MultiFlexi.
+
+Set these in ``/etc/multiflexi/multiflexi.env``:
+
+- **NODERED_CATALOG_URL**: HTTP-in URL of the catalog node (e.g.
+  ``http://node-red:1880/multiflexi-catalog``). Use a path distinct from
+  ``NODERED_WEBHOOK_URL``. Leave empty to disable the feed.
+- **NODERED_CATALOG_INTERVAL**: How often (seconds) to republish the catalog. The
+  payload is content-hashed, so an unchanged catalog is not resent (default: ``300``).
+
+The ``NODERED_TOKEN`` shared secret, when set, is also sent with the catalog push.
+
 Configuration File
 -------------------
 
