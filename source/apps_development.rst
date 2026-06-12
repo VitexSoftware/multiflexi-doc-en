@@ -762,7 +762,7 @@ When creating MultiFlexi applications:
 
 1. **Always validate JSON** - Use ``multiflexi-cli application validate-json --file``
 2. **Follow the structure** - Use the standard directory layout
-3. **Check existing applications** - Look at examples in ~/Projects for patterns
+3. **Check existing applications** - Look at examples at https://github.com/VitexSoftware for patterns
 4. **Generate unique UUIDs** - Never reuse UUIDs from other applications
 5. **Include both languages** - Provide "en" and "cs" translations for all user-facing text
 6. **Mark sensitive data** - Use ``"type": "password"`` for credentials
@@ -817,5 +817,5 @@ Resources
 
 * Application Schema: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json
 * Report Schema: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/schema/report.json
-* Example applications: ~/Projects/VitexSoftware/, ~/Projects/SpojeNet/
+* Example applications: https://github.com/VitexSoftware, https://github.com/Spoje-NET
 * MultiFlexi CLI: Required version 2.2.0 or newer

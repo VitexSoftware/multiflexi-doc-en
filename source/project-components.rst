@@ -98,7 +98,7 @@ Core Components
 php-vitexsoftware-multiflexi-core
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Location**: ``~/Projects/Multi/php-vitexsoftware-multiflexi-core``
+**Location**: https://github.com/VitexSoftware/php-vitexsoftware-multiflexi-core
 
 **Purpose**: Core PHP library providing the fundamental business logic, data models, and shared utilities for the entire MultiFlexi ecosystem.
 
@@ -125,7 +125,8 @@ php-vitexsoftware-multiflexi-core
 .. code-block:: bash
 
     # Development setup
-    cd ~/Projects/Multi/php-vitexsoftware-multiflexi-core
+    git clone https://github.com/VitexSoftware/php-vitexsoftware-multiflexi-core
+    cd php-vitexsoftware-multiflexi-core
     composer install
     
     # Run tests
@@ -151,7 +152,7 @@ multiflexi-database
    :align: right
    :alt: multiflexi-sqlite
 
-**Location**: ``~/Projects/Multi/multiflexi-database``
+**Location**: https://github.com/VitexSoftware/multiflexi-database
 
 **Purpose**: Database schema definitions, migration scripts, and database maintenance tools for MultiFlexi platform.
 
@@ -199,7 +200,7 @@ API and Server Components
 multiflexi-api
 ~~~~~~~~~~~~~~
 
-**Location**: ``~/Projects/Multi/multiflexi-api``
+**Location**: https://github.com/VitexSoftware/multiflexi-api
 
 **Purpose**: API class generator and server components that generate API server classes and handle routing.
 
@@ -263,7 +264,7 @@ multiflexi-cli
    :align: right
    :alt: multiflexi-cli
 
-**Location**: ``~/Projects/Multi/multiflexi-cli``
+**Location**: https://github.com/VitexSoftware/multiflexi-cli
 
 **Purpose**: Command-line interface for managing MultiFlexi resources and operations.
 
@@ -298,7 +299,7 @@ multiflexi-executor
    :align: right
    :alt: multiflexi-executor
 
-**Location**: ``~/Projects/Multi/multiflexi-executor``
+**Location**: https://github.com/VitexSoftware/multiflexi-executor
 
 **Purpose**: Dedicated service for executing jobs and tasks in isolated environments.
 
@@ -330,7 +331,7 @@ Web Interface Components
 MultiFlexi (main web UI)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Location**: ``~/Projects/Multi/MultiFlexi``
+**Location**: https://github.com/VitexSoftware/MultiFlexi
 
 **Purpose**: Primary web interface — dashboard, company management, application assignment, RunTemplate and job management, credentials UI.
 
@@ -359,7 +360,7 @@ multiflexi-web
 multiflexi-ui
 ~~~~~~~~~~~~~
 
-**Location**: ``~/Projects/Multi/multiflexi-ui``
+**Location**: https://github.com/VitexSoftware/multiflexi-ui
 
 **Purpose**: React/TypeScript/Vite UI components for a modern frontend alternative.
 
@@ -389,7 +390,7 @@ multiflexi-probe
    :align: right
    :alt: multiflexi-probe
 
-**Location**: ``~/Projects/Multi/multiflexi-probe``
+**Location**: https://github.com/VitexSoftware/multiflexi-probe
 
 **Purpose**: Testing and debugging tool for the MultiFlexi task launcher. Executes a simple health-check to verify the execution pipeline works end-to-end.
 
@@ -402,7 +403,7 @@ multiflexi-probe
 multiflexi-zabbix
 ~~~~~~~~~~~~~~~~~
 
-**Location**: ``~/Projects/Multi/multiflexi-zabbix``
+**Location**: https://github.com/VitexSoftware/multiflexi-zabbix
 
 **Purpose**: Zabbix monitoring integration, including Low-Level Discovery (LLD) scripts and Zabbix templates.
 
@@ -417,7 +418,7 @@ See :doc:`integrations/zabbix` for configuration details.
 multiflexi-zabbix-selenium
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Location**: ``~/Projects/Multi/multiflexi-zabbix-selenium``
+**Location**: https://github.com/VitexSoftware/multiflexi-zabbix-selenium
 
 **Purpose**: Production-ready integration of Mocha/Selenium web test results into Zabbix monitoring.
 
@@ -491,7 +492,7 @@ MCP Integration
 multiflexi-mcp-server
 ~~~~~~~~~~~~~~~~~~~~~
 
-**Location**: ``~/Projects/Multi/multiflexi-mcp-server``
+**Location**: https://github.com/VitexSoftware/multiflexi-mcp-server
 
 **Purpose**: Model Context Protocol (MCP) server that exposes the MultiFlexi REST API as MCP tools, enabling AI agents (Claude, etc.) to manage MultiFlexi directly.
 
@@ -521,7 +522,7 @@ multiflexi-event-processor
    :align: right
    :alt: multiflexi-eventor
 
-**Location**: ``~/Projects/Multi/multiflexi-event-processor``
+**Location**: https://github.com/VitexSoftware/multiflexi-event-processor
 
 **Purpose**: Event-driven job triggering daemon (``multiflexi-eventor``). Complements the time-based scheduler by firing jobs in response to external events.
 
@@ -538,13 +539,13 @@ Example Applications
 
 These repositories demonstrate how to build MultiFlexi-compatible applications:
 
-**MultiFlexi-Golang-App-Example** — ``~/Projects/Multi/MultiFlexi-Golang-App-Example``
+**MultiFlexi-Golang-App-Example** — https://github.com/VitexSoftware/MultiFlexi-Golang-App-Example
   Demonstrates the Go pattern: read environment variables, perform work, output structured JSON.
 
-**MultiFlexi-Java-App-Example** — ``~/Projects/Multi/MultiFlexi-Java-App-Example``
+**MultiFlexi-Java-App-Example** — https://github.com/VitexSoftware/MultiFlexi-Java-App-Example
   Comprehensive Java example with environment variable handling and JSON result output.
 
-**multiflexi-node-app** — ``~/Projects/Multi/multiflexi-node-app``
+**multiflexi-node-app** — https://github.com/VitexSoftware/multiflexi-node-app
   Node.js / Express template for building MultiFlexi applications.
 
 Terminal User Interface
@@ -559,7 +560,7 @@ multiflexi-tui
    :align: right
    :alt: multiflexi-tui
 
-**Location**: ``~/Projects/Multi/multiflexi-tui``
+**Location**: https://github.com/VitexSoftware/multiflexi-tui
 
 **Purpose**: A modern terminal UI frontend for ``multiflexi-cli``, built with the `Charmbracelet Bubbletea <https://github.com/charmbracelet/bubbletea>`_ framework (Go).
 
@@ -594,7 +595,7 @@ Deployment and Infrastructure
 multiflexi-ansible-collection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Location**: ``~/Projects/Multi/multiflexi-ansible-collection``
+**Location**: https://github.com/VitexSoftware/multiflexi-ansible-collection
 
 **Purpose**: Ansible collection for automated deployment and configuration management of MultiFlexi components.
 
@@ -624,11 +625,11 @@ Source Code vs Vendor Dependencies
 
 .. code-block:: text
 
-    ~/Projects/Multi/php-vitexsoftware-multiflexi-core/src/MultiFlexi/
-    ~/Projects/Multi/multiflexi-database/
-    ~/Projects/Multi/multiflexi-server/
-    ~/Projects/Multi/multiflexi-cli/
-    ~/Projects/Multi/multiflexi-web/src/MultiFlexi/
+    https://github.com/VitexSoftware/php-vitexsoftware-multiflexi-core  (src/MultiFlexi/)
+    https://github.com/VitexSoftware/multiflexi-database
+    https://github.com/VitexSoftware/multiflexi-server
+    https://github.com/VitexSoftware/multiflexi-cli
+    https://github.com/VitexSoftware/multiflexi-web  (src/MultiFlexi/)
 
 **Vendor Dependencies** (Read-only, prefer modifying source):
 
