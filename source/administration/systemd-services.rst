@@ -168,6 +168,14 @@ Set these in ``/etc/multiflexi/multiflexi.env``:
 
 The ``NODERED_TOKEN`` shared secret, when set, is also sent with the catalog push.
 
+Icons are **not** embedded in the push. The catalog node fetches each entity's
+icon from the MultiFlexi web image endpoints — ``appimage.php`` (apps),
+``companylogo.php`` and ``credentialimage.php`` — which are public (no login).
+On the catalog node, set **App URL** (``MULTIFLEXI_APP_URL``, default
+``/multiflexi/``) to where the MultiFlexi web UI is reachable from Node-RED.
+The ``node-red-contrib-multiflexi`` package also ships a systemd drop-in that
+adds ``/usr/share/node-red`` to the Node-RED service ``NODE_PATH``.
+
 Configuration File
 -------------------
 
