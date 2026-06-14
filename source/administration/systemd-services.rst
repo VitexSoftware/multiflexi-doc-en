@@ -176,6 +176,35 @@ On the catalog node, set **App URL** (``MULTIFLEXI_APP_URL``, default
 The ``node-red-contrib-multiflexi`` package also ships a systemd drop-in that
 adds ``/usr/share/node-red`` to the Node-RED service ``NODE_PATH``.
 
+Exposing the editor over HTTPS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Do not link users to the unencrypted ``:1880`` port. Instead, reverse-proxy the
+Node-RED editor under a path on the existing HTTPS vhost (for example
+``https://multiflexi.example.com/node-red/``). Tell Node-RED its base path so its
+assets and admin API resolve behind the proxy, in ``settings.js``:
+
+.. code-block:: javascript
+
+   httpAdminRoot: '/node-red',
+
+Then add an Apache reverse proxy (enable ``proxy``, ``proxy_http``,
+``proxy_wstunnel`` and ``rewrite``):
+
+.. code-block:: apache
+
+   RewriteEngine On
+   RewriteCond %{HTTP:Upgrade} =websocket [NC]
+   RewriteRule ^/node-red/comms(.*)$ ws://127.0.0.1:1880/node-red/comms$1 [P,L]
+   ProxyPass        /node-red/ http://127.0.0.1:1880/node-red/
+   ProxyPassReverse /node-red/ http://127.0.0.1:1880/node-red/
+
+The catalog HTTP-in node stays on the local port (its ``httpNodeRoot`` is left at
+``/``), so ``NODERED_CATALOG_URL`` keeps pointing at ``http://127.0.0.1:1880/...``.
+The ``vitexus.multiflexi`` Ansible ``multiflexi_server`` role configures all of
+this automatically via ``multiflexi_server_nodered_http_root`` (default
+``/node-red``).
+
 Configuration File
 -------------------
 
