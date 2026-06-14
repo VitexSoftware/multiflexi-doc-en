@@ -205,6 +205,21 @@ The ``vitexus.multiflexi`` Ansible ``multiflexi_server`` role configures all of
 this automatically via ``multiflexi_server_nodered_http_root`` (default
 ``/node-red``).
 
+Protect the editor with a login (``adminAuth`` in ``settings.js``). Generate a
+bcrypt password hash with ``node-red-admin hash-pw`` and add a user:
+
+.. code-block:: javascript
+
+   adminAuth: {
+       type: "credentials",
+       users: [{ username: "demo", password: "$2b$12$...", permissions: "*" }]
+   },
+
+The Ansible role creates this demo user automatically
+(``multiflexi_server_nodered_admin_user`` / ``_admin_password_hash`` /
+``_admin_permissions``; default ``demo`` with full access — use ``read`` for a
+read-only demo).
+
 Configuration File
 -------------------
 
