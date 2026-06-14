@@ -530,6 +530,103 @@ Best Practices for Reports
 6. **Document artifacts** - If your app produces files/URLs, list them in artifacts
 7. **Be consistent** - Use the same metric names across similar applications
 
+Declaring produces and consumes
+================================
+
+MultiFlexi supports **job chaining**: the output of one job (the producer)
+becomes the input of another job (the consumer). You declare this contract in
+the ``produces`` and ``consumes`` blocks of the application JSON definition.
+
+See :doc:`concepts/job-chaining` for a full explanation of how chaining works
+at runtime, the selector syntax, and binding configuration.
+
+Producer App — ``produces`` block
+----------------------------------
+
+Add a ``produces`` block at the top level of your app JSON. Each key is a
+logical name for one output that downstream consumers can reference.
+
+.. code-block:: json
+
+   "produces": {
+     "invoices": {
+       "format": "json",
+       "description": { "en": "Issued invoices", "cs": "Vystavené faktury" },
+       "patterns": ["invoices-.*\\.json$"],
+       "fields": {
+         "invoice_number": { "type": "string", "description": { "en": "Invoice number" } },
+         "total":          { "type": "float",  "description": { "en": "Total amount" } },
+         "customer_id":    { "type": "integer", "path": "$.customer.id" }
+       }
+     }
+   }
+
+Fields:
+
+- **format** — ``json``, ``text``, ``file``, ``url``, or ``custom``. Use
+  ``json`` when the output is a structured JSON file that downstream consumers
+  will extract individual values from.
+- **patterns** — list of filename regex patterns. MultiFlexi matches these
+  against files in the temp directory after the job finishes to locate the
+  produced artifact (the same mechanism as ``artifacts``).
+- **fields** — optional item-level metadata. Provide one entry per scalar
+  value a consumer may want to extract. Use the optional **path** key
+  (JSONPath notation, e.g. ``$.customer.id``) for values that are nested
+  inside the JSON structure.
+
+Consumer App — ``consumes`` block
+----------------------------------
+
+Add a ``consumes`` block that references the ``environment`` keys your
+executable already uses. Keep ``environment`` as the single source of truth
+for the command line; ``consumes`` only annotates which keys accept chained
+input.
+
+.. code-block:: json
+
+   "environment": {
+     "INPUT_FILE": {
+       "type": "file-path",
+       "category": "Behavior",
+       "description": { "en": "Path to the invoice JSON file to process" },
+       "required": true
+     },
+     "MIN_AMOUNT": {
+       "type": "float",
+       "description": { "en": "Minimum invoice amount to process" }
+     }
+   },
+   "cmdparamsTemplate": "--input {INPUT_FILE} --min {MIN_AMOUNT}",
+
+   "consumes": {
+     "source": {
+       "format": "json",
+       "description": { "en": "Invoice JSON produced by upstream job" },
+       "required": true,
+       "target": "INPUT_FILE",
+       "fields": {
+         "amount_threshold": {
+           "target": "MIN_AMOUNT",
+           "format": "float"
+         }
+       }
+     }
+   }
+
+Fields:
+
+- **target** — the ``environment`` key that receives the produced artifact's
+  file path (whole-file delivery mode). The runtime writes the artifact to a
+  temporary file and sets this env key to that path.
+- **fields[*].target** — the ``environment`` key that receives a single
+  scalar extracted from the producer's JSON output (item-level mapping mode).
+- **required** — whether the consumer expects this input to be present. The
+  system warns when scheduling B without a binding if ``required`` is ``true``.
+
+When MultiFlexi imports your app, it persists both ``produces`` and ``consumes``
+to the database so the binding editor (Node-RED ``multiflexi-map`` node and
+``multiflexi-cli event-rule:*`` commands) can display the available fields.
+
 Validating Application JSON
 ===========================
 

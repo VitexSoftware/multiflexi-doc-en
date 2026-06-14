@@ -79,6 +79,8 @@ Contents
    concepts/system-overview
    concepts/data-model
    concepts/job-lifecycle
+   concepts/tasks
+   concepts/job-chaining
    concepts/credential-management
    concepts/execution-architecture
    project-components

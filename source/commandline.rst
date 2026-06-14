@@ -25,6 +25,22 @@ MultiFlexi provides several command line utilities to manage and interact with t
          multiflexi-run-template -r <RUNTEMPLATE_ID> [-o <output_file>] [-t <seconds>]
 
     - ``-t, --timeout`` sets the maximum seconds to wait for the daemon to run the job (``0`` waits forever; default ``300``, or the ``RUNTEMPLATE_WAIT_TIMEOUT`` environment variable). On timeout the command exits ``124``.
+    - ``-E KEY=VALUE`` injects a one-time environment override into the job's environment. Repeat the flag to inject multiple values. The override is applied on top of the RunTemplate's configured environment (overrides win). Values are never logged.
+    - ``--env-json='{"KEY":"VALUE"}'`` accepts a JSON object whose keys and values are treated as env overrides, equivalent to repeating ``-E`` for each pair. If both ``-E`` and ``--env-json`` are given, ``-E`` entries take precedence. Invalid JSON causes a non-zero exit.
+
+      .. code-block:: bash
+
+         # Run RunTemplate 1 with a one-time environment override
+         multiflexi-executor -r 1 -E IMPORT_SCOPE=2025-11-01
+
+         # Pass multiple overrides
+         multiflexi-executor -r 1 -E FOO=bar -E BAZ=qux
+
+         # Pass overrides as a JSON object
+         multiflexi-executor -r 1 '--env-json={"IMPORT_SCOPE":"2025-11-01"}'
+
+      These flags are used by the job-chaining system to inject producer output into
+      consumer jobs. See :doc:`concepts/job-chaining` for details.
 
 4. **multiflexi-job2env**
     - Export job configuration as environment variables file.
