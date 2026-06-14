@@ -82,6 +82,7 @@ Contents
    concepts/tasks
    concepts/job-chaining
    concepts/credential-management
+   concepts/topics
    concepts/execution-architecture
    project-components
 
