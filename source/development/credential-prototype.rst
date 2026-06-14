@@ -318,6 +318,96 @@ In addition to JSON definitions, credential prototypes can be implemented as PHP
 
 Even when using a PHP class, it is recommended to also ship a ``.credprototype.json`` file so the ``credential-prototype:sync`` CLI command can register the prototype's ``homepage``, ``tags``, and localized strings.
 
+Adding a Live Availability Check
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Implement ``\MultiFlexi\checkableCredentialInterface`` on your prototype class to provide
+a runtime availability check. The base class ``\MultiFlexi\CredentialProtoType`` already
+declares a default no-op implementation that returns ``CredentialState::Unknown`` (which
+never blocks a job), so all existing prototypes remain backward compatible.
+
+.. code-block:: php
+
+    namespace MultiFlexi\CredentialProtoType;
+
+    class MyService extends \MultiFlexi\CredentialProtoType
+        implements \MultiFlexi\credentialTypeInterface,
+                   \MultiFlexi\checkableCredentialInterface
+    {
+        #[\Override]
+        public function checkAvailability(): \MultiFlexi\CredentialCheckResult
+        {
+            $url   = (string) ($this->configFieldsInternal->getFieldByCode('MY_URL')?->getValue()   ?? '');
+            $token = (string) ($this->configFieldsInternal->getFieldByCode('MY_TOKEN')?->getValue() ?? '');
+
+            // 1. Offline validation — missing required fields
+            if ($url === '' || $token === '') {
+                return new \MultiFlexi\CredentialCheckResult(
+                    \MultiFlexi\CredentialState::Misconfigured,
+                    _('MY_URL or MY_TOKEN is not set'),
+                    time(),
+                );
+            }
+
+            // 2. Live probe
+            $ch = curl_init($url.'/health');
+            curl_setopt_array($ch, [\CURLOPT_NOBODY => true, \CURLOPT_TIMEOUT => 5,
+                                     \CURLOPT_HTTPHEADER => ['Authorization: Bearer '.$token]]);
+            curl_exec($ch);
+            $errno = curl_errno($ch);
+            $http  = (int) curl_getinfo($ch, \CURLINFO_HTTP_CODE);
+
+            if ($errno !== 0) {
+                return new \MultiFlexi\CredentialCheckResult(
+                    \MultiFlexi\CredentialState::Unavailable,
+                    sprintf(_('My Service unreachable: %s'), curl_strerror($errno)),
+                    time(), 60,
+                );
+            }
+
+            if ($http === 401 || $http === 403) {
+                return new \MultiFlexi\CredentialCheckResult(
+                    \MultiFlexi\CredentialState::Misconfigured,
+                    sprintf(_('Authentication failed (HTTP %d)'), $http),
+                    time(),
+                );
+            }
+
+            return new \MultiFlexi\CredentialCheckResult(
+                \MultiFlexi\CredentialState::Available, '', time(), 300
+            );
+        }
+    }
+
+**State guide:**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 20 60
+
+   * - State
+     - Retry?
+     - When to return
+   * - ``Available``
+     - —
+     - Service reachable and credential valid
+   * - ``Degraded``
+     - Yes (deferred)
+     - Reachable but impaired (busy, overloaded)
+   * - ``Unavailable``
+     - Yes (deferred)
+     - Transient: timeout, connection refused, 5xx
+   * - ``Misconfigured``
+     - No
+     - Permanent: bad token, unreadable cert, missing field
+   * - ``Unknown``
+     - —
+     - Default (no check implemented) — never blocks
+
+The ``ttl`` parameter (seconds) tells the executor how long to cache the result.
+Use shorter TTLs for transient failures (60 s) and longer for successes (300 s).
+Rate-limited APIs should return a long TTL even on success to avoid burning quota.
+
 Packaging Checklist
 -------------------
 

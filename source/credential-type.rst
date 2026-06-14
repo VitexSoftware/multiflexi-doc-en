@@ -371,7 +371,118 @@ The credential management system implements several security features:
   - Field type enforcement and sanitization
   - Required field validation before credential usage
 
+.. _credential-availability-checks:
+
+Credential Availability Checks
+================================
+
+MultiFlexi performs a live availability check on each credential assigned to a RunTemplate
+before starting a job. This is **Phase 2** of the two-phase resolution model (Phase 1 is
+the static binding — does a credential of the right type exist and is it assigned?).
+
+How It Works
+-------------
+
+Each credential prototype can implement ``checkAvailability(): CredentialCheckResult``.
+The base class returns ``Unknown`` (do not block) so all existing credential types are
+backward compatible.
+
+When the executor picks up a job, it calls ``checkAvailability()`` on every assigned
+credential prototype. If any check returns a non-satisfied state, the job is not run:
+
+- ``Available`` — job proceeds.
+- ``Unknown`` — no check implemented; job proceeds (backward compatible).
+- ``Degraded`` — service reachable but impaired (e.g. mServer busy); job is deferred
+  and re-queued after the check's TTL.
+- ``Unavailable`` — transient failure (timeout, connection refused); job is deferred
+  and re-queued after the check's TTL.
+- ``Misconfigured`` — permanent fault (bad token, unreadable certificate, missing
+  field); job is blocked without retry. User action required.
+
+All blocked checks are reported to the SQL log, Zabbix (when ``ZABBIX_SERVER`` is
+configured), and OpenTelemetry (when ``OTEL_ENABLED`` is set).
+
+Built-in Checks
+---------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Credential Type
+     - What is checked
+   * - **mServer**
+     - Live connection via ``mServer\Client`` (same library apps use). HTTP 401 →
+       Misconfigured; timeout/refused → Unavailable; server busy → Degraded.
+   * - **Fio Bank**
+     - Token presence + host reachability of ``fioapi.fio.cz`` (no token-scoped call —
+       avoids the 30 s rate limit and cursor side effect).
+   * - **Raiffeisen Bank**
+     - Certificate readability + ``openssl_pkcs12_read`` + rate-limit budget file.
+   * - **AbraFlexi**
+     - Authenticated HEAD to server root; maps HTTP 401/403 → Misconfigured.
+   * - **Database Connection**
+     - ``new PDO(dsn, user, pass)`` with 5 s timeout; auth errors → Misconfigured.
+   * - **Mail (SMTP)**
+     - TCP connect to SMTP host:port via ``fsockopen`` (no message sent).
+   * - **VaultWarden**
+     - Authentication via ``BitwardenServiceDelegate``; auth failure → Misconfigured.
+
+The Credential Configuration Form
+-----------------------------------
+
+The credential configuration form in the web UI also calls ``checkAvailability()`` and
+renders the result so administrators see the service status immediately after saving
+credentials — the same check the executor uses at runtime.
+
+Implementing a Check in a Custom Prototype
+------------------------------------------
+
+Add ``implements \MultiFlexi\checkableCredentialInterface`` to your prototype class and
+override ``checkAvailability()``:
+
+.. code-block:: php
+
+    namespace MultiFlexi\CredentialProtoType;
+
+    class MyService extends \MultiFlexi\CredentialProtoType
+        implements \MultiFlexi\credentialTypeInterface,
+                   \MultiFlexi\checkableCredentialInterface
+    {
+        #[\Override]
+        public function checkAvailability(): \MultiFlexi\CredentialCheckResult
+        {
+            $token = (string) ($this->configFieldsInternal
+                ->getFieldByCode('MY_SERVICE_TOKEN')?->getValue() ?? '');
+
+            if ($token === '') {
+                return new \MultiFlexi\CredentialCheckResult(
+                    \MultiFlexi\CredentialState::Misconfigured,
+                    _('MY_SERVICE_TOKEN is not set'),
+                    time(),
+                );
+            }
+
+            // ... live check ...
+
+            return new \MultiFlexi\CredentialCheckResult(
+                \MultiFlexi\CredentialState::Available,
+                '',
+                time(),
+                300,   // cache TTL in seconds
+            );
+        }
+    }
+
+Field values are read from ``$this->configFieldsInternal`` (or ``$this->configFieldsProvided``
+for prototypes that copy internal fields there) after the prototype has been loaded via
+``load(int $credTypeId)``.
+
+The ``ttl`` value in ``CredentialCheckResult`` controls how long the executor caches the
+result per credential to avoid re-probing on rapid successive jobs (important for rate-limited
+APIs such as Fio Bank).
+
 See Also:
 ---------
 - :doc:`reference/cli`
-- :doc:`reference/cli`
+- :doc:`development/credential-prototype`
