@@ -48,6 +48,12 @@ The scheduler runs as ``multiflexi-scheduler.service``. It wakes up periodically
 
 The scheduler writes the next scheduled time back to the RunTemplate after enqueuing, preventing duplicate enqueuing.
 
+**Task materialization:**
+
+For RunTemplates on a fixed interval (hourly/daily/weekly/monthly/yearly — not a manual/custom cron schedule), the scheduler also materializes a :doc:`Task <tasks>` for the current scheduling window before enqueuing the Job, and links the Job to it via ``task_id``. This is what allows MultiFlexi to report "obligations fulfilled" rather than just raw job counts. Custom cron schedules have no fixed cadence window and are therefore enqueued as plain Jobs without Task tracking.
+
+On every tick the scheduler also finalizes Tasks whose window has expired without a successful Job, marking them ``missed`` (zero attempts) or ``failed`` (attempts exhausted). Once a Job tied to a Task finishes, ``MultiFlexi\Job`` updates the Task's state directly — marking it ``fulfilled``/``fulfilled_late`` on success, or scheduling a retry Job (and re-attaching the same ``task_id``) when the retry budget allows.
+
 **systemd service unit:**
 
 .. code-block:: ini

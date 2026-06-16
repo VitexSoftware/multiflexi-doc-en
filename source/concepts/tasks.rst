@@ -14,6 +14,10 @@ A Task is the unit of obligation for one scheduling window. A Job is a single at
 
 Headline metric: ``23/24 tasks fulfilled on time, 1 late`` instead of raw job counts.
 
+.. note::
+
+   Tasks are only materialized for RunTemplates on a **fixed interval** (hourly/daily/weekly/monthly/yearly). Custom cron schedules have no fixed cadence window to anchor a Task to and are scheduled as plain Jobs. See :doc:`execution-architecture` for where this happens in the scheduler daemon.
+
 Data Model
 ----------
 
