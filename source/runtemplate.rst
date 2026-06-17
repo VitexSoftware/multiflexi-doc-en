@@ -323,6 +323,62 @@ Business Process Automation
        channel: "#data-alerts"
        message: "Data sync failed for Customer Database"
 
+Task SLA & Retry Configuration
+------------------------------
+
+Each RunTemplate has an optional *Task SLA & Retry* section on the **Scheduling** tab.
+These fields control the per-interval task lifecycle (see :doc:`concepts/tasks`).
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 15 60
+
+   * - Field
+     - Default
+     - Description
+   * - ``deadline_offset``
+     - *(window end)*
+     - By when the result must be ready. Accepts a relative offset such as
+       ``+3h`` or ``+30m``, or an absolute time-of-day like ``08:00``.
+       A result arriving after this offset but still within the window is
+       counted as ``fulfilled_late`` (when ``allow_late`` is enabled).
+   * - ``max_attempts``
+     - 1
+     - Maximum number of job attempts allowed within one scheduling window.
+       Retries are distributed evenly across the time remaining before
+       the deadline.
+   * - ``retry_backoff``
+     - ``none``
+     - Backoff strategy between attempts: ``none``, ``fixed``, ``linear``,
+       or ``exponential``.
+   * - ``retry_min_gap``
+     - 0
+     - Minimum seconds between retry attempts. The scheduler rejects
+       configurations where ``retry_min_gap × max_attempts`` exceeds the
+       available retry budget.
+   * - ``allow_late``
+     - off
+     - When enabled, a job that succeeds after the deadline but still within
+       the window is recorded as ``fulfilled_late`` rather than ``failed``.
+
+All fields are inline-editable directly on the RunTemplate page (click the
+value to edit).
+
+Task Metrics Panel
+------------------
+
+The **Tasks** tab on the RunTemplate page displays a row of metric cards
+summarising the task history for this RunTemplate:
+
+- **Fulfilled** — tasks completed on time
+- **Fulfilled Late** — tasks completed after the deadline (requires ``allow_late``)
+- **Failed** — tasks where all attempts were exhausted without success
+- **Missed** — windows that started while the scheduler was down
+- **Active** — currently open or running tasks
+- **Total** — click to open the full task list filtered to this RunTemplate
+
+Each card links to ``tasks.php`` filtered by the corresponding state.
+
 Advanced Configuration
 ----------------------
 
