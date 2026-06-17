@@ -51,6 +51,7 @@ The MultiFlexi CLI provides the following main commands:
 - **company:\***         - Manage companies and their settings
 - **company-app:\***     - Manage company-application relations (list, assign, unassign)
 - **job:\***             - Manage job execution and monitoring
+- **task:\***            - Inspect task scheduling windows and their fulfilment state
 - **run-template:\***    - Manage run templates, scheduling, and credential assignment
 - **user:\***            - User account management
 - **user-erasure:\***    - GDPR user data erasure management
@@ -282,6 +283,37 @@ Examples:
     multiflexi-cli job:update --id=123 --executor=Native
     multiflexi-cli job:delete --id=123
 
+task
+----
+
+Inspect tasks — the per-interval scheduling obligations produced by RunTemplates. Each task
+represents one scheduling window and is fulfilled when a job succeeds within that window.
+
+Options:
+  --id               Task ID (``task:get`` only)
+  --runtemplate_id   Filter by RunTemplate ID (``task:list`` only)
+  --state            Filter by state: ``open``, ``running``, ``fulfilled``, ``fulfilled_late``, ``failed``, ``missed``
+  --with-jobs        Include job attempts in output (``task:get`` only)
+  --limit            Limit number of results
+  --offset           Offset for pagination
+  --order            Sort order: A (ascending) or D (descending)
+  --fields           Comma-separated list of fields to include
+  -f, --format       Output format: text or json (default: text)
+
+Examples:
+
+.. code-block:: bash
+
+    multiflexi-cli task:list
+    multiflexi-cli task:list --runtemplate_id=5
+    multiflexi-cli task:list --state=failed --format=json
+    multiflexi-cli task:list --state=open --limit=20 --order=D
+    multiflexi-cli task:get --id=42
+    multiflexi-cli task:get --id=42 --with-jobs
+    multiflexi-cli task:get --id=42 --format=json
+    multiflexi-cli task:status
+    multiflexi-cli task:status --format=json
+
 run-template
 ------------
 
@@ -308,6 +340,13 @@ Common options:
   --active       Active
   --config       Config key=value, saved persistently to run-template (repeatable, used with create/update)
   -f, --format   Output format: text or json (default: text)
+
+Task SLA options (create/update):
+  --deadline_offset  Deadline offset from window start: ``+3h``, ``+30m``, or absolute time-of-day ``08:00`` (default: window end)
+  --max_attempts     Maximum job attempts per task window (default: 1)
+  --retry_backoff    Retry backoff strategy: ``none``, ``fixed``, ``linear``, ``exponential`` (default: none)
+  --retry_min_gap    Minimum seconds between retry attempts (default: 0)
+  --allow_late       Count a post-deadline success as ``fulfilled_late``: ``true`` or ``false`` (default: false)
 
 Schedule-specific options:
   --env          One-time environment override key=value — passed to the job but NOT saved to run-template (repeatable)
