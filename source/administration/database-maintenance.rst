@@ -107,12 +107,26 @@ Understanding the schema helps with maintenance and debugging.
 Cleaning Up Old Data
 ---------------------
 
-Job and artifact records accumulate over time. Remove old data to keep the database lean:
+.. tip::
+
+   Install ``multiflexi-housekeeper`` to automate all routine cleanup tasks.
+   It runs hourly via a systemd timer and handles data retention, orphaned jobs,
+   log pruning, and more — no manual SQL required.
+
+   .. code-block:: bash
+
+      sudo apt install multiflexi-housekeeper
+      # Verify the timer is active
+      systemctl list-timers multiflexi-housekeeper
+
+   See :doc:`housekeeper` for the full feature list and configuration options.
+
+For manual or one-off cleanup:
 
 .. code-block:: bash
 
-   # Via CLI — remove jobs older than 90 days (adjust as needed)
-   multiflexi-cli job cleanup --older-than=90
+   # Via CLI — prune log and job tables, keeping the latest 10 000 records
+   multiflexi-cli prune --logs --jobs --keep 10000
 
    # Via SQL (MySQL/MariaDB) — remove jobs and cascade-delete their artifacts
    mysql -u root -p multiflexi -e "
@@ -191,6 +205,7 @@ To migrate from SQLite (development) to MySQL (production):
 See Also
 --------
 
+- :doc:`housekeeper` — Automated periodic maintenance (recommended over manual cleanup)
 - :doc:`backup-recovery` — Database backup procedures
 - :doc:`upgrading` — Migration during upgrades
 - :doc:`../reference/configuration` — Database connection settings

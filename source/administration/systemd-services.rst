@@ -12,30 +12,36 @@ Systemd Services
 Overview
 --------
 
-A standard MultiFlexi installation runs three background services managed by systemd:
+A standard MultiFlexi installation runs three continuously-running background services and one periodic maintenance timer managed by systemd:
 
-+-----------------------------------+----------------------------------------------+
-| Service unit                      | Purpose                                      |
-+===================================+==============================================+
-| ``multiflexi-scheduler.service``  | Enqueues jobs based on RunTemplate schedules |
-+-----------------------------------+----------------------------------------------+
-| ``multiflexi-executor.service``   | Executes queued jobs                         |
-+-----------------------------------+----------------------------------------------+
-| ``multiflexi-eventor.service``    | Triggers jobs in response to external events |
-+-----------------------------------+----------------------------------------------+
++----------------------------------------------+----------------------------------------------+
+| Service / Timer unit                         | Purpose                                      |
++==============================================+==============================================+
+| ``multiflexi-scheduler.service``             | Enqueues jobs based on RunTemplate schedules |
++----------------------------------------------+----------------------------------------------+
+| ``multiflexi-executor.service``              | Executes queued jobs                         |
++----------------------------------------------+----------------------------------------------+
+| ``multiflexi-eventor.service``               | Triggers jobs in response to external events |
++----------------------------------------------+----------------------------------------------+
+| ``multiflexi-housekeeper.timer`` (hourly)    | Periodic maintenance — cleanup, retention,   |
+|                                              | schedule integrity, credential health checks |
++----------------------------------------------+----------------------------------------------+
 
-All three run as the ``multiflexi`` system user and load their configuration from ``/etc/multiflexi/multiflexi.env``.
+All run as the ``multiflexi`` system user and load their configuration from ``/etc/multiflexi/multiflexi.env``.
 
 Checking Service Status
 ------------------------
 
 .. code-block:: bash
 
-   # Status of all three services at a glance
+   # Status of all services at a glance
    systemctl status multiflexi-scheduler multiflexi-executor multiflexi-eventor
 
    # Detailed status with recent log lines
    systemctl status multiflexi-executor -l
+
+   # HouseKeeper timer — next scheduled run
+   systemctl list-timers multiflexi-housekeeper
 
 Starting and Stopping Services
 --------------------------------
@@ -55,6 +61,9 @@ Starting and Stopping Services
 
    # Reload (re-reads the env file without interrupting running jobs — executor only)
    sudo systemctl reload multiflexi-executor
+
+   # Trigger an immediate HouseKeeper run without waiting for the timer
+   sudo systemctl start multiflexi-housekeeper.service
 
 Enabling / Disabling on Boot
 -----------------------------
@@ -79,8 +88,9 @@ All services log to the systemd journal.
    # Live log tail
    sudo journalctl -u multiflexi-executor -f
 
-   # All three services together
-   sudo journalctl -u multiflexi-scheduler -u multiflexi-executor -u multiflexi-eventor -f
+   # All services together
+   sudo journalctl -u multiflexi-scheduler -u multiflexi-executor -u multiflexi-eventor \
+     -u multiflexi-housekeeper -f
 
    # Last 100 lines
    sudo journalctl -u multiflexi-executor -n 100
@@ -126,6 +136,28 @@ Monitors configured event sources and enqueues jobs in response to external trig
 
    If you do not use event-driven job triggering, ``multiflexi-eventor`` can be disabled:
    ``sudo systemctl disable --now multiflexi-eventor``
+
+multiflexi-housekeeper
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Periodic maintenance timer that runs once per hour. Cleans orphaned jobs and broken
+schedule entries, finalizes stale Tasks, enforces data retention policies, prunes the
+log table, recalculates RunTemplate job counters, and checks credential health.
+
+- **Package**: ``multiflexi-housekeeper``
+- **Timer**: ``multiflexi-housekeeper.timer`` (``OnCalendar=hourly``, ``Persistent=true``)
+- **Service**: ``multiflexi-housekeeper.service`` (``Type=oneshot``)
+- **Binary**: ``/usr/lib/multiflexi-housekeeper/housekeeper.php``
+- **Jitter**: up to 5 minutes (``RandomizedDelaySec=300``) — prevents thundering-herd on multi-server deployments
+- **Dry-run**: ``sudo -u multiflexi multiflexi-housekeeper --dry-run``
+
+.. note::
+
+   The HouseKeeper uses a *timer* unit, not a continuously-running service.
+   ``systemctl status multiflexi-housekeeper.service`` shows the result of the last
+   run; ``systemctl list-timers multiflexi-housekeeper`` shows the next scheduled run.
+
+See :doc:`housekeeper` for full configuration reference and troubleshooting.
 
 Node-RED bridge
 ^^^^^^^^^^^^^^^
@@ -229,6 +261,10 @@ All services share ``/etc/multiflexi/multiflexi.env``. After editing this file, 
 
    sudo systemctl restart multiflexi-scheduler multiflexi-executor multiflexi-eventor
 
+The HouseKeeper reads the env file at the start of each timer-triggered run, so no
+restart is needed for ``multiflexi-housekeeper`` — the next run picks up the changes
+automatically.
+
 See :doc:`../reference/configuration` for the full list of configuration variables.
 
 Troubleshooting Service Issues
@@ -278,6 +314,7 @@ See Also
 --------
 
 - :doc:`../concepts/execution-architecture` — How the daemons interact
+- :doc:`housekeeper` — HouseKeeper periodic maintenance reference
 - :doc:`../reference/configuration` — Environment variables
 - :doc:`../troubleshooting` — General troubleshooting guide
 - :doc:`docker` — Running services in Docker Compose

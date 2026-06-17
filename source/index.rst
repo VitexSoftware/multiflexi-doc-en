@@ -126,6 +126,7 @@ Contents
 
    administration/docker
    administration/systemd-services
+   administration/housekeeper
    administration/database-maintenance
    administration/backup-recovery
    administration/upgrading

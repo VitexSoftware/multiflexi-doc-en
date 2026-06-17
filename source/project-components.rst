@@ -55,6 +55,14 @@ This section describes the individual projects that make up the MultiFlexi ecosy
           :width: 48px
           :alt: multiflexi-probe
      - multiflexi-probe
+   * - .. image:: _static/images/components/multiflexi-housekeeper.svg
+          :width: 48px
+          :alt: multiflexi-housekeeper
+     - multiflexi-housekeeper
+     -
+     -
+     -
+     -
    * - .. image:: _static/images/components/multiflexi-abraflexi.svg
           :width: 48px
           :alt: multiflexi-abraflexi
@@ -324,6 +332,43 @@ multiflexi-executor
     
     # Execute single job
     php executor.php --job-id 123
+
+multiflexi-housekeeper
+~~~~~~~~~~~~~~~~~~~~~~
+
+**Location**: https://github.com/VitexSoftware/multiflexi-housekeeper
+
+**Purpose**: Periodic maintenance daemon that keeps the MultiFlexi platform healthy by running eight housekeeping duties once per hour via a systemd timer.
+
+**Key Features**:
+- Stale Task finalization (marks expired open/running Tasks as ``missed`` or ``failed``)
+- Orphaned job and broken queue-entry cleanup
+- Schedule integrity repair (resets stuck ``next_schedule`` on RunTemplates)
+- GDPR data retention enforcement (delegates to ``RetentionService`` when ``multiflexi-web`` is installed)
+- Disk temp-file cleanup (removes orphaned result files after artifact storage)
+- Log table pruning (keeps the ``log`` table below a configurable row count)
+- RunTemplate job-counter recalculation (corrects drift after retention deletes)
+- Credential health checks (reports Misconfigured credentials before they block a job)
+
+**Deployment**:
+
+.. code-block:: bash
+
+    sudo apt install multiflexi-housekeeper
+    # Timer is enabled automatically on install
+    systemctl list-timers multiflexi-housekeeper
+
+    # Ad-hoc run
+    sudo systemctl start multiflexi-housekeeper.service
+
+    # Preview without changes
+    sudo -u multiflexi multiflexi-housekeeper --dry-run
+
+**Key Namespace**: ``MultiFlexi\Duty\`` → ``src/MultiFlexi/Duty/``
+
+**Service**: ``multiflexi-housekeeper.timer`` + ``multiflexi-housekeeper.service``
+
+See :doc:`/administration/housekeeper` for full configuration and troubleshooting.
 
 Web Interface Components
 ------------------------
