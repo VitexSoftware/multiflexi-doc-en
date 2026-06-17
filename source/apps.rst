@@ -102,6 +102,40 @@ MultiFlexi includes a built-in test application called "Probe" that's useful for
 
 The Probe application creates a simple JSON report showing system information and can be configured to test different types of fields and outputs.
 
+**Environment Variables**
+
+.. list-table::
+   :widths: 25 10 65
+   :header-rows: 1
+
+   * - Variable
+     - Default
+     - Description
+   * - ``FILE_UPLOAD``
+     - ``/etc/fstab``
+     - Path to test file; passed as a command-line argument.
+   * - ``PASSWORD``
+     - ``donotcare``
+     - Example password field; redacted in the env dump by default.
+   * - ``APP_DEBUG``
+     - ``False``
+     - Enable debug output.
+   * - ``RESULT_FILE``
+     - ``env_report.json``
+     - File path where the probe writes its JSON env dump.
+   * - ``FORCE_EXITCODE``
+     - ``0``
+     - Exit with this code to simulate application failure.
+   * - ``PROBE_SLEEP``
+     - ``0``
+     - Sleep this many seconds before exiting, to simulate a long-running job. Set to ``0`` to disable.
+   * - ``ZABBIX_KEY``
+     - ``multiflexi-probe-{PASSWORD}``
+     - Zabbix item key name template.
+   * - ``PROBE_SHOW_SECRETS``
+     - ``False``
+     - When ``true``, disables redaction of secret-looking variable values in the env dump. Use only in throwaway environments.
+
 Creating Your Own Applications
 ------------------------------
 
