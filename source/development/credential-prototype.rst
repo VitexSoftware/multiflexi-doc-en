@@ -408,6 +408,30 @@ The ``ttl`` parameter (seconds) tells the executor how long to cache the result.
 Use shorter TTLs for transient failures (60 s) and longer for successes (300 s).
 Rate-limited APIs should return a long TTL even on success to avoid burning quota.
 
+Example: Two-Phase SharePoint Check
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``multiflexi-microsoft365`` package is a real-world example. Acquiring an
+Office 365 token is **not** proof of access: the legacy Azure ACS app-only
+endpoint can return a syntactically valid token (HTTP 200) that SharePoint
+Online then rejects (HTTP 401 ``invalid_request``) at the tenant level, so a
+check that only verifies "I got a token" reports a false positive.
+
+Its ``checkAvailability()`` therefore runs two phases:
+
+1. **Token** — acquire a token, preferring the modern Entra ID v2
+   ``client_credentials`` grant (scope ``https://{tenant}.sharepoint.com/.default``)
+   and falling back to legacy ACS.
+2. **REST** — make a real call (``GET /_api/web/title``) through the
+   ``vgrem/php-spo`` library, wrapped in a retry that resets the SDK's cached
+   token once (a transient ACS hiccup can otherwise poison every later request).
+
+The outcome maps to ``Unavailable`` for transient failures (timeout, 5xx,
+network) and ``Misconfigured`` for permanent ones (bad/expired secret, or a
+token that SharePoint rejects — check tenant ``DisableCustomAppAuthentication``,
+the app-only grant at ``_layouts/15/appinv.aspx`` and the secret's expiry). The
+client secret authenticates the probe but is never written to any diagnostic.
+
 Packaging Checklist
 -------------------
 
