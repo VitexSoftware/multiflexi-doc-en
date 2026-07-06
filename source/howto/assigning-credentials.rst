@@ -94,6 +94,15 @@ Step 3: Assign the CredentialType to a RunTemplate
    # Verify the assignment
    multiflexi-cli run-template:list-credentials --id=42
 
+.. note::
+
+   **Overlapping configuration is cleaned up automatically.** If the RunTemplate
+   already stores a configuration value with the same name as a field provided by
+   the assigned credential, MultiFlexi removes that stored value during the
+   assignment and records each removal in the log. This prevents the stored value
+   and the credential value from conflicting when the job runs. See
+   :doc:`../concepts/credential-management` for details.
+
 How Credentials Are Used
 -------------------------
 

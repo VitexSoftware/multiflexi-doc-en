@@ -174,6 +174,23 @@ See :doc:`../howto/assigning-credentials` for a detailed step-by-step guide.
      --runtemplate=42 \
      --credentialtype=7
 
+Configuration Cleanup on Assignment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An assigned credential provides its own set of configuration fields. If the
+RunTemplate already stores a configuration value under the same name as one of
+those provided fields, the stored value would be silently overwritten while the
+job environment is assembled.
+
+To keep the configuration unambiguous, MultiFlexi removes every stored
+RunTemplate configuration field whose name matches a field provided by the newly
+assigned credential. Each removed value is written to the log, so the change is
+auditable.
+
+Only the RunTemplate's own stored values are removed. The credential keeps
+providing the field, so the effective job environment is unchanged apart from the
+now-redundant duplicate entry.
+
 How Credentials Are Injected into Jobs
 ----------------------------------------
 
