@@ -24,7 +24,7 @@ MultiFlexi provides several command line utilities to manage and interact with t
          # Schedule a RunTemplate to run now and wait for the result
          multiflexi-run-template -r <RUNTEMPLATE_ID> [-o <output_file>] [-t <seconds>]
 
-    - ``-t, --timeout`` sets the maximum seconds to wait for the daemon to run the job (``0`` waits forever; default ``300``, or the ``RUNTEMPLATE_WAIT_TIMEOUT`` environment variable). On timeout the command exits ``124``.
+    - ``-t, --timeout`` sets the maximum seconds to wait for the daemon to run the job (``0`` waits forever; default ``300``, or the ``RUNTEMPLATE_WAIT_TIMEOUT`` environment variable). On timeout the command exits ``124``. Requires multiflexi-executor >= 1.18.0 — earlier versions declared ``-t``/``--timeout`` as an optional-value getopt option, so a space-separated value (``-t 180``) was silently dropped and the wait fell back to unlimited; upgrade and kill any long-running ``executor.php -r`` processes started before the upgrade.
     - ``-E KEY=VALUE`` injects a one-time environment override into the job's environment. Repeat the flag to inject multiple values. The override is applied on top of the RunTemplate's configured environment (overrides win). Values are never logged.
     - ``--env-json='{"KEY":"VALUE"}'`` accepts a JSON object whose keys and values are treated as env overrides, equivalent to repeating ``-E`` for each pair. If both ``-E`` and ``--env-json`` are given, ``-E`` entries take precedence. Invalid JSON causes a non-zero exit.
 
