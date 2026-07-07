@@ -69,7 +69,7 @@ The application now appears in the company's installed applications list and you
 Configuring Application Parameters
 ------------------------------------
 
-Many applications have configuration fields (API URLs, file paths, behaviour flags). These are set per-company on the assignment:
+Many applications have configuration fields (API URLs, file paths, behavior flags). These are set per-company on the assignment:
 
 1. After assigning, click the application name in the company view
 2. Fill in the configuration fields shown
