@@ -72,6 +72,15 @@ Logging & Telemetry
 - **ZABBIX_SERVER**: Zabbix server address for logging to Zabbix.
 - **ENABLE_GOOGLE_ANALYTICS**: Enable Google Analytics (default: ``false``).
 - **LIVE_OUTPUT_SOCKET**: WebSocket URI for live output (e.g., ``ws://localhost:8080``).
+- **OTEL_ENABLED**: Enable OpenTelemetry metrics export (default: ``false``). See
+  :doc:`/integrations/opentelemetry`.
+- **OTEL_SERVICE_NAME**: Service name reported to the OTLP collector, and the value shown
+  under the ``otel_scope_name`` label on every exported metric (default: ``multiflexi``).
+- **OTEL_EXPORTER_OTLP_ENDPOINT**: OTLP collector ingest endpoint (default:
+  ``http://localhost:4318``). This is the metrics/traces ingest URL, distinct from
+  ``OTEL_DASHBOARD_URL`` below, which is a browsable UI link.
+- **OTEL_EXPORTER_OTLP_PROTOCOL**: OTLP wire protocol, ``http/json`` or ``http/protobuf``
+  (default: ``http/json``).
 
 Integrations
 ~~~~~~~~~~~~

@@ -332,7 +332,62 @@ Use the OpenTelemetry Operator for Kubernetes to automatically instrument MultiF
 Grafana Dashboard
 -----------------
 
-Import the MultiFlexi OpenTelemetry dashboard to visualize metrics.
+A pre-built dashboard ("MultiFlexi - OpenTelemetry Overview") is provisioned as
+Infrastructure-as-Code in the ``VSAnsible`` repository and ships with every
+``playbooks/grafana.yml`` run.
+
+Import the Pre-Built Dashboard
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The dashboard JSON lives at
+``files/grafana/dashboards/multiflexi-otel-overview.json`` in the
+``VSAnsible`` repository and is provisioned automatically into a dedicated
+**MultiFlexi** Grafana folder:
+
+.. code-block:: bash
+
+   cd VSAnsible
+   ansible-playbook playbooks/grafana.yml --tags otel_dashboards
+
+Re-running the playbook after editing the JSON updates the dashboard in
+place (the task is idempotent, diffed by dashboard ``uid``). If you'd
+rather import it by hand, upload the JSON file directly via Grafana's
+**Dashboards → New → Import** screen and select a Prometheus data source
+when prompted.
+
+The dashboard exposes a ``$service`` template variable
+(``label_values(multiflexi_jobs_total, otel_scope_name)``) to filter by
+host/instance. Note that ``otel_scope_name`` is currently just whatever
+``OTEL_SERVICE_NAME`` was set to per host — it is a rough per-host proxy,
+not a dedicated resource attribute, so it may include ad hoc values (e.g.
+from local ``telemetry:test`` runs) alongside real per-host service names.
+
+Dashboard Panels
+~~~~~~~~~~~~~~~~
+
+The pre-built dashboard ships four rows of panels:
+
+**Overview** (Stat panels, respect the dashboard time range):
+
+1. **Total Jobs**: ``sum(increase(multiflexi_jobs_total{otel_scope_name=~"$service"}[$__range]))``
+2. **Success Rate %**: ``sum(increase(multiflexi_jobs_success_total{...}[$__range])) / sum(increase(multiflexi_jobs_total{...}[$__range])) * 100``
+3. **Jobs Currently Running**: ``multiflexi_jobs_running{otel_scope_name=~"$service"}``
+4. **Failed Jobs**: ``sum(increase(multiflexi_jobs_failed_total{...}[$__range]))``
+
+**Job Throughput** (time series):
+
+5. **Jobs Rate (success vs failed)**: ``sum(rate(multiflexi_jobs_success_total{...}[5m]))`` and the ``_failed_total`` equivalent
+6. **Job Duration Percentiles** (p50/p95/p99): ``histogram_quantile(0.95, sum(rate(multiflexi_job_duration_seconds_bucket{...}[5m])) by (le))``
+
+**Inventory** (Stat panels, raw gauge values):
+
+7. **Applications Total / Enabled**, **Companies Total**, **RunTemplates Total**
+
+**Breakdowns** (bar gauges, sourced from the duration histogram's ``_count`` series since it carries the richest label set):
+
+8. **Jobs by Application**: ``sum(increase(multiflexi_job_duration_seconds_count{...}[$__range])) by (app_name)``
+9. **Jobs by Company**: same, ``by (company_name)``
+10. **Jobs by Exit Code**: same, ``by (exitcode)``
 
 Example PromQL Queries
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -341,15 +396,15 @@ Example PromQL Queries
 
 .. code-block:: promql
 
-   rate(multiflexi_jobs_success_total[5m]) / 
-   rate(multiflexi_jobs_total[5m]) * 100
+   sum(increase(multiflexi_jobs_success_total[1h])) /
+   sum(increase(multiflexi_jobs_total[1h])) * 100
 
 **Average Job Duration**:
 
 .. code-block:: promql
 
-   rate(multiflexi_job_duration_sum[5m]) / 
-   rate(multiflexi_job_duration_count[5m])
+   sum(rate(multiflexi_job_duration_seconds_sum[5m])) /
+   sum(rate(multiflexi_job_duration_seconds_count[5m]))
 
 **Failed Jobs by Application**:
 
@@ -364,17 +419,6 @@ Example PromQL Queries
 .. code-block:: promql
 
    multiflexi_jobs_running
-
-Dashboard Panels
-~~~~~~~~~~~~~~~~
-
-Create the following panels in Grafana:
-
-1. **Job Execution Rate** (Graph): ``rate(multiflexi_jobs_total[5m])``
-2. **Success vs Failure** (Pie Chart): Compare success and failed counters
-3. **Job Duration Heatmap**: Use histogram buckets
-4. **Top Applications** (Bar Gauge): Jobs by ``app_name``
-5. **Active Resources** (Stat): Show gauges for jobs, apps, companies
 
 Troubleshooting
 ---------------
