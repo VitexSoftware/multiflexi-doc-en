@@ -8,6 +8,9 @@ OpenTelemetry Integration
 Overview
 --------
 
+.. image:: ../multiflexi-otel.png
+   :alt: MultiFlexi OpenTelemetry pipeline: multiflexi-cli/core export metrics via OTLP to an OpenTelemetry Collector, which feeds Prometheus and Grafana.
+
 MultiFlexi supports exporting metrics to **OpenTelemetry (OTel)** compatible backends such as Prometheus, Grafana, Jaeger, and the OpenTelemetry Collector.
 
 OpenTelemetry is a vendor-neutral, open-source observability framework that provides APIs, libraries, agents, and instrumentation to enable the collection and export of telemetry data (metrics, logs, and traces).
@@ -335,6 +338,9 @@ Grafana Dashboard
 A pre-built dashboard ("MultiFlexi - OpenTelemetry Overview") is provisioned as
 Infrastructure-as-Code in the ``VSAnsible`` repository and ships with every
 ``playbooks/grafana.yml`` run.
+
+.. image:: ../grafana-dashboard.png
+   :alt: MultiFlexi OpenTelemetry Overview Grafana dashboard, showing job throughput, success rate, duration percentiles, inventory gauges, and breakdowns by application, company, and exit code.
 
 Import the Pre-Built Dashboard
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
