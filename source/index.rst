@@ -69,6 +69,7 @@ Contents
    what-is-multiflexi
    quickstart
    install
+   platform-support
    firstrun
    tutorial-first-job
 

@@ -7,7 +7,7 @@ Get MultiFlexi running and execute your first automated job in under 15 minutes.
 **Difficulty:** Beginner  
 **Prerequisites:**
 
-- Debian 12 or Ubuntu 24.04 LTS
+- Debian 13 (Trixie, recommended) or Ubuntu 24.04 LTS — see :doc:`platform-support`
 - Root or sudo access
 - Internet connection
 

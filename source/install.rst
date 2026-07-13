@@ -13,10 +13,11 @@ Start monitoring your infrastructure immediately with the new **MultiFlexi Probe
 Supported Platforms
 -------------------
 
-MultiFlexi packages are available for the following Long Term Support (LTS) distributions:
-
-- **Debian**: 11 (Bullseye), 12 (Bookworm), 13 (Trixie), 14 (Forky)
-- **Ubuntu**: 22.04 LTS (Jammy Jellyfish), 24.04 LTS (Noble Numbat)
+**Debian 13 (Trixie)** is the recommended platform for new installs.
+MultiFlexi packages are also published for Ubuntu 24.04 LTS, Ubuntu 22.04
+LTS, and Debian 12 (Bookworm, build-maintained but no longer promoted for
+new installs). See :doc:`platform-support` for the full support matrix,
+including end-of-coverage dates and why Debian 11 and 14 are not supported.
 
 Prerequisites
 -------------
