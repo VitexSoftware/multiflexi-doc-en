@@ -467,6 +467,25 @@ Page Shows "Access Denied" When It Shouldn't
 
 ---
 
+Relationship to system-wide RBAC roles
+---------------------------------------
+
+.. note::
+
+   Everything above describes **company membership** (the ``company_user``
+   table): which companies a user can see, with a simple per-company role
+   (``viewer``/``manager``/``admin``). It is managed via
+   ``POST /company/{companyId}/user/`` and ``DELETE
+   /company/{companyId}/user/{userId}``.
+
+   MultiFlexi separately has **system-wide RBAC roles** (``rbac_roles`` /
+   ``rbac_user_roles``, e.g. ``super_admin``, ``admin``, ``editor``,
+   ``user``, ``viewer``), assigned independently of company membership via
+   ``multiflexi-cli user-role:set`` or ``POST /user/{userId}/roles/``. These
+   are two distinct, independently maintained mechanisms — a user's
+   system-wide role does not imply company access, and company membership
+   does not grant any system-wide role.
+
 See Also
 --------
 

@@ -83,6 +83,57 @@ This endpoint allows you to manage topics. You can retrieve and update topics.
 - **POST /topic/{topicId}.{suffix}**: Update Topic
 - **GET /topics.{suffix}**: Get All Topics
 
+/task/
+------
+This endpoint exposes :doc:`Tasks <../concepts/tasks>` — the per-scheduling-window
+obligation record derived from a RunTemplate's interval, holding one or more
+Job attempts.
+
+- **GET /task/{taskId}.{suffix}**: Get Task by ID, including its embedded job
+  attempt history
+- **GET /tasks.{suffix}**: List Tasks, optionally filtered by ``state``,
+  ``runtemplate_id``, ``from``, and ``to``
+
+/eventrule/
+-----------
+This endpoint manages EventRules — the event-to-RunTemplate mapping used to
+chain a RunTemplate's completion into scheduling another one.
+
+- **GET /eventrule/{eventRuleId}.{suffix}**: Get EventRule by ID
+- **POST /eventrule/**: Create or Update EventRule
+- **DELETE /eventrule/{eventRuleId}.{suffix}**: Delete EventRule by ID
+- **GET /eventrules.{suffix}**: Show All EventRules
+
+/eventsource/
+-------------
+This endpoint manages EventSources — webhook adapter database connections
+that EventRules can react to.
+
+- **GET /eventsource/{eventSourceId}.{suffix}**: Get EventSource by ID
+- **POST /eventsource/**: Create or Update EventSource
+- **DELETE /eventsource/{eventSourceId}.{suffix}**: Delete EventSource by ID
+- **GET /eventsources.{suffix}**: Show All EventSources
+- **POST /eventsource/{eventSourceId}/test.{suffix}**: Test whether the
+  adapter database is reachable
+
+/user/{userId}/roles/
+----------------------
+This endpoint manages RBAC role assignments for a user.
+
+- **GET /user/{userId}/roles.{suffix}**: Get the RBAC roles assigned to a user
+- **POST /user/{userId}/roles/**: Set (replace or extend, via the ``replace``
+  query parameter) the RBAC roles assigned to a user
+
+/company/{companyId}/user/
+---------------------------
+This endpoint manages company membership — which users have access to a
+company and with what role.
+
+- **GET /company/{companyId}/users.{suffix}**: List users assigned to a
+  company, with their roles
+- **POST /company/{companyId}/user/**: Assign a user to a company (upsert)
+- **DELETE /company/{companyId}/user/{userId}**: Remove a user from a company
+
 Other Endpoints
 ===============
 
