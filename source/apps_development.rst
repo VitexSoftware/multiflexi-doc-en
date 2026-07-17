@@ -841,6 +841,39 @@ Testing Your Application
 
        bin/your-command
 
+Validating in CI with GitHub Actions
+-------------------------------------
+
+Rather than hand-rolling a schema-download-and-validate script in every
+application repository, use the reusable composite action
+`VitexSoftware/validate-multiflexi-app <https://github.com/VitexSoftware/validate-multiflexi-app>`_.
+It installs ``multiflexi-cli`` from ``repo.multiflexi.eu`` and runs
+``multiflexi-cli application:validate-json`` against your app definition
+files, using the schema bundled with ``php-vitexsoftware-multiflexi-core``
+instead of fetching a schema URL at validation time:
+
+.. code-block:: yaml
+
+    name: MultiFlexi JSON Validation
+
+    on:
+      push:
+        paths:
+          - 'multiflexi/*.json'
+      pull_request:
+        paths:
+          - 'multiflexi/*.json'
+
+    jobs:
+      validate-multiflexi-json:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v7
+          - uses: VitexSoftware/validate-multiflexi-app@v1
+
+The action accepts a ``path-glob`` input (default ``multiflexi/*.json``) if
+your app definitions live elsewhere. See the action's README for all inputs.
+
 Deployment
 ==========
 
@@ -916,3 +949,4 @@ Resources
 * Report Schema: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/schema/report.json
 * Example applications: https://github.com/VitexSoftware, https://github.com/Spoje-NET
 * MultiFlexi CLI: Required version 2.2.0 or newer
+* CI validation action: https://github.com/VitexSoftware/validate-multiflexi-app

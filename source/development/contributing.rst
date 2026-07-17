@@ -237,6 +237,14 @@ MultiFlexi enforces JSON schema validation for application definitions to ensure
 * **Array vs Object**: Fields like ``topics``, ``requirements``, and ``artifacts`` must be arrays, not objects
 * **Missing required fields**: All required fields in the schema must be present
 
+**Automating validation in CI**: application repositories should validate
+their ``multiflexi/*.json`` files on every push using the reusable action
+`VitexSoftware/validate-multiflexi-app <https://github.com/VitexSoftware/validate-multiflexi-app>`_,
+which wraps ``multiflexi-cli application:validate-json`` against the schema
+bundled with ``php-vitexsoftware-multiflexi-core`` (no schema URL fetch at
+validation time). See :ref:`application-development` /
+:doc:`../apps_development` for a sample workflow.
+
 **Example of correct environment variable definition**:
 
 .. code-block:: json
