@@ -26,6 +26,18 @@ Database Settings
 - **DB_USERNAME**: Database user name.
 - **DB_PASSWORD**: Database password.
 
+Timezone
+~~~~~~~~
+
+- **MULTIFLEXI_TIMEZONE**: Timezone used for scheduling and displaying job/task times
+  (e.g., ``Europe/Prague``). Shared by ``multiflexi-web``, ``multiflexi-web5`` and
+  ``multiflexi-cli``. If unset, it is autodetected from the server (PHP's
+  ``date.timezone`` ini setting, then ``/etc/timezone``, then the ``/etc/localtime``
+  symlink, then ``timedatectl``), falling back to ``UTC`` if none of those resolve.
+  Set this explicitly whenever the server's detected timezone does not match the
+  timezone your schedules are defined in — an undetected mismatch shows scheduled
+  times and countdowns offset by the difference from UTC.
+
 Security Options
 ~~~~~~~~~~~~~~~~
 
