@@ -22,9 +22,8 @@ Installation (5 minutes)
 
 .. code-block:: bash
 
-   curl -sSLo /tmp/multiflexi-archive-keyring.deb https://repo.multiflexi.eu/multiflexi-archive-keyring.deb
-   sudo dpkg -i /tmp/multiflexi-archive-keyring.deb
-   echo "deb [signed-by=/usr/share/keyrings/repo.multiflexi.eu.gpg] https://repo.multiflexi.eu/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/multiflexi.list
+   sudo curl -fsSL https://repo.multiflexi.eu/KEY.gpg -o /usr/share/keyrings/multiflexi-archive-keyring.gpg
+   echo "deb [signed-by=/usr/share/keyrings/multiflexi-archive-keyring.gpg] https://repo.multiflexi.eu/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/multiflexi.list
    sudo apt update
 
 **2. Install MultiFlexi with MySQL**

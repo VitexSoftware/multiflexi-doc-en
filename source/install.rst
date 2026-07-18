@@ -49,11 +49,10 @@ First, add the MultiFlexi repository to your system's package sources.
     sudo apt install -y lsb-release apt-transport-https bzip2 ca-certificates curl
 
     # Add GPG key
-    curl -sSLo /tmp/multiflexi-archive-keyring.deb https://repo.multiflexi.eu/multiflexi-archive-keyring.deb
-    sudo dpkg -i /tmp/multiflexi-archive-keyring.deb
+    sudo curl -fsSL https://repo.multiflexi.eu/KEY.gpg -o /usr/share/keyrings/multiflexi-archive-keyring.gpg
 
     # Add repository source
-    echo "deb [signed-by=/usr/share/keyrings/repo.multiflexi.eu.gpg] https://repo.multiflexi.eu/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/multiflexi.list
+    echo "deb [signed-by=/usr/share/keyrings/multiflexi-archive-keyring.gpg] https://repo.multiflexi.eu/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/multiflexi.list
 
     # Refresh package lists
     sudo apt update
