@@ -137,5 +137,16 @@ team, not resolved here:
 - ``python3-multiflexi`` and ``node-red-contrib-multiflexi`` build for
   Trixie only (no Bookworm build at all) — narrower than the rest of the
   fleet.
+- ``multiflexi-server``'s ``debian/Jenkinsfile`` and
+  ``debian/Jenkinsfile.release`` no longer build for ``ubuntu:jammy``
+  (removed 2026-07-19). ``php-slim-psr7`` isn't published for jammy in
+  either Ubuntu's own universe archive or ``repo.vitexsoftware.com``, and
+  jammy universe's own ``php-psr-http-factory`` is pinned at ``1.0.1-2``
+  while ``php-slim-psr7`` requires ``>= 1.1`` — an unsatisfiable
+  combination in the current jammy build image, not a MultiFlexi packaging
+  bug. Effectively ``multiflexi-server`` is Trixie/Bookworm/Noble only
+  until a compatible ``php-psr-http-factory`` (or ``php-slim-psr7``) build
+  is available for jammy; the rest of the fleet still builds for jammy
+  per the table above.
 
 See the audit artifact for full detail.
