@@ -41,7 +41,12 @@ Timezone
 Security Options
 ~~~~~~~~~~~~~~~~
 
-- **ENCRYPTION_MASTER_KEY**: Master key used for data encryption (Critical: Back this up).
+- **ENCRYPTION_MASTER_KEY**: Master key used to encrypt the per-purpose
+  encryption keys stored in the ``encryption_keys`` table (Critical: back
+  this up — losing it makes all encrypted credential values unrecoverable).
+  Set it, then run ``multiflexi-cli encryption:init`` once to generate the
+  ``credentials`` key. ``MULTIFLEXI_MASTER_KEY`` is accepted as a
+  backward-compatible alias.
 - **CSRF_PROTECTION_ENABLED**: Enable Cross-Site Request Forgery protection (default: ``true``).
 - **BRUTE_FORCE_PROTECTION_ENABLED**: Enable protection against brute force attacks (default: ``true``).
 - **BRUTE_FORCE_MAX_ATTEMPTS**: Maximum number of failed attempts allowed (default: ``5``).
@@ -49,7 +54,12 @@ Security Options
 - **BRUTE_FORCE_TIME_WINDOW**: Time window in seconds to count attempts (default: ``300``).
 - **BRUTE_FORCE_IP_LIMITING**: Enable IP-based limiting for brute force protection (default: ``true``).
 - **SECURITY_LOGGING_ENABLED**: Enable security audit logging (default: ``true``).
-- **DATA_ENCRYPTION_ENABLED**: Enable data encryption features (default: ``true``).
+- **DATA_ENCRYPTION_ENABLED**: When ``true`` (the default), redactable
+  (password/secret-typed) Credential field values are required to be
+  encrypted (AES-256-GCM) before being written to ``credata.value`` —
+  storing them fails closed if ``encryption:init`` has not been run yet.
+  Set to ``false`` only for local development/testing, where secret values
+  are then stored as plaintext instead.
 - **RATE_LIMITING_ENABLED**: Enable general rate limiting (default: ``true``).
 - **IP_WHITELIST_ENABLED**: Enable IP whitelisting (default: ``false``).
 - **TWO_FACTOR_AUTH_ENABLED**: Enable Two-Factor Authentication (default: ``true``).

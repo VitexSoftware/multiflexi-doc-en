@@ -207,10 +207,35 @@ This means any application that respects these environment variables will automa
 Security Considerations
 ------------------------
 
-- Credential values are stored encrypted in the database (AES-256) when ``DATA_ENCRYPTION_ENABLED=true``
-- Password-type fields are masked in the web UI
-- Credentials are company-scoped: users can only see credentials for their assigned company
-- VaultWarden integration (``multiflexi-vaultwarden``) can be used to store secrets externally instead of in the MultiFlexi database
+- Fields marked ``"type": "password"`` or ``"type": "secret"`` in a prototype
+  definition (or with an explicit ``"secret": true`` flag) are treated as
+  **redactable**: MultiFlexi never returns their real value through the web
+  UI, the REST API, or the CLI's default output. Instead they show a fixed
+  placeholder — ``••••••••`` when a value is stored, ``(not set)`` when it
+  isn't. The placeholder length never varies with the secret's length, since
+  that itself would leak information.
+- Credential values are encrypted at rest (AES-256-GCM) in the database when
+  ``DATA_ENCRYPTION_ENABLED=true`` (the default) and
+  ``multiflexi-cli encryption:init`` has been run. Encryption keys are
+  versioned: rotating a key (``encryption:init --force``) keeps the previous
+  version's key material so data encrypted under it stays decryptable — it
+  does not invalidate existing credentials. See
+  :doc:`../reference/configuration` for the relevant environment variables
+  and :ref:`cli-encryption-commands` for key lifecycle commands.
+- Editing a credential never re-displays its stored secret value. Changing
+  it always means entering a new value; leaving the field blank keeps the
+  existing value unchanged. This applies uniformly to the web form, the
+  REST API, and the CLI.
+- The **only** way to see a stored secret's real value is
+  ``multiflexi-cli credential:get --reveal``, which prompts for confirmation
+  and writes an audit log entry (event ``credential_revealed``) each time it
+  is used. No such path exists in the REST API or the web UI — job execution
+  itself resolves credentials in-process and never needs to go through
+  these redacted, human-facing surfaces.
+- Credentials are company-scoped: users can only see credentials for their
+  assigned company.
+- VaultWarden integration (``multiflexi-vaultwarden``) can be used to store
+  secrets externally instead of in the MultiFlexi database.
 
 See Also
 --------

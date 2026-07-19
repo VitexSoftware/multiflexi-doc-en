@@ -105,6 +105,16 @@ Schema Overview:
   - **default**: Default value
   - **options**: Array of options (for select fields)
 
+Field type ``password`` and ``secret``:
+----------------------------------------
+
+Fields declared with ``"type": "password"`` or ``"type": "secret"`` are
+automatically marked redactable, equivalent to setting an explicit
+``"secret": true``. Redactable fields never appear in plaintext in the web
+UI, REST API, or CLI output — see :doc:`concepts/credential-management` for
+the masking convention and the sole (CLI-only, audit-logged) way to reveal
+an actual stored value.
+
 Localization Support:
 ---------------------
 

@@ -145,6 +145,35 @@ Examples:
     multiflexi-cli company-app:assign --company_id=1 --app_uuid=uuid-123 --format=json
     multiflexi-cli company-app:unassign --company_id=1 --app_id=2
 
+credential
+----------
+
+Read a Credential (the assignment of a CredentialType to a RunTemplate, see
+:doc:`../concepts/credential-management`).
+
+Options:
+  --id           Credential ID
+  --fields       Comma-separated list of fields to display
+  --reveal       Show actual secret values instead of masked placeholders
+                 (prompts for confirmation, writes an audit log entry)
+  -f, --format   Output format: text or json (default: text)
+
+Examples:
+
+.. code-block:: bash
+
+    # Redactable (password/secret-typed) fields are masked by default
+    multiflexi-cli credential:get --id=1
+
+    # Reveal the real values — requires interactive confirmation
+    multiflexi-cli credential:get --id=1 --reveal
+
+Redactable field values print as ``••••••••`` (set) or ``(not set)``
+(empty) unless ``--reveal`` is passed. This is the only place in
+MultiFlexi that can show a stored credential's real value — see
+:doc:`../concepts/credential-management` for why the REST API and web UI
+intentionally have no equivalent.
+
 credential-type
 ---------------
 
@@ -499,6 +528,8 @@ Examples:
     multiflexi-cli token:update --id=1 --token=NEWVALUE
     multiflexi-cli token:delete --id=1
 
+.. _cli-encryption-commands:
+
 encryption
 ----------
 
@@ -555,15 +586,21 @@ Sample output:
     Master Key: configured
     Total Keys: 3
     Active Keys: 3
-    
+
     Keys:
-    +-------------+-------------+--------+---------------------+---------+
-    | Key Name    | Algorithm   | Status | Created             | Rotated |
-    +-------------+-------------+--------+---------------------+---------+
-    | credentials | aes-256-gcm | active | 2025-10-30 09:00:00 | never   |
-    | default     | aes-256-gcm | active | 2025-10-29 10:00:00 | never   |
-    | personal    | aes-256-gcm | active | 2025-10-28 08:00:00 | never   |
-    +-------------+-------------+--------+---------------------+---------+
+    +-------------+---------+-------------+--------+---------------------+---------+
+    | Key Name    | Version | Algorithm   | Status | Created             | Rotated |
+    +-------------+---------+-------------+--------+---------------------+---------+
+    | credentials | 2       | aes-256-gcm | active | 2025-11-02 09:00:00 | never   |
+    | credentials | 1       | aes-256-gcm | inactive | 2025-10-30 09:00:00 | 2025-11-02 09:00:00 |
+    | default     | 1       | aes-256-gcm | active | 2025-10-29 10:00:00 | never   |
+    | personal    | 1       | aes-256-gcm | active | 2025-10-28 08:00:00 | never   |
+    +-------------+---------+-------------+--------+---------------------+---------+
+
+Each key name can have multiple **versions**: rotating a key deactivates the
+previous version but keeps its key material, so data encrypted under it
+remains decryptable — only the ``active`` version is used for new
+encryption.
 
 JSON output includes:
 
@@ -579,8 +616,9 @@ JSON output includes:
             "keys": [
                 {
                     "key_name": "credentials",
+                    "version": 2,
                     "algorithm": "aes-256-gcm",
-                    "created_at": "2025-10-30 09:00:00",
+                    "created_at": "2025-11-02 09:00:00",
                     "rotated_at": null,
                     "is_active": true
                 }
@@ -591,14 +629,17 @@ JSON output includes:
 Init Action
 ^^^^^^^^^^^
 
-Re-initialize encryption keys:
+Initialize (or rotate) the ``credentials`` encryption key:
 
 .. code-block:: bash
 
-    # Re-initialize encryption keys
+    # First-time setup
     multiflexi-cli encryption:init
 
-    # Re-initialize with JSON output
+    # Rotate: generate a new active version of the key
+    multiflexi-cli encryption:init --force
+
+    # With JSON output
     multiflexi-cli encryption:init -f json
 
 Sample output:
@@ -608,12 +649,14 @@ Sample output:
     Encryption key initialized successfully
     Key name: credentials
     Algorithm: aes-256-gcm
-    WARNING: All existing encrypted credentials are now invalid and must be re-entered
 
-**Warning**: Re-initializing encryption keys will invalidate all previously encrypted credentials. All sensitive data must be re-entered after running this command. Use this command only during:
+**Rotation is non-destructive**: running ``encryption:init --force`` deactivates
+the current key version and activates a new one, but keeps the old version's
+key material in the ``encryption_keys`` table. Credentials already encrypted
+under the previous version keep decrypting correctly — nothing needs to be
+re-entered. Use ``--force`` during:
 
-- Initial system setup
-- After master key rotation
+- Scheduled key rotation policy
 - Security incident response
 - Explicit security policy requirements
 
@@ -624,6 +667,28 @@ If ``ENCRYPTION_MASTER_KEY`` is not configured, the init command will fail:
 .. code-block:: text
 
     ERROR: ENCRYPTION_MASTER_KEY is not configured. Set it in .env file or as environment variable.
+
+Encrypt-Existing Action
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Backfills any ``credata`` rows that were written before encryption at rest
+was enabled (or before this feature existed), encrypting only redactable
+(password/secret-typed) field values. Idempotent — rows already encrypted
+are skipped, so it is safe to re-run.
+
+.. code-block:: bash
+
+    # Preview how many rows would be affected, without changing anything
+    multiflexi-cli credential:encrypt-existing --dry-run
+
+    # Run the backfill
+    multiflexi-cli credential:encrypt-existing
+
+    # JSON output, larger batch size
+    multiflexi-cli credential:encrypt-existing -f json --batch-size=500
+
+Requires ``encryption:init`` to have been run first (the command fails
+with the same "ENCRYPTION_MASTER_KEY is not configured" error otherwise).
 
 queue
 -----
