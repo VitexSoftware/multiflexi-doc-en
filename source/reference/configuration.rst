@@ -44,9 +44,15 @@ Security Options
 - **ENCRYPTION_MASTER_KEY**: Master key used to encrypt the per-purpose
   encryption keys stored in the ``encryption_keys`` table (Critical: back
   this up — losing it makes all encrypted credential values unrecoverable).
-  Set it, then run ``multiflexi-cli encryption:init`` once to generate the
-  ``credentials`` key. ``MULTIFLEXI_MASTER_KEY`` is accepted as a
-  backward-compatible alias.
+  On package installs, ``multiflexi-common``'s ``debconf`` prompt sets this
+  automatically (generated, or a value you supply — see the "Credential
+  Encryption Key" step in :doc:`/install`; re-run with
+  ``dpkg-reconfigure multiflexi-common`` to change your choice).
+  Otherwise set it manually, then run ``multiflexi-cli encryption:init``
+  once to generate the ``credentials`` key. ``MULTIFLEXI_MASTER_KEY`` is
+  accepted as a backward-compatible alias. Not required for the web
+  interface to function — it degrades gracefully (encryption/decryption
+  simply unavailable) if unset.
 - **CSRF_PROTECTION_ENABLED**: Enable Cross-Site Request Forgery protection (default: ``true``).
 - **BRUTE_FORCE_PROTECTION_ENABLED**: Enable protection against brute force attacks (default: ``true``).
 - **BRUTE_FORCE_MAX_ATTEMPTS**: Maximum number of failed attempts allowed (default: ``5``).
@@ -59,7 +65,9 @@ Security Options
   encrypted (AES-256-GCM) before being written to ``credata.value`` —
   storing them fails closed if ``encryption:init`` has not been run yet.
   Set to ``false`` only for local development/testing, where secret values
-  are then stored as plaintext instead.
+  are then stored as plaintext instead. Choosing "Do not encrypt
+  credentials (development only)" in ``multiflexi-common``'s install-time
+  ``debconf`` prompt sets this automatically.
 - **RATE_LIMITING_ENABLED**: Enable general rate limiting (default: ``true``).
 - **IP_WHITELIST_ENABLED**: Enable IP whitelisting (default: ``false``).
 - **TWO_FACTOR_AUTH_ENABLED**: Enable Two-Factor Authentication (default: ``true``).

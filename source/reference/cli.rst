@@ -547,7 +547,7 @@ MultiFlexi encryption requires ``ENCRYPTION_MASTER_KEY`` to be configured in one
 2. Environment variable: ``MULTIFLEXI_MASTER_KEY`` (backward compatibility)
 3. Configuration file: ``/etc/multiflexi/multiflexi.env``
 
-**Automatic Setup**: During installation of the ``multiflexi-common`` package, a master key is automatically generated and stored in ``/etc/multiflexi/multiflexi.env``.
+**Automatic Setup**: During installation of the ``multiflexi-common`` package, a ``debconf`` prompt asks whether to generate a random key automatically (default), let you enter your own, or disable encryption entirely (development only, sets ``DATA_ENCRYPTION_ENABLED=false``). See the "Credential Encryption Key" step in :doc:`/install`. Re-run the prompt at any time with ``sudo dpkg-reconfigure multiflexi-common`` — it is skipped automatically once a choice (or an existing key) is already present in ``/etc/multiflexi/multiflexi.env``, so it never overwrites an existing key or setting.
 
 **Manual Configuration**:
 

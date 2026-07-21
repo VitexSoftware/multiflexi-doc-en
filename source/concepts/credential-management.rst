@@ -216,7 +216,11 @@ Security Considerations
   that itself would leak information.
 - Credential values are encrypted at rest (AES-256-GCM) in the database when
   ``DATA_ENCRYPTION_ENABLED=true`` (the default) and
-  ``multiflexi-cli encryption:init`` has been run. Encryption keys are
+  ``multiflexi-cli encryption:init`` has been run. The ``multiflexi-common``
+  package's install-time ``debconf`` prompt normally handles both — it
+  generates (or lets you supply) ``ENCRYPTION_MASTER_KEY``, or sets
+  ``DATA_ENCRYPTION_ENABLED=false`` if you choose not to encrypt (see
+  :doc:`../install`). Encryption keys are
   versioned: rotating a key (``encryption:init --force``) keeps the previous
   version's key material so data encrypted under it stays decryptable — it
   does not invalidate existing credentials. See

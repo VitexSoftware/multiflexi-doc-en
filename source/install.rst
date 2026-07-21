@@ -99,6 +99,56 @@ During installation, the ``dbconfig-common`` tools will prompt you to configure 
    ``multiflexi-cli`` can locate its configuration immediately without any manual
    copy step.
 
+Step 3b: Credential Encryption Key
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``multiflexi-common`` (pulled in as a dependency of ``multiflexi-mysql`` /
+``multiflexi-sqlite``) asks, via ``debconf``, how to set up the master key
+used to encrypt stored credential secrets (passwords, API keys, tokens) at
+rest:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Choice
+     - Effect
+   * - **Generate a random key automatically** (default)
+     - A secure key is generated with ``openssl rand`` and written to
+       ``ENCRYPTION_MASTER_KEY`` in ``/etc/multiflexi/multiflexi.env``.
+       Recommended for production.
+   * - **Enter my own key**
+     - Prompts (password-style input, not echoed) for a key to use instead
+       — for example to match an existing deployment or a key managed
+       externally. Leaving this blank falls back to generating one.
+   * - **Do not encrypt credentials (development only)**
+     - Sets ``DATA_ENCRYPTION_ENABLED=false``. Credential secrets are then
+       stored as plaintext in the database. Only appropriate for local
+       development — never for a deployment holding real credentials.
+
+.. warning::
+
+   Back up ``ENCRYPTION_MASTER_KEY`` somewhere safe. If it is ever lost,
+   credentials already encrypted with it become permanently unrecoverable.
+   See :doc:`administration/backup-recovery`.
+
+This prompt only runs once — on upgrade, or on any subsequent
+``dpkg-reconfigure multiflexi-common``, it is skipped automatically if
+either ``ENCRYPTION_MASTER_KEY`` or ``DATA_ENCRYPTION_ENABLED=false`` is
+already present in ``/etc/multiflexi/multiflexi.env``, so an existing
+choice (and any already-encrypted data) is never overwritten. To change
+your choice later, run:
+
+.. code-block:: bash
+
+    sudo dpkg-reconfigure multiflexi-common
+
+The web interface itself does not require ``ENCRYPTION_MASTER_KEY`` to be
+set — it works whether encryption is configured or not. See
+:doc:`reference/configuration` for the full list of encryption-related
+environment variables and :doc:`concepts/credential-management` for how
+redaction and encryption interact.
+
 Step 4: Install Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
