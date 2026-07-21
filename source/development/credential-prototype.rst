@@ -408,6 +408,45 @@ The ``ttl`` parameter (seconds) tells the executor how long to cache the result.
 Use shorter TTLs for transient failures (60 s) and longer for successes (300 s).
 Rate-limited APIs should return a long TTL even on success to avoid burning quota.
 
+Classifying TLS/Certificate Failures
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A plain ``$errno !== 0`` check (as in the minimal example above) lumps every
+transport failure — including an expired or untrusted server certificate —
+into ``Unavailable``. That is wrong for certificates: an expired cert will
+never "become reachable" again on its own, so treating it as transient causes
+the executor to retry forever instead of surfacing an actionable error.
+
+``\MultiFlexi\CredentialProtoType\AbraFlexi::checkAvailability()`` shows the
+fix. It keeps a list of curl error codes that indicate a TLS/certificate
+problem rather than a network hiccup:
+
+.. code-block:: php
+
+    private const TLS_ERRNOS = [
+        \CURLE_SSL_CONNECT_ERROR,   // 35
+        51,                         // CURLE_PEER_FAILED_VERIFICATION / CURLE_SSL_PEER_CERTIFICATE
+        \CURLE_SSL_CERTPROBLEM,     // 58 - local client cert problem
+        \CURLE_SSL_CIPHER,          // 59
+        \CURLE_SSL_CACERT,          // 60 - peer cert could not be verified against CA
+        \CURLE_SSL_CACERT_BADFILE,  // 77
+        82,                         // CURLE_SSL_CRL_BADFILE
+        83,                         // CURLE_SSL_ISSUER_ERROR
+    ];
+
+(A few libcurl error codes are not exposed as PHP constants on every build —
+those are used as bare integers with a comment.)
+
+When the initial probe fails with one of these codes, re-probe once with
+``CURLOPT_SSL_VERIFYPEER`` / ``CURLOPT_SSL_VERIFYHOST`` disabled and
+``CURLOPT_CERTINFO => true``, then read ``CURLINFO_CERTINFO`` to get the
+peer certificate's ``Expire date``. If that date is in the past, return
+``Misconfigured`` with the concrete expiry timestamp instead of curl's
+generic "SSL peer certificate ... was not OK" text; otherwise fall back to a
+``Misconfigured`` "certificate is not trusted" message. Either way the result
+is ``Misconfigured`` (no retry), because both cases need a human to fix the
+server's certificate, not the executor to keep polling it.
+
 Example: Two-Phase SharePoint Check
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
