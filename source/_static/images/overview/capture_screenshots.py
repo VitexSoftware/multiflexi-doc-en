@@ -88,7 +88,7 @@ try:
 
     # --- Job list ---
     print("Capturing job list...")
-    drv.get(f"{BASE}/joblist.php")
+    drv.get(f"{BASE}/jobs.php")
     screenshot("jobs", 3)
 
     print("All screenshots captured successfully.")
