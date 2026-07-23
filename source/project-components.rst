@@ -553,7 +553,9 @@ multiflexi-mcp-server
 
     export MULTIFLEXI_HOST=https://multiflexi.example.com
 
-**Features**: Tools for apps, jobs, companies, users, run templates, GDPR data exports.
+**Features**: Tools for apps, jobs, companies, users, run templates, credentials, credential
+types, topics, event sources, event rules, tasks, and GDPR data exports — including full
+read/update coverage for credentials, credential types, and topics.
 
 Event-Driven Processing
 -----------------------
