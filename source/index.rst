@@ -141,6 +141,7 @@ Contents
    development/application-development
    development/credential-prototype
    development/testing
+   development/test-scenarios
    development/contributing
 
 .. toctree::

@@ -12,8 +12,13 @@ MultiFlexi employs a comprehensive testing strategy to ensure code quality and s
   Database connectivity testing and API endpoint validation across different environments.
 
 **End-to-End Web Testing**
-  Comprehensive Selenium-based web interface testing with support for multiple environments and internationalization. 
+  Comprehensive Selenium-based web interface testing with support for multiple environments and internationalization.
   See :doc:`/selenium-testing` for detailed information.
+
+**Test Scenarios**
+  For the acceptance criteria each feature must satisfy — steps, expected
+  reactions, and the matching CLI/Selenium/API verification for each — see
+  :doc:`/development/test-scenarios`.
 
 **Key Testing Features:**
 

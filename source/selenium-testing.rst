@@ -15,6 +15,16 @@ Overview
 
 The Selenium test suite is designed to validate the MultiFlexi web interface through automated browser testing. It covers complete user workflows from authentication to job execution, ensuring system reliability and user experience quality.
 
+.. note::
+
+   The suite described on this page lives in the ``multiflexi-web5``
+   repository (``tests/selenium/``) — the currently active MultiFlexi web
+   frontend. The older ``multiflexi-web`` repository is no longer developed
+   and does not carry this suite. See :doc:`/development/test-scenarios` for
+   the business-scenario catalogue that ties these tests to their CLI and
+   REST API equivalents, and for which scenarios still lack Selenium
+   coverage.
+
 **Key Features:**
 
 - **Multi-Environment Testing**: Support for development, local package, and staging environments
