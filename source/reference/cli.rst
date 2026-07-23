@@ -288,12 +288,25 @@ Options:
   --runtemplate_id  RunTemplate ID
   --scheduled      Scheduled datetime
   --executor       Executor
-  --schedule_type  Schedule type
+  --schedule_type  Schedule type (see below)
   --app_id         App ID
   --limit          Limit number of results
   --offset         Offset for pagination
   --order          Sort order: A (ascending) or D (descending)
   --status         Filter by job state: ``failed``, ``success``, ``running``, ``pending``
+
+``schedule_type`` values:
+
+- An interval name (``hourly``, ``daily``, ``weekly``, ``monthly``, ``yearly``,
+  ``minutly``, ``custom``) — the job was spawned by the cron scheduler for the
+  RunTemplate's configured interval.
+- ``adhoc-web`` — triggered manually from the web UI.
+- ``adhoc-cli`` — triggered manually from ``multiflexi-cli`` for immediate execution.
+- ``adhoc-api`` — triggered via the REST API (e.g. from Node-RED) for immediate execution.
+- ``CommandLine`` — scheduled for a future time via the CLI or REST API (not immediate).
+
+Only the interval-name values update the RunTemplate's ``next_schedule`` /
+``last_schedule`` bookkeeping; all ad-hoc/``CommandLine`` types leave it untouched.
 
   --fields         Comma-separated list of fields to display
   -f, --format     Output format: text or json (default: text)
