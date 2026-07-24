@@ -110,6 +110,33 @@ Debian 12 is **not being dropped**. The distinction that matters:
   `_audit/debian-support-audit-2026-07.md
   <https://github.com/VitexSoftware/multiflexi-doc-en/blob/main/_audit/debian-support-audit-2026-07.md>`_.
 
+``multiflexi-server`` requires a backported ``php-slim`` (Slim 4) on every distro
+------------------------------------------------------------------------------------
+
+``multiflexi-server`` (the REST API) is built on `Slim Framework 4
+<https://www.slimframework.com/>`_ via ``php-di-slim-bridge``, which requires
+Slim 4's ``Slim\Interfaces\AdvancedCallableResolverInterface``. No supported
+distro ships that in its own archive:
+
+- **Debian 12 (Bookworm), Ubuntu 22.04 (Jammy), Ubuntu 24.04 (Noble)** —
+  their official archives don't package ``php-slim`` at all.
+- **Debian 13 (Trixie)** — its official archive *does* ship a ``php-slim``
+  package, but it is Slim **3.12.5**, not Slim 4. Installing it instead of
+  ours causes ``multiflexi-server``'s API to fail every request with a fatal
+  ``Interface "Slim\Interfaces\AdvancedCallableResolverInterface" not
+  found`` error (confirmed on demo.multiflexi.eu, 2026-07-24).
+
+VitexSoftware therefore publishes its own ``php-slim`` package (currently
+Slim 4.15.2, version string ``4.15.2~trixie...~<distro>``) to the
+``backports`` component of ``repo.vitexsoftware.com`` / ``repo.multiflexi.eu``
+for **all four** supported distros, not just Trixie. On Trixie this package
+must win over Debian's own — its upstream version (``4.x``) sorts higher
+than Debian's ``3.12.5-1``, so a plain ``apt-get install`` / ``apt-get
+upgrade`` picks it correctly as long as the VitexSoftware repo is enabled;
+no special pinning is required. ``multiflexi-server``'s ``debian/control``
+pins ``php-slim (>= 4)`` so the dependency can never silently resolve to
+Debian's Slim 3 package.
+
 Test repository scope is unchanged
 -------------------------------------
 
