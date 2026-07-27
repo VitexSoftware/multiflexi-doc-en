@@ -726,6 +726,23 @@ Options:
   paging. JSON output (``--format json``) is unaffected — it remains a bare
   array of job objects.
 
+**queue:fix checks:**
+
+- **Orphaned jobs**: pending jobs referencing a missing company or
+  runtemplate.
+- **Broken schedule records**: queue entries pointing at a missing or
+  empty job.
+- **Implausible schedules**: pending jobs whose scheduled time lies
+  further in the future than one cadence period of their runtemplate's
+  interval (e.g. a daily runtemplate with a job scheduled several days
+  out). This can happen when a runtemplate's schedule state is lost, for
+  example after ``queue:truncate`` runs after the current cadence
+  boundary has already passed — the affected schedule/job pair is purged
+  and the runtemplate's ``next_schedule`` is reset so the scheduler daemon
+  recomputes a correct time on its next run.
+- **Missing jobs for a stale next_schedule**: runtemplates whose
+  ``next_schedule`` no longer has a matching queued job.
+
 Examples:
 
 .. code-block:: bash

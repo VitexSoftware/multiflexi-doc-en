@@ -35,7 +35,7 @@ The three daemons are fully decoupled and communicate only through the shared da
 The Scheduler Daemon
 ---------------------
 
-The scheduler runs as ``multiflexi-scheduler.service``. It wakes up periodically, iterates over all enabled RunTemplates, and creates a ``Job`` record for any RunTemplate whose next scheduled run time has passed.
+The scheduler runs as ``multiflexi-scheduler.service``. Its main loop (``CronScheduler::scheduleCronJobs()``) ticks roughly every second and considers every active RunTemplate whose ``interv`` is not ``Manually`` and whose ``next_schedule`` column is currently ``NULL``.
 
 **Scheduling intervals available in RunTemplates:**
 
@@ -45,8 +45,18 @@ The scheduler runs as ``multiflexi-scheduler.service``. It wakes up periodically
 - Weekly (once per week)
 - Monthly (once per month)
 - Yearly (once per year)
+- Custom cron expression
 
-The scheduler writes the next scheduled time back to the RunTemplate after enqueuing, preventing duplicate enqueuing.
+**Computing the next run time:**
+
+For each candidate RunTemplate the scheduler resolves the interval (or custom ``cron`` field) to a cron expression and computes the next run time from one of two anchors:
+
+- If the RunTemplate has a ``last_schedule`` (its previous Job already completed), the next run is the first cron occurrence strictly *after* ``last_schedule``. This guarantees a period is never enqueued twice.
+- If ``last_schedule`` is empty (a brand-new RunTemplate, or one whose schedule state was lost — for example after ``queue:fix`` or ``queue:truncate`` reset ``next_schedule``), the scheduler anchors to the most recent cadence boundary at or before "now" instead of jumping to the next one. It only skips ahead to the next boundary if a Job already exists for that exact slot (pending or finished); otherwise it enqueues the missed slot immediately, with an ``after`` time in the past, which the executor then runs right away. This catch-up behavior — driven by actual Job history rather than a fixed "next boundary from now" rule — is what prevents a daily RunTemplate from silently losing today's run when its schedule state is reset after the day's cadence boundary has already passed.
+
+The scheduler writes the computed time back to the RunTemplate's ``next_schedule`` column when enqueuing, preventing duplicate enqueuing on subsequent ticks. This bookkeeping only applies to cron-driven Jobs — ad-hoc Jobs (manually triggered via the web UI, CLI, or API) carry a ``schedule_type`` of ``adhoc``/``adhoc-web``/``adhoc-cli``/``adhoc-api``/``CommandLine`` and never read or write ``next_schedule``/``last_schedule``, so triggering a Job immediately has no effect on a RunTemplate's cron cadence.
+
+See :doc:`../reference/cli` (``queue:fix``) for the consistency checks that detect and repair a RunTemplate whose ``next_schedule``/queue state has drifted — including a queued Job scheduled implausibly far in the future for its interval, and orphaned or broken queue records.
 
 **Task materialization:**
 

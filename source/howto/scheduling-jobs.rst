@@ -19,12 +19,14 @@ You do not manage individual jobs directly — you configure the RunTemplate sch
 How Scheduling Works
 ---------------------
 
-1. The **scheduler daemon** wakes up every minute and scans active RunTemplates
-2. For each RunTemplate where ``next_run <= now()``, it creates a new ``Job`` record in the database
-3. It updates the RunTemplate's ``next_run`` to the next scheduled time
-4. The **executor daemon** picks up pending Job records and executes them
+1. The **scheduler daemon** ticks roughly every second and scans active RunTemplates whose ``next_schedule`` is currently empty
+2. For each due RunTemplate it computes the next run time from its interval (or custom cron expression) and creates a new ``Job`` record in the database
+3. It writes that time back to the RunTemplate's ``next_schedule`` column, so the same slot is not enqueued twice
+4. The **executor daemon** picks up pending Job records (anything whose scheduled time has arrived) and executes them
 
-This means there is a small delay (up to ~1 minute) between a scheduled time and actual execution start.
+This means there is only a small delay (typically under a second) between a scheduled time and actual execution start. If a RunTemplate's schedule state is ever reset (for example by ``multiflexi-cli queue:fix`` or ``queue:truncate``), the scheduler catches up on a missed slot on its next tick instead of waiting for the next cadence boundary — see :doc:`../concepts/execution-architecture` for the exact algorithm.
+
+Manually triggering a Job (see `Triggering a Job Immediately`_ below) does not touch the RunTemplate's ``next_schedule``/``last_schedule`` and therefore never interferes with its regular cadence.
 
 Interval Reference
 -------------------
