@@ -720,6 +720,11 @@ Options:
 - **Schedule Type**: Human-readable schedule types converted from interval codes
 - **Waiting Time**: Human-readable time remaining (e.g., "2h 45m", "overdue")
 - **Complete Job Details**: RunTemplate name, Application name, Company information
+- **Total count**: after the table, a summary line reports the total number of
+  scheduled jobs (``Total scheduled jobs: N``), independent of ``--limit``/
+  ``--offset`` paging. In JSON format (``--format json``), the output is an
+  object ``{"jobs": [...], "total": N}`` instead of a bare array, so the total
+  is available to scripts as well.
 
 Examples:
 
