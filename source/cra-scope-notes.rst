@@ -43,10 +43,11 @@ vectors that plausibly bring parts of the project into scope as a
 "manufacturer":
 
 1. **Hardware appliances.** MultiFlexi is sold pre-installed on Raspberry Pi
-   hardware in multiple tiers (Lite, Standard, Pro, Enterprise) via
-   rpishop.cz. Software bundled with hardware and placed on the market is
-   unambiguously in scope for CRA purposes — this is the clearer of the two
-   vectors.
+   hardware in multiple tiers (Lite, Standard, Pro, Enterprise). The
+   Raspberry Pi hardware itself is sourced from multiple suppliers as part
+   of building these appliances. Software bundled with hardware and placed
+   on the market is unambiguously in scope for CRA purposes — this is the
+   clearer of the two vectors.
 2. **A possible future subscription/support model.** Not yet in effect. If
    introduced, whether it brings the software into "placing on the market"
    scope depends on the Commission's "monetization test" (draft guidance,
