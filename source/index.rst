@@ -150,6 +150,8 @@ Contents
 
    apps_overview
    gdpr-compliance
+   sbom-process
+   cra-scope-notes
    troubleshooting
    usage
 
