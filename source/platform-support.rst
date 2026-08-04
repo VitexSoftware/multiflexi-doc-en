@@ -175,5 +175,14 @@ team, not resolved here:
   until a compatible ``php-psr-http-factory`` (or ``php-slim-psr7``) build
   is available for jammy; the rest of the fleet still builds for jammy
   per the table above.
+- ``multiflexi-vaultwarden``'s ``debian/Jenkinsfile`` and
+  ``debian/Jenkinsfile.release`` no longer build for ``debian:bookworm``
+  (removed 2026-08-04). It depends on ``php-jalismrs-bitwarden``, which
+  requires ``php-symfony-process (>= 6.0)``; Bookworm ships Symfony
+  5.4.x and no compatible backport is published on
+  ``repo.vitexsoftware.com`` / ``repo.multiflexi.eu``, so
+  ``php-jalismrs-bitwarden`` itself stopped publishing for Bookworm on
+  2026-07-12. Effectively ``multiflexi-vaultwarden`` is Trixie/Noble
+  only until a Bookworm-compatible Symfony backport exists.
 
 See the audit artifact for full detail.
