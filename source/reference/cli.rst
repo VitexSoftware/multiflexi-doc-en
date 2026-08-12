@@ -366,12 +366,26 @@ Manage run templates (list, get, create, update, delete, schedule, and credentia
     multiflexi-cli run-template:list [options]
     multiflexi-cli run-template:get --id=<id> [options]
     multiflexi-cli run-template:create --name=<name> --app_id=<id> --company_id=<id> [options]
+    multiflexi-cli run-template:clone --id=<id> [--name=<name>]
     multiflexi-cli run-template:update --id=<id> [options]
     multiflexi-cli run-template:delete --id=<id>
     multiflexi-cli run-template:schedule --id=<id> [options]
     multiflexi-cli run-template:assign-credential --id=<id> --credential_id=<id> [options]
     multiflexi-cli run-template:unassign-credential --id=<id> --credential_id=<id> [options]
     multiflexi-cli run-template:list-credentials --id=<id> [options]
+
+``run-template:delete`` cascades the removal of every record tied to the
+RunTemplate: its jobs (and each job's queue entries, output logs, and
+artifacts), action config, assigned credentials, saved config values, and any
+job-chaining event rules that reference it. Deleting a RunTemplate with no
+matching id reports an error instead of silently succeeding.
+
+``run-template:clone`` copies a run template's configuration, saved config
+values, and credential assignments into a new run template. **The clone is
+always created disabled** (``active=false``), regardless of the source
+template's state, so a copied — and not yet reviewed — configuration can
+never be picked up by the scheduler. Enable it explicitly with
+``run-template:update --id=<clone_id> --active=true`` once you've checked it.
 
 Common options:
   --id           RunTemplate ID
@@ -413,6 +427,10 @@ Examples:
     multiflexi-cli run-template:update --id=230 --config=IMPORT_SCOPE=yesterday --config=ANOTHER_KEY=foo
     multiflexi-cli run-template:get --id=230 --format=json
     multiflexi-cli run-template:create --name="Import" --app_id=6e2b2c2e-7c2a-4b1a-8e2d-123456789abc --company_id=1
+
+    # Clone a run template — the clone is created disabled, review then enable it:
+    multiflexi-cli run-template:clone --id=230 --name="Copy of Import"
+    multiflexi-cli run-template:update --id=<clone_id> --active=true
 
     # One-time backfill with a custom IMPORT_SCOPE — value is NOT saved to run-template:
     multiflexi-cli run-template:schedule --id=167 --env=IMPORT_SCOPE=2025-11-1>2026-01-07
