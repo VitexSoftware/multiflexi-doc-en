@@ -124,6 +124,78 @@ Relationship Diagram
     │   false (misconfigured)          → block, notify │
     └──────────────────────────────────────────────────┘
 
+.. _app-json-vs-credprototype-json:
+
+``app.json`` vs. ``credprototype.json``: Who Declares What
+-------------------------------------------------------------
+
+Two different JSON files use two different vocabularies for what looks like
+the same information, and conflating them is an easy mistake:
+
+- **``app.json``'s ``requirements`` array** names the **topics** (credential
+  prototype ``code`` values) the app needs an assigned credential for — it
+  is a list of names, not a list of fields. See above.
+- **``app.json``'s ``environment`` object** lists every environment variable
+  the application's own executable actually reads — this is the app's
+  **required** configuration contract, independent of where the values come
+  from (an assigned credential, an app-specific setting, or both).
+- **``credprototype.json``'s ``fields`` array** lists the environment
+  variables a given credential *type* **provides** when a credential of
+  that type is assigned — it is the canonical, shared definition of those
+  fields (type, hint, validation), reused by every app that requires the
+  same topic.
+
+**Crucially, adding a topic to ``requirements`` does not remove the need to
+also declare its fields in ``environment``.** MultiFlexi does not
+auto-merge the two — an assigned credential supplies the *values*, but the
+app's own ``environment`` block is still what drives its configuration
+form and ``cmdparamsTemplate`` substitution. In practice, apps that
+require a shared topic **duplicate** that topic's field keywords in their
+own ``environment`` block.
+
+Example — ``pohoda-bank-to-realpad.app.json`` requires the ``Realpad``
+topic *and* still declares ``REALPAD_USERNAME`` / ``REALPAD_PASSWORD``
+under ``environment``:
+
+.. code-block:: json
+
+    {
+      "requirements": ["mserver", "Realpad"],
+      "environment": {
+        "REALPAD_USERNAME": { "type": "string", "required": true, "...": "..." },
+        "REALPAD_PASSWORD": { "type": "password", "required": true, "...": "..." },
+        "REALPAD_PROJECT_ID": { "type": "string", "required": true, "...": "..." }
+      }
+    }
+
+while the shared ``multiflexi-realpad/multiflexi/realpad.credprototype.json``
+defines the same two keywords once, under ``fields``, so every app that
+requires the ``Realpad`` topic can reuse that single definition instead of
+re-specifying field metadata (type, hint, description) from scratch:
+
+.. code-block:: json
+
+    {
+      "code": "Realpad",
+      "fields": [
+        { "keyword": "REALPAD_USERNAME", "type": "string", "required": true },
+        { "keyword": "REALPAD_PASSWORD", "type": "password", "required": true }
+      ]
+    }
+
+Note that ``REALPAD_PROJECT_ID`` appears only in the app's own
+``environment`` — it is app-specific configuration, not part of what the
+``Realpad`` credential provides, so it has no place in the credential
+prototype.
+
+.. warning::
+
+    Do not strip a topic's fields from an app's ``environment`` block just
+    because the app now also lists that topic in ``requirements``. Removing
+    them breaks the app's configuration form and command-line substitution
+    — ``requirements`` and ``environment`` serve different purposes and
+    must both be kept in sync with what the executable actually needs.
+
 Web UI Indicators
 -----------------
 

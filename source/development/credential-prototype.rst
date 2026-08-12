@@ -5,6 +5,16 @@ Credential Prototype Development
 
 Credential prototypes define reusable sets of configuration fields that applications can reference. They describe *what credentials look like* (e.g. "Fio Bank API token + account number") without storing actual secret values. Applications declare which credential prototype they need, and administrators fill in the real values per company.
 
+.. important::
+
+    A credential prototype's ``fields`` array lists what the credential
+    **provides**. An application's own ``environment`` block lists what the
+    application **requires** to run, and must still declare the same
+    keywords even after adding the prototype's ``code`` to its
+    ``requirements`` array — the two are not auto-merged. See
+    :ref:`app-json-vs-credprototype-json` for the full explanation and a
+    worked example.
+
 Schema Reference
 ----------------
 

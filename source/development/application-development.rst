@@ -59,8 +59,19 @@ If you have older application definitions:
 - Add ``$schema`` field at the top
 - Change ``topics`` string to ``tags`` array: ``"topics": "A,B,C"`` → ``"tags": ["A", "B", "C"]``
 - Change ``cmdparams`` to ``cmdparamsTemplate`` with ``${VAR}`` syntax instead of ``{VAR}``
-- Remove deprecated fields: ``setup``, ``deploy``, ``requirements``, ``multiflexi``
+- Remove deprecated fields: ``setup``, ``deploy``, ``multiflexi``
 - Add ``schemaVersion": "3.0.0"`` to explicitly declare compatibility
+
+.. note::
+
+    ``requirements`` was deprecated in older schema iterations but has since
+    been **reintroduced** with new semantics: it is now the array of topic
+    codes (matching credential prototype ``code`` values, e.g.
+    ``"requirements": ["FioBank"]``) that a RunTemplate must have satisfied
+    with an assigned credential before a job can run. Do **not** remove it
+    from current application definitions. See :ref:`topics` for the full
+    provider/consumer model, and :ref:`app-json-vs-credprototype-json` for
+    how it relates to the app's own ``environment`` block.
 
 Advanced Application Examples
 -----------------------------
