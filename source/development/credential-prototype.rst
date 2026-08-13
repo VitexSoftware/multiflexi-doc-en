@@ -209,6 +209,33 @@ In your ``debian/*.install`` file, install the logo to the shared path:
 
     Do **not** install logos to ``/usr/share/multiflexi-web/images/`` — that path is reserved for web UI assets. All application and credential prototype logos go to ``/usr/share/multiflexi/images/``.
 
+Serving logos in multiflexi-web
+--------------------------------
+
+``CredentialProtoType::logo()`` (and the ``logo`` column on a saved
+``CredentialType``) returns a **bare filename** — e.g. ``my-service.svg`` — not a
+path. ``multiflexi-web`` resolves that filename to actual bytes through
+``src/logoimage.php``, the credential-type counterpart of ``src/appimage.php``
+(which serves application icons by ``uuid``).
+
+``MultiFlexi\Ui\CredentialTypeLogo`` routes any bare filename through it:
+
+.. code-block:: text
+
+    logoimage.php?file=my-service.svg
+
+``logoimage.php`` looks the file up in, in order:
+
+1. ``src/images/`` (development source tree)
+2. ``/usr/share/multiflexi/images/`` (deb-installed application/credential-prototype logos)
+
+falling back to ``images/apps.svg`` if not found. The ``file`` parameter is
+passed through ``basename()`` before use, so only a bare filename can ever be
+requested — no path traversal into arbitrary filesystem locations.
+
+Only the built-in "none" placeholder logo (a ``data:image/svg+xml;base64,...``
+URI) bypasses ``logoimage.php`` and is used directly as the ``<img src>``.
+
 Database Schema
 ---------------
 
