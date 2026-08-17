@@ -429,6 +429,10 @@ Built-in Checks
        avoids the 30 s rate limit and cursor side effect).
    * - **Raiffeisen Bank**
      - Certificate readability + ``openssl_pkcs12_read`` + rate-limit budget file.
+   * - **Czech Data Box (Datovka)**
+     - Authenticates via ``getSimpleApi()->getDataBoxInfo()`` (login/password or
+       certificate). Auth rejected → Misconfigured; SOAP/network failure →
+       Unavailable; wrong ``DATABOX_ID`` → Misconfigured.
    * - **AbraFlexi**
      - Authenticated HEAD to server root; maps HTTP 401/403 → Misconfigured.
    * - **Database Connection**
