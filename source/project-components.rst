@@ -59,8 +59,10 @@ This section describes the individual projects that make up the MultiFlexi ecosy
           :width: 48px
           :alt: multiflexi-housekeeper
      - multiflexi-housekeeper
-     -
-     -
+     - .. image:: _static/images/components/multiflexi-datovka.svg
+          :width: 48px
+          :alt: multiflexi-datovka
+     - multiflexi-datovka
      -
      -
    * - .. image:: _static/images/components/multiflexi-abraflexi.svg
@@ -530,6 +532,19 @@ multiflexi-mtr
 ~~~~~~~~~~~~~~
 
 MTR network diagnostics credential prototype for network monitoring jobs.
+
+multiflexi-datovka
+~~~~~~~~~~~~~~~~~~~
+
+.. image:: _static/images/components/multiflexi-datovka.svg
+   :width: 64px
+   :align: right
+   :alt: multiflexi-datovka
+
+Czech Data Box (datová schránka / ISDS) credential prototype. Fields: ``LOGIN``,
+``PASSWORD``, ``CERT_FILE``, ``PRODUCTION``, ``DATABOX_ID``. Supports both
+login/password and certificate authentication, and includes a live availability
+check via ``getSimpleApi()->getDataBoxInfo()``. See :ref:`credential-availability-checks`.
 
 MCP Integration
 ---------------
