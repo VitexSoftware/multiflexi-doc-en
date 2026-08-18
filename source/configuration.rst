@@ -81,14 +81,18 @@ Configuration Field Types
 
 MultiFlexi utilizes a typed configuration system to ensure valid data input:
 
-- **Text**: Standard single-line input.
-- **Number**: Numeric input (integer or decimal).
-- **Date**: Date picker widget.
+- **String**: Standard single-line input.
+- **Text**: Multi-line input.
+- **Integer** / **Float**: Numeric input.
 - **Email**: Validated email input.
+- **URL**: Validated URL input.
 - **Password**: Masked input for sensitive credentials.
-- **Checkbox**: Boolean switch (Yes/No).
-- **File**: File upload widget.
-- **Directory**: Server-side directory path selector.
+- **Yes/No**: Boolean toggle switch, consistently rendered wherever a
+  boolean field is edited. Unchecking and saving a Yes/No field correctly
+  persists the "No" value.
+- **File path**: Server-side file path input.
+- **Set**: Selection from a fixed set of values (currently rendered as
+  plain text; a picker populated from a defined option list is planned).
 
 .. image:: appconfigfieldseditor.png
     :alt: Application Configuration Editor
