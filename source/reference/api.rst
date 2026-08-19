@@ -94,6 +94,18 @@ Job attempts.
 - **GET /tasks.{suffix}**: List Tasks, optionally filtered by ``state``,
   ``runtemplate_id``, ``from``, and ``to``
 
+/auditlog/
+----------
+This endpoint exposes the audit trail — one entry per create/update/delete
+performed on any entity, recorded automatically regardless of whether the
+action came from the web UI, the CLI, or the REST API. See
+:doc:`Audit Logging <../concepts/audit-logging>` for how entries are
+produced.
+
+- **GET /auditlog/{auditLogId}.{suffix}**: Get a single audit log entry by ID
+- **GET /auditlog.{suffix}**: List audit log entries, optionally filtered by
+  ``user_id``, ``entity_type``, ``entity_id``, ``action``, ``from``, and ``to``
+
 /eventrule/
 -----------
 This endpoint manages EventRules — the event-to-RunTemplate mapping used to

@@ -85,6 +85,7 @@ Contents
    concepts/credential-management
    concepts/topics
    concepts/execution-architecture
+   concepts/audit-logging
    project-components
 
 .. toctree::
