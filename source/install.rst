@@ -166,6 +166,86 @@ To install the full suite of standard applications:
 
     sudo apt install multiflexi-all
 
+Nginx Configuration (Manual Step)
+----------------------------------
+
+The ``multiflexi-web`` package auto-configures itself on **Apache2** and
+**lighttpd** during installation (a ``conf-available`` snippet is enabled
+and the web server is restarted automatically). It does **not** do this for
+Nginx - Nginx has no equivalent drop-in ``conf-available`` mechanism, so a
+server block has to be added by hand.
+
+MultiFlexi is a plain PHP application (individual ``.php`` scripts, not a
+single front controller), served through PHP-FPM, with one exception: the
+REST API under ``/multiflexi/api`` is a Slim-based application that does
+route everything through a single ``index.php``. The example below reflects
+both.
+
+.. code-block:: nginx
+
+    # Adjust server_name, the PHP-FPM socket, and TLS directives for your
+    # environment. This assumes MultiFlexi is reachable at /multiflexi/
+    # under an existing site - add these blocks inside your server {} block.
+
+    location /multiflexi {
+        alias /usr/share/multiflexi-web;
+        index index.php;
+
+        location ~ \.php$ {
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+        }
+
+        # Deny access to dotfiles (.user.ini, .htaccess - the latter is
+        # unused by Nginx but should never be served either way).
+        location ~ /\. {
+            deny all;
+        }
+    }
+
+    location /multiflexi/api {
+        alias /usr/share/multiflexi-server/api;
+        index index.php;
+
+        # Front-controller: route anything that isn't a real file/dir
+        # through index.php (mirrors the Apache mod_rewrite rule shipped
+        # for this path).
+        try_files $uri $uri/ /multiflexi/api/index.php?$query_string;
+
+        location ~ \.php$ {
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+
+        location ~ /\. {
+            deny all;
+        }
+    }
+
+.. note::
+
+   Nginx has no equivalent of Apache's per-directory ``php_admin_value``
+   directives, so ``open_basedir`` hardening for MultiFlexi is instead
+   shipped as ``/usr/share/multiflexi-web/.user.ini``, which PHP-FPM picks
+   up automatically regardless of which web server sits in front of it -
+   no Nginx-side configuration is needed for that part. ``allow_url_fopen``
+   is ``PHP_INI_SYSTEM`` and has no per-app equivalent under either web
+   server; set it in the PHP-FPM pool's ``php.ini`` if you need to
+   override it.
+
+.. tip::
+
+   Replace ``php8.2-fpm.sock`` with the PHP-FPM socket (or ``host:port``)
+   actually in use on your system - check
+   ``/etc/php/*/fpm/pool.d/*.conf`` for the ``listen`` directive, or run
+   ``ls /run/php/``.
+
 Post-Installation Verification
 ------------------------------
 
