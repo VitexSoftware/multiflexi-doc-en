@@ -62,6 +62,57 @@ Invalid Security Token
 
       timedatectl status
 
+Sessions Expire Much Sooner Than ``SESSION_TIMEOUT``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Symptom:** Users are silently logged out after ~20-30 minutes of
+inactivity, well short of the ``SESSION_TIMEOUT`` configured in
+``/etc/multiflexi/multiflexi.env`` (default 14400s / 4h). No "Your session
+has expired" message is shown - the user just appears logged out, and a
+DataTables view being polled in the background (e.g. the Jobs list) may
+briefly show an "Invalid JSON response" warning if this happens mid-poll.
+
+**Cause:** on Debian/Ubuntu, PHP session files under ``session.save_path``
+(default ``/var/lib/php/sessions``) are reaped by an OS-level housekeeper
+independent of the application - either a cron job
+(``/etc/cron.d/php``) or, on systemd hosts, the ``phpsessionclean.timer`` /
+``phpsessionclean.service`` pair (check which is active with
+``systemctl list-timers | grep sess``). Both read ``session.gc_maxlifetime``
+directly from the PHP-FPM pool's **on-disk** ``php.ini`` - Debian's stock
+default is ``1440`` seconds (24 minutes). MultiFlexi's own
+``SessionManager`` calls ``ini_set('session.gc_maxlifetime', ...)`` with the
+configured ``SESSION_TIMEOUT``, but that only affects the *current PHP-FPM
+worker process for the current request* - it never reaches the static
+``php.ini`` that the standalone cleanup script parses. So whichever value is
+smaller wins in practice, and on a stock Debian/Ubuntu PHP-FPM pool that's
+almost always the 24-minute system default, not the app's own timeout.
+
+Because the session *file* simply disappears (rather than the app detecting
+an expired/invalid session), ``session.use_strict_mode`` (which MultiFlexi
+does set) causes PHP to silently start a brand-new, empty session instead of
+erroring - so the app's own "session expired, redirecting to login" flow
+never triggers for this case, and the logout happens with no warning.
+
+**Solutions:**
+
+1. Check what the PHP-FPM pool serving MultiFlexi actually has configured:
+
+   .. code-block:: bash
+
+      php -i | grep -i gc_maxlifetime
+      systemctl list-timers | grep sess
+
+2. Give MultiFlexi its own PHP-FPM pool (recommended if it shares the
+   default ``www`` pool with other applications) with
+   ``php_admin_value[session.gc_maxlifetime] = <SESSION_TIMEOUT seconds>``,
+   matching the value configured in ``/etc/multiflexi/multiflexi.env``. This
+   is the only way to make the *pool-wide* setting - and therefore what the
+   cleanup timer reads - match the app's intended timeout without affecting
+   other applications sharing the default pool.
+3. Alternatively, raise ``session.gc_maxlifetime`` in the shared pool's
+   ``php.ini`` directly, accepting that this also extends session lifetime
+   for any other application sharing that pool.
+
 Cannot Log In (Wrong Password)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
