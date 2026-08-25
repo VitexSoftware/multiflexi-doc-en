@@ -170,6 +170,8 @@ Common Issues Quick Reference
      - Executor hit the memory ceiling (2 GB) and restarted mid-job. Check for memory leaks in the application.
    * - Credential fields empty in environment
      - CredentialType not assigned to the RunTemplate — see :doc:`assigning-credentials`
+   * - Job succeeds and produces a file (e.g. a downloaded PDF), but it never shows up as an artifact
+     - On MultiFlexi core versions before the ``artifacts.artifact`` column was made binary-safe, storing binary content (PDF, images, ...) as an artifact fails silently with a MySQL ``Incorrect string value`` error in the executor log, while text artifacts (JSON, XML) from the same job attach normally. Check ``journalctl -u multiflexi-executor`` for ``Failed to create artifact for result file`` around the job's timestamp; update ``multiflexi-database`` to a version including the ``artifacts_binary_safe`` migration and run ``multiflexi-migrations`` to apply it.
 
 See Also
 --------
