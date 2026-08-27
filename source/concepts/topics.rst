@@ -95,6 +95,15 @@ Zabbix (when ``ZABBIX_SERVER`` is set), and OpenTelemetry (when ``OTEL_ENABLED``
 is set). Blocked jobs appear in the job list with exit code **75** (POSIX
 ``EX_TEMPFAIL``) and an orange ``job-credential-blocked`` row class.
 
+A job blocked this way and *not* re-queued for retry (retry budget exhausted,
+or a ``misconfigured`` result) still has its Job row closed out — exit code,
+begin, and end are recorded even though the underlying command never ran.
+This matters for periodic RunTemplates: the scheduler's self-healing check
+only resets a stuck ``next_schedule`` when it finds no pending (``exitcode
+IS NULL``) job for that slot, so a blocked job that never closes its row
+would silently drop the RunTemplate out of its daily/periodic schedule
+until someone intervenes manually.
+
 Relationship Diagram
 --------------------
 
