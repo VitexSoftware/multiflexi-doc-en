@@ -345,7 +345,9 @@ downstream ``multiflexi-runtemplate`` node, which already merges
 the ``event_rule`` table.
 
 See the ``node-red-contrib-multiflexi`` README for installation and detailed
-node configuration.
+node configuration, and :doc:`../integrations/node-red-authentication` for
+how the ``multiflexi-map`` node (and the rest of the Node-RED integration)
+authenticates against the MultiFlexi API and the webhook feed.
 
 .. _chaining-caveats:
 

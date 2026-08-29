@@ -177,23 +177,46 @@ This endpoint is used to list all available endpoints.
 Authentication
 ==============
 
-The API uses HTTP Basic Authentication. Pass credentials in the standard
-``Authorization`` header:
+The API accepts two authentication mechanisms, checked in this order for every
+request:
 
-.. code-block:: bash
+1. **Bearer token** (recommended for service integrations, e.g. Node-RED):
 
-    curl -u username:password https://your-server/api/v1/apps.json
-    # or equivalently:
-    curl -H "Authorization: Basic $(echo -n 'username:password' | base64)" \
-         https://your-server/api/v1/apps.json
+   .. code-block:: bash
+
+       curl -H "Authorization: Bearer <token>" https://your-server/api/v1/apps.json
+
+   Tokens are minted with ``multiflexi-cli token:generate`` for a specific user and
+   are shown once at issue time - store them securely (Node-RED, for example,
+   keeps one per environment in an encrypted ``multiflexi-config`` credential).
+   A token can carry an expiry (``--ttl``); an expired or unknown token is
+   rejected outright, it does **not** fall back to Basic auth.
+
+2. **HTTP Basic Authentication** (interactive/human use), used automatically
+   whenever no bearer token is present on the request:
+
+   .. code-block:: bash
+
+       curl -u username:password https://your-server/api/v1/apps.json
+       # or equivalently:
+       curl -H "Authorization: Basic $(echo -n 'username:password' | base64)" \
+            https://your-server/api/v1/apps.json
 
 .. note::
 
    Credentials embedded in the URL (``user:pass@host``) are **not** supported.
-   Always use the ``Authorization: Basic`` header.
+   Always use the ``Authorization`` header (``Bearer`` or ``Basic``).
+
+.. note::
+
+   Both mechanisms require HTTPS in any deployment other than ``localhost`` /
+   ``multiflexi.local``. Never add a real hostname to that relaxed list.
 
 The following paths are exempt from authentication and accessible without
 credentials: ``/ping``, ``/login``, and the API index root (``/``).
+
+See :doc:`../integrations/node-red-authentication` for a worked example of
+issuing and using a token for the Node-RED integration.
 
 API Documentation
 =================

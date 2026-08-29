@@ -110,6 +110,7 @@ Contents
    integrations/pohoda
    integrations/ansible
    integrations/kubernetes
+   integrations/node-red-authentication
 
 .. toctree::
    :maxdepth: 2
