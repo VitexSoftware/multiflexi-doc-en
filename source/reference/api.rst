@@ -213,7 +213,8 @@ request:
    ``multiflexi.local``. Never add a real hostname to that relaxed list.
 
 The following paths are exempt from authentication and accessible without
-credentials: ``/ping``, ``/login``, and the API index root (``/``).
+credentials: ``/ping`` and ``/login``. Every other path, including the API
+index route, requires authentication.
 
 See :doc:`../integrations/node-red-authentication` for a worked example of
 issuing and using a token for the Node-RED integration.
