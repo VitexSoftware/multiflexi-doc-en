@@ -117,6 +117,7 @@ The template includes:
 - **Company Discovery**: Automatic discovery of companies/tenants
 - **RunTemplate Discovery**: Application and company-specific job monitoring
 - **Action Discovery**: Monitoring of Zabbix actions configured in RunTemplates
+- **Credential Availability Discovery**: Per-credential endpoint availability, with severity-tiered alerting on misconfigured or unreachable credentials
 - **Pre-configured Triggers**: Job failures, low success rates, service down alerts
 - **Performance Graphs**: Entity statistics and job execution metrics
 - **HTTP Tests**: Web interface availability monitoring
@@ -139,6 +140,9 @@ The Zabbix agent configuration and LLD scripts are now part of the dedicated `mu
 - ``multiflexi.action.lld`` - Action discovery
 - ``multiflexi.appstatus`` - System status (JSON format)
 - ``multiflexi.jobstatus`` - Job status summary (JSON format)
+- ``multiflexi.schedule.stale`` - Stale RunTemplate schedule watchdog (JSON format)
+- ``multiflexi.credential.lld`` - Credential availability discovery
+- ``multiflexi.credential.check[*]`` - Credential availability check result (JSON format), keyed by credential ID
 
 Restart Zabbix agent after package installation:
 
@@ -360,6 +364,79 @@ Output includes:
 **4. multiflexi-zabbix-lld-tasks**
 
 Discovers scheduled tasks/jobs.
+
+**5. multiflexi-zabbix-lld-credentials**
+
+Discovers MultiFlexi credentials and, per credential, checks their availability. See :ref:`credential-availability-monitoring` below for the full behavior.
+
+.. code-block:: bash
+
+   # Discovery mode
+   multiflexi-zabbix-lld-credentials
+
+   # Check mode: run one availability check for a given credential ID
+   multiflexi-zabbix-lld-credentials 5
+
+Discovery output:
+
+.. code-block:: json
+
+   [
+     {
+       "{#CREDENTIAL_ID}": 5,
+       "{#CREDENTIAL_NAME}": "Acme FioBank CZK",
+       "{#CREDENTIAL_TYPE}": "FioBank Acme Corporation",
+       "{#COMPANY_ID}": 1,
+       "{#COMPANY_NAME}": "Acme Corporation"
+     }
+   ]
+
+Check output:
+
+.. code-block:: json
+
+   {
+     "state": "available",
+     "state_code": 0,
+     "message": "",
+     "checked_at": 1735689600,
+     "ttl": 300,
+     "details": []
+   }
+
+.. _credential-availability-monitoring:
+
+Credential Availability Monitoring
+-----------------------------------
+
+Many :doc:`/credential-type` prototypes (AbraFlexi, FioBank, RaiffeisenBank, Pohoda mServer, Realpad, database connections, SMTP, VaultWarden, Office365, ...) implement a live ``checkAvailability()`` endpoint check. The **Credential Availability Discovery** rule (``multiflexi.credential.lld``) surfaces that state to Zabbix so failing or misconfigured credentials show up as alerts instead of only being noticed when a job using them fails.
+
+**Discovery scope:** every credential is discovered, not only ones with a live check. A credential whose type has no ``checkAvailability()`` implementation is still evaluated against a generic fallback: if any of its required configuration fields is empty, it is reported ``Misconfigured`` (it cannot possibly work); otherwise it is reported ``Unknown`` (no way to verify without a live check).
+
+**State values** (item ``multiflexi.credential.state[{#CREDENTIAL_ID}]``, mapped by the ``MultiFlexi Credential State`` value map):
+
+- ``Available`` (0) - Endpoint reachable, credential usable. No trigger.
+- ``Degraded`` (1) - Reachable but impaired (e.g. remote service busy or rate-limited). Trigger severity: **Average**.
+- ``Unavailable`` (2) - Fully configured, but the endpoint could not be reached. Trigger severity: **High**.
+- ``Misconfigured`` (3) - Required configuration field(s) missing or empty. Trigger severity: **Warning**.
+- ``Unknown`` (4) - No live check implemented, but required fields are filled. No trigger.
+
+**Item structure:** to avoid running the (possibly network- or DB-bound) check more than once per polling cycle, each discovered credential gets one active ``TEXT`` master item, ``multiflexi.credential.check[{#CREDENTIAL_ID}]``, returning the full check result as JSON. Three dependent items extract from it via JSONPath preprocessing:
+
+- ``multiflexi.credential.state[{#CREDENTIAL_ID}]`` - ``$.state_code`` (``UNSIGNED``, value-mapped)
+- ``multiflexi.credential.message[{#CREDENTIAL_ID}]`` - ``$.message`` (``TEXT``, human-readable)
+- ``multiflexi.credential.details[{#CREDENTIAL_ID}]`` - ``$.details`` (``TEXT``, opaque JSON)
+
+The ``details`` field is intentionally passed through unchanged: every credential prototype puts different, sometimes localized, keys in it (there is no standardized schema across prototypes), so it is only meant for troubleshooting - not for alerting or dashboards.
+
+**Configuring polling interval and exceptions per service:**
+
+Some services have tight API rate limits (e.g. RaiffeisenBank's PSD2 API), so polling them as often as other credentials could exhaust their quota. This is handled entirely through template macros - no code change is needed when a new rate-limited credential type is added:
+
+- ``{$CRED.AVAILABILITY.INTERVAL}`` (default ``5m``) - polling interval for ``multiflexi.credential.check[*]``. Override per credential type with a macro context, e.g. set ``{$CRED.AVAILABILITY.INTERVAL:"RaiffeisenBank"}`` to ``30m`` on the host.
+- ``{$CRED.AVAILABILITY.EXCLUDE}`` (default empty) - regex matched against ``{#CREDENTIAL_TYPE}``; any matching type is excluded from discovery entirely. E.g. set to ``^(SomeRateLimitedType)$`` to stop monitoring it.
+
+Both macros can be overridden at the host level in the Zabbix frontend, so exceptions for a specific deployment don't require editing the template.
 
 Zabbix LLD Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~
