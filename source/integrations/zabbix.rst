@@ -434,7 +434,7 @@ The ``details`` field is intentionally passed through unchanged: every credentia
 Some services have tight API rate limits (e.g. RaiffeisenBank's PSD2 API), so polling them as often as other credentials could exhaust their quota. This is handled entirely through template macros - no code change is needed when a new rate-limited credential type is added:
 
 - ``{$CRED.AVAILABILITY.INTERVAL}`` (default ``5m``) - polling interval for ``multiflexi.credential.check[*]``. Override per credential type with a macro context, e.g. set ``{$CRED.AVAILABILITY.INTERVAL:"RaiffeisenBank"}`` to ``30m`` on the host.
-- ``{$CRED.AVAILABILITY.EXCLUDE}`` (default empty) - regex matched against ``{#CREDENTIAL_TYPE}``; any matching type is excluded from discovery entirely. E.g. set to ``^(SomeRateLimitedType)$`` to stop monitoring it.
+- ``{$CRED.AVAILABILITY.EXCLUDE}`` (default ``^$``) - regex matched against ``{#CREDENTIAL_TYPE}``; any matching type is excluded from discovery entirely. The default only matches an empty string, which no real credential type name ever is, so nothing is excluded. E.g. set to ``^(SomeRateLimitedType)$`` to stop monitoring it. Do not set this to an empty string - an empty regex matches everything and would silently exclude every credential from discovery.
 
 Both macros can be overridden at the host level in the Zabbix frontend, so exceptions for a specific deployment don't require editing the template.
 
