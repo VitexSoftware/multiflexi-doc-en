@@ -130,6 +130,30 @@ The template includes:
 - Value mapping for human-readable status
 - Customizable macros for thresholds
 
+**Importing the template:**
+
+Via the Zabbix frontend: *Data collection → Templates → Import*, select
+``zabbix/multiflexi-template.xml`` (installed to
+``/usr/share/multiflexi/zabbix-templates/multiflexi-template.xml`` by the ``.deb`` package). Via the
+API, ``configuration.import`` with ``format: "json"`` (or ``"xml"``) works the same way; a host and
+template linkage rule set of at least
+``{"templates": {"createMissing": true, "updateExisting": true}, "discoveryRules": {...}, "items": {...}, "triggers": {...}, "valueMaps": {...}}``
+is enough for a first import.
+
+The template only needs importing into a given Zabbix server once - after that, link it to as many
+hosts as needed the normal way (*Host → Templates → Link new templates*, or ``host.update`` with a
+``templates`` array via the API).
+
+**If the host already runs another template with overlapping item keys** (for example, a
+hand-maintained template that also happens to define ``multiflexi.appstatus`` or similar): Zabbix
+will refuse to link this template as-is, reporting *"Cannot inherit item with key ... because an item
+with the same key is already inherited from template ..."*. In that situation, either remove the
+duplicate items from one of the two templates first, or - if only the credential-availability feature
+is actually needed on that host - re-import a trimmed copy of this template containing just the
+``multiflexi.credential.lld`` discovery rule (and its macros/value map), using
+``discoveryRules``/``items``/``triggers``/``valueMaps`` import rules with ``deleteMissing: true`` to
+prune everything else back out of that copy before linking it.
+
 **Zabbix Agent Configuration:**
 
 The Zabbix agent configuration and LLD scripts are now part of the dedicated `multiflexi-zabbix` package. Installation provides UserParameters at ``/etc/zabbix/zabbix_agent2.d/multiflexi.conf``:
@@ -140,6 +164,7 @@ The Zabbix agent configuration and LLD scripts are now part of the dedicated `mu
 - ``multiflexi.action.lld`` - Action discovery
 - ``multiflexi.appstatus`` - System status (JSON format)
 - ``multiflexi.jobstatus`` - Job status summary (JSON format)
+- ``multiflexi.queue`` - Currently queued jobs (JSON format)
 - ``multiflexi.schedule.stale`` - Stale RunTemplate schedule watchdog (JSON format)
 - ``multiflexi.credential.lld`` - Credential availability discovery
 - ``multiflexi.credential.check[*]`` - Credential availability check result (JSON format), keyed by credential ID
@@ -149,6 +174,84 @@ Restart Zabbix agent after package installation:
 .. code-block:: bash
 
    systemctl restart zabbix-agent2
+
+What Gets Checked and Sent
+---------------------------
+
+Every item above is an **active** Zabbix agent check: the agent itself runs the underlying
+``multiflexi-cli`` or ``multiflexi-zabbix-lld-*`` command on its own polling schedule and pushes the
+result to the server - MultiFlexi never has to push anything or know the Zabbix server's address for
+these to work (that's only needed for the separate trapper/action-based reporting described in
+`Zabbix Action Configuration`_). This section documents exactly what each check inspects and the
+shape of the data it reports.
+
+``multiflexi.appstatus`` - overall system health
+    Backed by ``multiflexi-cli status --format=json`` (default poll interval: 5 minutes). Reports one
+    JSON object with:
+
+    - ``version-cli`` / ``version-core`` - installed ``multiflexi-cli`` and ``multiflexi-core`` versions
+    - ``db-migration`` - name and version of the most recently applied database migration
+    - ``user`` - OS user the check ran as
+    - ``php`` / ``os`` / ``memory`` - PHP version, OS name, and current PHP memory usage in bytes
+    - ``companies`` / ``apps`` / ``runtemplates`` / ``topics`` / ``credentials`` / ``credential_types`` -
+      row counts for each of these entities
+    - ``jobs`` - a human-readable summary string: total job count plus counts for the last month/week/
+      day/hour and the average jobs-per-minute over the last day
+    - ``database`` - driver and connection info (for SQLite: file path, owner, group, and file mode; for
+      MySQL/PostgreSQL: driver, connection status, server info, and server version)
+    - ``encryption`` - ``disabled``, ``active (N keys)``, or a ``broken (...)``/``unknown (...)`` reason
+      if the encryption subsystem is misconfigured
+    - ``zabbix`` - ``disabled`` or ``"<ZABBIX_HOST> => <ZABBIX_SERVER>"`` showing this integration's own
+      configured target
+    - ``telemetry`` - OpenTelemetry export status (``disabled`` or the configured endpoint/protocol)
+    - ``executor`` / ``scheduler`` - systemd unit status of ``multiflexi-executor.service`` and
+      ``multiflexi-scheduler.service``
+    - ``timestamp`` - ISO 8601 timestamp of when the check ran
+
+    The template's ``MultiFlexi: Database Host``, ``MultiFlexi: Total Applications/Companies/
+    RunTemplates/Jobs`` items are ``DEPENDENT`` items that extract single fields from this same JSON via
+    JSONPath, so the underlying command only actually runs once per interval.
+
+``multiflexi.jobstatus`` - job execution counters
+    Backed by ``multiflexi-cli job:status --format=json`` (default poll interval: 1 minute). A single
+    SQL aggregate query over the ``job`` table plus the current scheduler queue length, reporting:
+
+    - ``total_jobs`` - all jobs ever recorded
+    - ``successful_jobs`` / ``failed_jobs`` - jobs with exit code 0 vs. non-zero
+    - ``incomplete_jobs`` - jobs with no exit code yet (still running, or never finished)
+    - ``total_applications`` - distinct applications that have run at least one job
+    - ``repeated_jobs`` - jobs that belong to a recurring (scheduled) RunTemplate
+    - ``queue_length`` - jobs currently waiting to run
+
+``multiflexi.queue`` - the queue itself
+    Backed by ``multiflexi-cli queue:list --format=json``. Returns the full list of currently queued
+    jobs (id, RunTemplate, application, company, and scheduled time for each), not just a count -
+    useful for inspecting *what* is queued rather than just how much.
+
+``multiflexi.schedule.stale`` / ``multiflexi.schedule.stale.count`` - stuck scheduling watchdog
+    Backed by ``multiflexi-cli run-template:stale --format=json --tolerance-hours=6`` (default poll
+    interval: 15 minutes). Under normal operation a RunTemplate's ``next_schedule`` column is only ever
+    set for the brief window between a job being queued and finishing; if a job crashes, gets OOM-killed,
+    or otherwise fails outside the normal fail path, ``next_schedule`` can be left stuck in the past and
+    the RunTemplate silently drops out of the daily cron rotation. This check lists every active,
+    recurring RunTemplate whose ``next_schedule`` is both non-null and more than the tolerance window
+    (default 6h) in the past: ``{"count": N, "stale": [{"id", "name", "company_id", "next_schedule",
+    "last_schedule"}, ...]}``. The dependent ``.count`` item extracts just ``count`` for the
+    ``MultiFlexi: N RunTemplate(s) have a stale schedule`` trigger (**High** severity); the raw
+    ``multiflexi.schedule.stale`` item holds the full per-RunTemplate detail for troubleshooting. Fix
+    with ``multiflexi-cli queue:fix``.
+
+``multiflexi.company.lld`` / ``multiflexi.job.lld`` / ``multiflexi.runtemplate.lld[*]`` / ``multiflexi.action.lld`` - structural discovery
+    These don't report metrics themselves; they discover *what exists* (companies, scheduled tasks,
+    per-company RunTemplates, and RunTemplates with a Zabbix success/fail action configured) so Zabbix
+    can create per-entity items and triggers automatically. See `Available LLD Scripts`_ above for each
+    one's exact output macros.
+
+``multiflexi.credential.lld`` / ``multiflexi.credential.check[*]`` - per-credential availability
+    See :ref:`credential-availability-monitoring` below for the full behavior, state values, and JSON
+    shape - this is the most involved check, since it invokes each credential type's own
+    ``checkAvailability()`` implementation (a live reachability check) where one exists, and falls back
+    to a static required-field completeness check otherwise.
 
 Usage
 -----
@@ -661,6 +764,35 @@ Verifying Data in Zabbix
 .. code-block:: bash
 
    tail -f /var/log/zabbix/zabbix_server.log | grep -i trapper
+
+Discovery Rule Produces No Items After Linking the Template
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Active-check discovery rules (all of the ``*.lld`` items in this package) are pulled by the Zabbix
+*agent*, not pushed by the server, so the server has to hand the new key to the agent before anything
+runs. Two independent causes can delay or block that, and both look identical from the outside (no
+discovered items, no error):
+
+1. **Server configuration cache staleness.** Zabbix server only rebuilds its active-checks list for a
+   host periodically (``CacheUpdateFrequency``). Newly linking a template can take longer than expected
+   to actually reach the agent. Confirm by tailing the agent's own log
+   (``/var/log/zabbix/zabbix_agent2.log``) for the discovery key (e.g. ``multiflexi.credential.lld``) -
+   if it never appears despite the agent's ``refreshActiveChecks()`` running every few seconds, the
+   server hasn't offered it yet. Forcing a targeted resync (rather than waiting out
+   ``CacheUpdateFrequency``): toggle the discovery rule's ``status`` off then back on via the API
+   (``discoveryrule.update``) and restart ``zabbix-agent2`` on the host - this reliably triggers an
+   immediate pickup.
+2. **A misconfigured discovery filter silently excluding everything.** If the discovery rule's item
+   count stays at zero even after the key does start executing (visible in the agent log with real
+   JSON output), check the discovery rule's filter conditions. In particular, an empty string used as a
+   ``NOT_MATCHES_REGEX`` pattern matches *everything* (an empty regex trivially matches at every
+   position), which inverts to *excluding* every discovered row - this is why
+   ``{$CRED.AVAILABILITY.EXCLUDE}`` defaults to ``^$`` rather than an empty string (see `What Gets
+   Checked and Sent`_ above).
+
+Neither of these produces a Zabbix-visible error; the only symptom is "the item just never shows up",
+so when a freshly-linked discovery rule stays empty, check the agent log for actual execution first,
+then double-check any filter macros before assuming the deployment is broken.
 
 Best Practices
 --------------
