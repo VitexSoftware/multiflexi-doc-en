@@ -71,6 +71,31 @@ Configure Zabbix integration using environment variables in ``/etc/multiflexi/mu
 - ``ZABBIX_HOST``: The monitored host name as registered in Zabbix. Defaults to system hostname if not specified. Can be overridden per-company.
 - ``USE_ZABBIX_SENDER``: When ``true``, uses the system ``zabbix_sender`` binary instead of native PHP implementation.
 
+File Permissions for the LLD/UserParameter Scripts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``multiflexi.*`` Zabbix items (``multiflexi.runtemplate.lld``,
+``multiflexi.appstatus``, and the other UserParameters shipped in
+``/etc/zabbix/zabbix_agent2.d/multiflexi.conf``) run as the Zabbix agent's
+own system user (usually ``zabbix``), not as ``www-data`` or ``multiflexi``.
+``/etc/multiflexi`` is deliberately locked down to ``multiflexi:www-data``
+mode ``0750`` because ``multiflexi.env`` holds ``DB_PASSWORD`` and
+``ENCRYPTION_MASTER_KEY`` — so without extra access, every one of these
+items fails with a misleading ``config file does not exist`` error (it is
+actually a permission error) and Zabbix reports e.g. **"Multi Apptemplate
+LLD is not running"** even though the file is present and correct.
+
+Since ``multiflexi-zabbix`` 2.4.4, the package's ``postinst`` grants the
+``zabbix`` user read-only ACL access to ``/etc/multiflexi`` and
+``multiflexi.env`` automatically (via ``setfacl``, pulled in through the
+new ``acl`` dependency) — no manual step needed on a fresh install or
+upgrade. If you're troubleshooting an older install, or the agent runs as
+a different user, apply the same ACL manually::
+
+   setfacl -m u:zabbix:r-x /etc/multiflexi
+   setfacl -m u:zabbix:r-- /etc/multiflexi/multiflexi.env
+   systemctl restart zabbix-agent2
+
 Company-Specific Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
