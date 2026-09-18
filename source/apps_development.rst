@@ -43,7 +43,7 @@ Schema Location
 ---------------
 
 The schema is available at:
-https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json
+https://multiflexi.eu/schema/application.json
 
 Basic Structure
 ---------------
@@ -51,7 +51,7 @@ Basic Structure
 .. code-block:: json
 
     {
-      "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+      "$schema": "https://multiflexi.eu/schema/application.json",
       "schemaVersion": "3.2.1",
       "uuid": "unique-uuid-here",
       "version": "1.0.0",
@@ -367,7 +367,7 @@ Report Schema
 -------------
 
 The report schema is available at:
-https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/schema/report.json
+https://multiflexi.eu/schema/report.json
 
 Required Fields
 ---------------
@@ -697,7 +697,7 @@ Application JSON (blocknet.multiflexi.app.json)
 .. code-block:: json
 
     {
-      "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+      "$schema": "https://multiflexi.eu/schema/application.json",
       "schemaVersion": "3.2.1",
       "uuid": "8f3c4a5e-9b2d-4e1f-a6d8-7c9e0f1a2b3c",
       "version": "1.0.0",
@@ -896,7 +896,7 @@ When creating MultiFlexi applications:
 4. **Generate unique UUIDs** - Never reuse UUIDs from other applications
 5. **Include both languages** - Provide "en" and "cs" translations for all user-facing text
 6. **Mark sensitive data** - Use ``"type": "password"`` for credentials
-7. **Generate compliant reports** - All applications must produce reports following the schema at https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/schema/report.json
+7. **Generate compliant reports** - All applications must produce reports following the schema at https://multiflexi.eu/schema/report.json
 8. **Include required report fields** - Always include producer, status, and timestamp in reports
 9. **Validate before finishing** - Always confirm JSON validity as the final step
 10. **Update documentation** - Include README.md with usage instructions
@@ -945,8 +945,8 @@ Environment Variables Not Loaded
 Resources
 =========
 
-* Application Schema: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json
-* Report Schema: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/schema/report.json
+* Application Schema: https://multiflexi.eu/schema/application.json
+* Report Schema: https://multiflexi.eu/schema/report.json
 * Example applications: https://github.com/VitexSoftware, https://github.com/Spoje-NET
 * MultiFlexi CLI: Required version 2.2.0 or newer
 * CI validation action: https://github.com/VitexSoftware/validate-multiflexi-app

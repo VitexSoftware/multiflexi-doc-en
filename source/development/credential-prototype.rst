@@ -24,7 +24,7 @@ MultiFlexi uses **JSON Schema version 0.2.0** to validate credential prototype d
 
 .. code-block:: text
 
-    https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/schema/credential-prototype.json
+    https://multiflexi.eu/schema/credential-prototype.json
 
 **Required Fields:**
 
@@ -87,7 +87,7 @@ Minimal Example
 .. code-block:: json
 
     {
-        "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/schema/credential-prototype.json",
+        "$schema": "https://multiflexi.eu/schema/credential-prototype.json",
         "uuid": "550e8400-e29b-41d4-a716-446655440000",
         "code": "MyService",
         "name": "My Service API",
@@ -121,7 +121,7 @@ Full Example with Localization
 .. code-block:: json
 
     {
-        "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/schema/credential-prototype.json",
+        "$schema": "https://multiflexi.eu/schema/credential-prototype.json",
         "uuid": "f79aaa38-2eaf-453a-beee-3a2afa1221d5",
         "code": "FioBank",
         "name": {

@@ -1,5 +1,6 @@
 multiflexi-doc (2.3.0) UNRELEASED; urgency=medium
 
+  * Point schema documentation at https://multiflexi.eu/schema/*.json
   * Migrate documentation sources from multiflexi-common to dedicated repository
   * Add .readthedocs.yaml for ReadTheDocs integration
   * Fix debian/rules to use plain debhelper and make html

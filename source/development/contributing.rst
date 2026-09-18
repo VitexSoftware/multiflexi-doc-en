@@ -223,7 +223,7 @@ Application JSON Schema Validation
 
 MultiFlexi enforces JSON schema validation for application definitions to ensure consistency and prevent configuration errors.
 
-**Schema URL**: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json
+**Schema URL**: https://multiflexi.eu/schema/application.json
 
 **Validation Command**:
 

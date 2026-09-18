@@ -92,7 +92,7 @@ Applications do not have to come from a Debian package. Any valid ``.app.json`` 
    # Import
    multiflexi-cli application:import-json --file myapp.app.json
 
-The JSON must conform to the `application schema <https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json>`_. See :doc:`../reference/application-schema` for full details.
+The JSON must conform to the `application schema <https://multiflexi.eu/schema/application.json>`_. See :doc:`../reference/application-schema` for full details.
 
 Updating an Application
 ------------------------

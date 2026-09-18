@@ -14,7 +14,10 @@ MultiFlexi uses **JSON Schema version 3.0.0** to validate application definition
 
 .. code-block:: text
 
-    https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json
+    https://multiflexi.eu/schema/application.json
+
+The source file lives in ``php-vitexsoftware-multiflexi-core/schema/application.json``.
+JSON Schema ``$id`` matches the canonical URL above. GitHub raw URLs are an unofficial mirror only.
 
 **Schema Version:** 3.0.0
 
@@ -83,7 +86,7 @@ Here is a simple example conforming to schema version 3.0.0:
 .. code-block:: json
 
   {
-      "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+      "$schema": "https://multiflexi.eu/schema/application.json",
       "name": "RB transaction report",
       "description": "Raiffeisenbank transaction report",
       "executable": "raiffeisenbank-transaction-report",
@@ -116,7 +119,7 @@ Here is a simple example conforming to schema version 3.0.0:
 .. code-block:: json
 
   {
-      "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+      "$schema": "https://multiflexi.eu/schema/application.json",
       "schemaVersion": "3.0.0",
       "name": {
           "en": "Invoice Processor",
@@ -234,7 +237,7 @@ Key Concepts (as defined in the report schema):
 
 Validation Schema:
 
-`multiflexi.report.schema.json <https://github.com/VitexSoftware/php-vitexsoftware-multiflexi-core/blob/main/multiflexi.report.schema.json>`_
+`report.json <https://multiflexi.eu/schema/report.json>`_
 
 Basic Report Example:
 

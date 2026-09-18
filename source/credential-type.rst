@@ -81,12 +81,13 @@ Benefits of Three-Tier System
 Credential Type Schema
 ======================
 
-The MultiFlexi Credential Type Schema (`multiflexi.credential-type.schema.json`) defines the structure for credential types used in MultiFlexi. Credential types describe the required fields and metadata for authentication and integration with external systems (e.g., databases, cloud services, APIs).
+The MultiFlexi Credential Type Schema (`credential-type.json`) defines the structure for credential types used in MultiFlexi. Credential types describe the required fields and metadata for authentication and integration with external systems (e.g., databases, cloud services, APIs).
 
 Schema Location:
 ----------------
 
-- File: `php-vitexsoftware-multiflexi-core/multiflexi.credential-type.schema.json`
+- Canonical URL: https://multiflexi.eu/schema/credential-type.json
+- Source file: `php-vitexsoftware-multiflexi-core/schema/credential-type.json`
 
 Schema Overview:
 ----------------

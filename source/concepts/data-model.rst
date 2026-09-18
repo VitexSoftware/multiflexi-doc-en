@@ -50,7 +50,7 @@ Application
 - ``requirements``: Dependencies (PHP extensions, system packages)
 - ``ociimage``: Docker/Podman container image (optional)
 
-**Storage:** Applications are defined in JSON files conforming to the `Application Schema <https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json>`_.
+**Storage:** Applications are defined in JSON files conforming to the `Application Schema <https://multiflexi.eu/schema/application.json>`_.
 
 **Lifecycle:**
 
