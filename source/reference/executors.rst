@@ -42,16 +42,22 @@ configuration.
 Docker Executor
 ---------------
 
-The Docker executor runs tasks inside Docker containers.  This allows for
-better isolation and dependency management, as each task can run in its own
-container with its own set of dependencies.
+The Docker executor runs tasks inside one-shot Docker containers via
+``docker run --rm``.
 
 Features:
 
-- Runs tasks in isolated Docker containers
-- Better dependency management
-- Requires Docker to be installed on the host machine
-- Uses the ``ociimage`` field from the application definition
+- Runs tasks in isolated Docker containers with the application ``ociimage``
+- Passes job environment through a temporary ``--env-file``
+- Optional Docker network via ``MULTIFLEXI_DOCKER_NETWORK``
+- Optional ``docker pull`` before each job via ``MULTIFLEXI_DOCKER_PULL``
+- Requires Docker Engine; package postinst adds ``multiflexi`` to group ``docker``
+
+**Host setup (summary):** install Docker → install ``multiflexi-executor-docker``
+→ confirm ``multiflexi`` ∈ ``docker`` → restart ``multiflexi-executor`` → set
+runtemplate ``executor=Docker``.
+
+For the complete numbered checklist, see :ref:`docker-executor-integration`.
 
 Kubernetes Executor
 -------------------

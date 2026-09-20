@@ -108,6 +108,16 @@ Integrations
   is added to the **Integrations** menu. This is separate from ``OTEL_EXPORTER_OTLP_ENDPOINT``
   (see *Logging & Telemetry*), which is the OTLP ingest endpoint and is not a browsable UI.
 
+Executor — Docker
+-----------------
+
+- **MULTIFLEXI_DOCKER_NETWORK**: Optional Docker network name passed as
+  ``--network=`` to ``docker run``. When unset, Docker's default bridge is used.
+  See :ref:`docker-executor-integration`.
+- **MULTIFLEXI_DOCKER_PULL**: When set to ``always``, ``true``, ``yes``, or ``1``,
+  the executor runs ``docker pull`` for the application ``ociimage`` before each
+  job. Default: do not pull.
+
 Executor — Kubernetes
 ---------------------
 

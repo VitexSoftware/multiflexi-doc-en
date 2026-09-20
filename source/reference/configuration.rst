@@ -47,6 +47,13 @@ Kubernetes Executor
   and Helm operations. When unset, uses the Helm chart namespace (default
   ``multiflexi``) or the cluster default. See :ref:`kubernetes-integration`.
 
+Docker Executor
+~~~~~~~~~~~~~~~
+
+- **MULTIFLEXI_DOCKER_NETWORK**: Optional network for ``docker run --network=``.
+- **MULTIFLEXI_DOCKER_PULL**: Set to ``always`` (or ``true``/``1``) to pull the
+  application image before each job. See :ref:`docker-executor-integration`.
+
 Security Options
 ~~~~~~~~~~~~~~~~
 
