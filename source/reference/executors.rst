@@ -90,7 +90,14 @@ record.  Environment variables are passed to the pod via ``--env`` flags on
 The ``multiflexi-executor-k8s`` package ships RBAC manifests at
 ``/usr/share/multiflexi/k8s/multiflexi-executor-rbac.yaml``.
 
-For a complete setup guide, see :ref:`kubernetes-integration`.
+**Host setup (summary):** install packages → install kubectl/helm → create
+namespace → apply RBAC → mint SA kubeconfig → install it as
+``/var/lib/multiflexi/.kube/config`` → set ``KUBECONFIG`` and
+``MULTIFLEXI_K8S_NAMESPACE`` in ``/etc/multiflexi/multiflexi.env`` → restart
+``multiflexi-executor``.
+
+For the complete numbered checklist and verification commands, see
+:ref:`kubernetes-integration`.
 
 Podman Executor
 ---------------

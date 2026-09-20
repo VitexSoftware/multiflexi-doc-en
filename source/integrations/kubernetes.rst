@@ -13,139 +13,335 @@ Kubernetes Integration
    :local:
    :depth: 2
 
-MultiFlexi can execute jobs inside Kubernetes pods using the **Kubernetes executor**.
-When a runtemplate is configured with the Kubernetes executor, the
-``multiflexi-executor`` daemon deploys the application's Helm chart into the
-cluster (if not already present) and launches a one-shot pod via
-``kubectl run --attach``.  The pod's standard output is captured and stored in
-the database as the job's ``stdout`` value.
+MultiFlexi can execute jobs inside Kubernetes pods using the **Kubernetes
+executor** (package ``multiflexi-executor-k8s``).
 
-Prerequisites
--------------
+When a runtemplate uses this executor, the ``multiflexi-executor`` daemon:
 
-The following must be available on the machine that runs the
-``multiflexi-executor`` daemon:
+1. Optionally deploys the application's Helm chart (only when ``helmchart`` is
+   set and the release is not already present)
+2. Launches a one-shot pod with ``kubectl run --restart=Never --attach``
+3. Captures stdout/stderr into the job record
+4. Optionally copies every path listed in the application ``artifacts`` field
+   out of the pod with ``kubectl cp``
 
-- **kubectl** – Kubernetes command-line tool, accessible in ``$PATH``
-- **helm** (v3+) – Required only when applications declare a ``helmchart``
-- **kubeconfig** – A valid kubeconfig file at ``~/.kube/config`` (relative to
-  the daemon user's ``$HOME``) or referenced via the ``KUBECONFIG`` environment
-  variable
+This page is the full deployment and configuration guide.
 
-The daemon typically runs as the ``multiflexi`` system user whose home
-directory is ``/var/lib/multiflexi/``.  Prefer a least-privilege ServiceAccount
-kubeconfig (not cluster-admin) at ``/var/lib/multiflexi/.kube/config`` with
-owner ``multiflexi`` and permissions ``0600``.
+Deployment checklist
+--------------------
 
-Namespace and RBAC
+Do these steps **once per MultiFlexi host** that should run Kubernetes jobs,
+and **once per cluster** for namespace/RBAC.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 8, 55, 37
+
+   * - #
+     - Step
+     - Where
+   * - 1
+     - Install ``multiflexi-executor`` and ``multiflexi-executor-k8s``
+     - Executor host
+   * - 2
+     - Install ``kubectl`` (and ``helm`` if you use Helm charts)
+     - Executor host
+   * - 3
+     - Create namespace ``multiflexi`` (or your chosen name)
+     - Cluster
+   * - 4
+     - Apply packaged RBAC (ServiceAccount + Role + RoleBinding)
+     - Cluster
+   * - 5
+     - Mint a kubeconfig for SA ``multiflexi-executor``
+     - Admin workstation → cluster
+   * - 6
+     - Install kubeconfig as ``/var/lib/multiflexi/.kube/config`` (mode ``0600``)
+     - Executor host
+   * - 7
+     - Set ``KUBECONFIG`` and ``MULTIFLEXI_K8S_NAMESPACE`` in ``multiflexi.env``
+     - Executor host
+   * - 8
+     - Ensure the application has ``ociimage`` (required) and optional
+       ``helmchart`` / ``artifacts``
+     - MultiFlexi DB / app JSON
+   * - 9
+     - Set the runtemplate ``executor`` to ``Kubernetes``
+     - MultiFlexi DB / CLI / UI
+   * - 10
+     - Restart ``multiflexi-executor`` and verify with a scheduled job
+     - Executor host
+
+Step-by-step host and cluster setup
+-----------------------------------
+
+1. Install packages
 ~~~~~~~~~~~~~~~~~~
 
-Create the namespace (once):
+On the machine that runs the daemon (typically as the ``multiflexi`` system
+user via systemd):
 
 .. code-block:: bash
 
+   sudo apt-get update
+   sudo apt-get install -y multiflexi-executor multiflexi-executor-k8s
+
+Confirm the executor class and RBAC manifest are present:
+
+.. code-block:: bash
+
+   ls -la /usr/share/php/MultiFlexi/Executor/Kubernetes.php
+   ls -la /usr/share/multiflexi/k8s/multiflexi-executor-rbac.yaml
+
+2. Install kubectl and helm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **kubectl** is mandatory (in ``$PATH`` for the daemon).
+- **helm** (v3+) is required only when applications declare a ``helmchart``.
+  One-shot pods without Helm work with kubectl alone.
+
+On Debian/Ubuntu, ``kubectl`` is often available as package ``kubernetes-client``
+or via your cluster vendor's repo. Install ``helm`` from your preferred source
+if the distro does not ship it.
+
+Verify as root (or any login that can see ``$PATH``):
+
+.. code-block:: bash
+
+   command -v kubectl
+   command -v helm   # optional unless you use Helm charts
+   kubectl version --client
+
+3. Create the namespace
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From a machine that already has cluster-admin (or equivalent) access:
+
+.. code-block:: bash
+
+   export KUBECONFIG=/path/to/admin.kubeconfig
    kubectl create namespace multiflexi
 
-Apply the Role / RoleBinding / ServiceAccount shipped by the
-``multiflexi-executor-k8s`` package (or from the source tree
-``k8s/multiflexi-executor-rbac.yaml``):
+Use a different name only if you will also set ``MULTIFLEXI_K8S_NAMESPACE`` to
+that same value on every executor host.
+
+4. Apply RBAC
+~~~~~~~~~~~~~
+
+The ``multiflexi-executor-k8s`` package ships a least-privilege Role for
+one-shot pods (create/get/list/watch/delete, logs, attach, exec) plus Helm
+resources (deployments, replicasets, configmaps, secrets, serviceaccounts,
+services) in namespace ``multiflexi``.
 
 .. code-block:: bash
 
    kubectl apply -f /usr/share/multiflexi/k8s/multiflexi-executor-rbac.yaml
 
-Override the target namespace with ``MULTIFLEXI_K8S_NAMESPACE`` when it should
-differ from the Helm default (``multiflexi``) or the cluster default.
+This creates:
 
-Install a kubeconfig for ServiceAccount ``multiflexi-executor``:
+- ServiceAccount ``multiflexi-executor``
+- Role ``multiflexi-executor-role``
+- RoleBinding ``multiflexi-executor-binding``
+
+Verify:
+
+.. code-block:: bash
+
+   kubectl get sa,role,rolebinding -n multiflexi
+   kubectl auth can-i create pods -n multiflexi \
+     --as=system:serviceaccount:multiflexi:multiflexi-executor
+
+Do **not** bind the Role to the ``default`` ServiceAccount and expect the
+daemon to pick it up. The daemon authenticates with whatever identity is in
+its kubeconfig file. Use the dedicated ``multiflexi-executor`` SA.
+
+5. Create a ServiceAccount kubeconfig
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Generate a token-based kubeconfig for SA ``multiflexi-executor`` (example for
+Kubernetes 1.24+, one-year token):
+
+.. code-block:: bash
+
+   export KUBECONFIG=/path/to/admin.kubeconfig
+   SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+   CA=$(kubectl config view --raw --minify --flatten \
+     -o jsonpath='{.clusters[0].cluster.certificate-authority-data}')
+   TOKEN=$(kubectl create token multiflexi-executor -n multiflexi --duration=8760h)
+
+   cat > multiflexi-executor.kubeconfig <<EOF
+   apiVersion: v1
+   kind: Config
+   clusters:
+   - cluster:
+       certificate-authority-data: ${CA}
+       server: ${SERVER}
+     name: multiflexi
+   contexts:
+   - context:
+       cluster: multiflexi
+       namespace: multiflexi
+       user: multiflexi-executor
+     name: multiflexi-executor
+   current-context: multiflexi-executor
+   users:
+   - name: multiflexi-executor
+     user:
+       token: ${TOKEN}
+   EOF
+   chmod 600 multiflexi-executor.kubeconfig
+
+Smoke-test **before** copying to the host:
+
+.. code-block:: bash
+
+   KUBECONFIG=./multiflexi-executor.kubeconfig kubectl get pods -n multiflexi
+   KUBECONFIG=./multiflexi-executor.kubeconfig helm -n multiflexi list
+
+.. note::
+
+   Prefer this SA kubeconfig over copying a cluster-admin kubeconfig onto the
+   executor host. Renew the token before expiry (or use a longer-lived SA
+   secret if your cluster policy allows it).
+
+6. Install the kubeconfig on the executor host
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The systemd unit runs as user ``multiflexi`` with home
+``/var/lib/multiflexi/``. Place the kubeconfig there:
 
 .. code-block:: bash
 
    sudo mkdir -p /var/lib/multiflexi/.kube
-   sudo install -o multiflexi -g multiflexi -m 0600 ./multiflexi-executor.kubeconfig \
+   sudo install -o multiflexi -g multiflexi -m 0600 \
+     ./multiflexi-executor.kubeconfig \
      /var/lib/multiflexi/.kube/config
 
-Application Configuration
+Verify as the daemon user:
+
+.. code-block:: bash
+
+   sudo -u multiflexi \
+     KUBECONFIG=/var/lib/multiflexi/.kube/config \
+     kubectl get pods -n multiflexi
+
+7. Configure environment variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Edit ``/etc/multiflexi/multiflexi.env`` (loaded by
+``multiflexi-executor.service`` via ``EnvironmentFiles=``) and add:
+
+.. code-block:: bash
+
+   KUBECONFIG=/var/lib/multiflexi/.kube/config
+   MULTIFLEXI_K8S_NAMESPACE=multiflexi
+
+Meaning:
+
+- **KUBECONFIG** – absolute path to the SA kubeconfig. Without it, the
+  executor falls back to ``$HOME/.kube/config`` for the process user
+  (``/var/lib/multiflexi/.kube/config`` when HOME is set correctly).
+- **MULTIFLEXI_K8S_NAMESPACE** – target namespace for pods and Helm. Overrides
+  the Helm default namespace (``multiflexi`` when a chart is configured).
+  When unset and no Helm chart is used, the cluster default namespace applies.
+
+See also :doc:`/confienv` and :doc:`/reference/configuration`.
+
+8. Restart the daemon
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   sudo systemctl restart multiflexi-executor
+   systemctl is-active multiflexi-executor
+   systemctl status multiflexi-executor --no-pager
+
+Application configuration
 -------------------------
 
-Helm Chart Reference
+Required and optional application fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20, 15, 65
+
+   * - Field
+     - Required?
+     - Purpose
+   * - ``ociimage``
+     - **Yes**
+     - Container image for ``kubectl run`` (for example
+       ``docker.io/vitexsoftware/multiflexi-probe``)
+   * - ``helmchart``
+     - No
+     - When set, the executor runs ``helm upgrade --install`` if the release
+       is missing. When empty, only the one-shot pod is launched.
+   * - ``artifacts``
+     - No
+     - Comma-separated paths **inside the pod**. Every path is copied with
+       ``kubectl cp`` and stored in the job file store (field name = file
+       basename).
+   * - ``executable`` / ``cmdparams``
+     - As for Native
+     - Command run inside the pod after ``--`` on ``kubectl run``
+
+``usableForApp()`` only checks that ``ociimage`` is non-empty. A missing
+``helmchart`` is valid.
+
+Helm chart reference
 ~~~~~~~~~~~~~~~~~~~~
 
-Each application that supports Kubernetes execution must declare a Helm chart.
-This is stored in the ``helmchart`` field of the application record and can be
-set in two ways:
+When ``helmchart`` is set, it may be:
 
-1. **Via the application JSON definition** – The ``kubernetes.helm.chart``
-   field in the ``*.multiflexi.app.json`` file is mapped to the database
-   ``helmchart`` column when imported:
+- A local filesystem path readable by the ``multiflexi`` user
+  (for example ``/opt/helm-charts/my-app``)
+- An OCI registry reference (for example ``oci://ghcr.io/org/charts/my-app``)
+- A Helm repository chart name (for example ``myrepo/my-app``)
 
-   .. code-block:: json
+You can set it via application JSON import or directly in the database:
 
-      {
-        "kubernetes": {
-          "helm": {
-            "enabled": true,
-            "releaseName": "my-app",
-            "namespace": "multiflexi",
-            "chart": "/path/to/chart-dir",
-            "upgradeInstall": true,
-            "timeoutSeconds": 300,
-            "atomic": false,
-            "wait": true
-          },
-          "artifacts": {
-            "enabled": true,
-            "outputPath": "result.json",
-            "keepPodOnFailure": false
-          }
-        }
-      }
+.. code-block:: bash
 
-   Import with:
+   multiflexi-cli application:import-json --file=multiflexi/myapp.multiflexi.app.json
 
-   .. code-block:: bash
+.. code-block:: sql
 
-      multiflexi-cli application:import-json --file=multiflexi/myapp.multiflexi.app.json
+   UPDATE apps SET helmchart='/opt/helm-charts/my-app' WHERE id=23;
 
-2. **Direct database update** – Useful when the chart path needs to differ from
-   the JSON definition (e.g. local path vs. OCI reference):
+Example fragment in ``*.multiflexi.app.json`` (imported fields map to DB
+columns; runtime currently derives config from ``helmchart``, ``name``, and
+``artifacts``):
 
-   .. code-block:: sql
+.. code-block:: json
 
-      UPDATE apps SET helmchart='/opt/helm-charts/my-app' WHERE id=23;
+   {
+     "ociimage": "docker.io/example/my-app:latest",
+     "kubernetes": {
+       "helm": {
+         "enabled": true,
+         "chart": "oci://ghcr.io/example/my-app",
+         "namespace": "multiflexi"
+       },
+       "artifacts": {
+         "enabled": true,
+         "outputPath": "report.json,output.csv"
+       }
+     }
+   }
 
-The ``helmchart`` value can be:
+Release name is derived as a DNS-1123-safe form of the application ``name``
+(max 63 characters), defaulting to ``mf-app``.
 
-- A local filesystem path (e.g. ``/opt/helm-charts/my-app``)
-- An OCI registry reference (e.g. ``oci://ghcr.io/org/charts/my-app``)
-- A Helm repository chart name (e.g. ``myrepo/my-app``)
-
-OCI Image
-~~~~~~~~~
-
-The application must also have an ``ociimage`` field set (e.g.
-``docker.io/vitexsoftware/multiflexi-probe``).  This image is used by
-``kubectl run`` to create the one-shot job pod.
-
-Helm Chart Structure
+Helm chart structure
 ~~~~~~~~~~~~~~~~~~~~
 
-A minimal Helm chart for a MultiFlexi application should include:
-
-- **ConfigMap** – For non-secret environment variables
-- **Secret** – For sensitive environment variables (passwords, tokens)
-- **Deployment** – Running the application container with ``envFrom``
-  referencing the ConfigMap and Secret
-- **ServiceAccount** – Optional, for cluster permissions
-
-See the ``multiflexi-probe`` project's ``helm/`` directory for a reference
-implementation.
+A typical chart for a MultiFlexi application includes ConfigMap, Secret,
+Deployment (with ``envFrom``), and optionally a ServiceAccount. See the
+``multiflexi-probe`` project's ``helm/`` directory for a reference.
 
 Configuring a RunTemplate
 -------------------------
-
-Using the CLI
-~~~~~~~~~~~~~
 
 Set the executor on an existing runtemplate:
 
@@ -153,7 +349,7 @@ Set the executor on an existing runtemplate:
 
    multiflexi-cli run-template:update --id=158 --executor=Kubernetes
 
-Or create a new runtemplate with the Kubernetes executor:
+Or create a new one:
 
 .. code-block:: bash
 
@@ -166,132 +362,122 @@ Or create a new runtemplate with the Kubernetes executor:
      --cron="0 6 * * *" \
      --active=1
 
-Scheduling Immediate Execution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Schedule an immediate run:
 
 .. code-block:: bash
 
    multiflexi-cli run-template:schedule --id=158 --schedule_time=now
 
-When ``--executor`` is not provided on the ``schedule`` command, the executor
-is read from the runtemplate record.  The above command will use the
-``Kubernetes`` executor that was configured on the runtemplate.
+When ``--executor`` is omitted on ``schedule``, the executor stored on the
+runtemplate is used.
 
-Execution Flow
+You can also select **Kubernetes** in the web UI when editing a runtemplate.
+
+Execution flow
 --------------
 
-When the ``multiflexi-executor`` daemon picks up a job with the Kubernetes
-executor, the following steps occur:
+When the daemon picks up a job with the Kubernetes executor:
 
-1. **Helm status check** (only when ``helmchart`` is set) – Runs
-   ``helm status <releaseName> --namespace <ns>`` to determine whether the
-   application's Helm release is already deployed in the cluster.
+1. **Helm status** (only if ``helmchart`` is set) — ``helm status <release>``
+2. **Helm pre-deploy** (if needed) — ``helm upgrade --install`` with
+   ``--create-namespace``, ``--wait``, and the configured timeout
+3. **Pod create** — ``kubectl run --restart=Never --attach`` with ``--env``
+   for each runtemplate environment variable
+4. **Output capture** — stdout/stderr from attach; helper commands (Helm,
+   ``kubectl cp``, delete) use a quiet runner and do not overwrite job output
+5. **Artifacts** — every comma-separated path from ``artifacts`` via
+   ``kubectl cp`` into FileStore
+6. **Cleanup** — delete the pod unless ``keepPodOnFailure`` is true and the
+   job failed; without artifacts, ``kubectl run --rm`` removes the pod
+7. **Persist** — stdout, stderr, exit code, and command line on the job row
 
-2. **Helm pre-deployment** (if needed) – If the release is not found, runs
-   ``helm upgrade --install`` using the chart path from the ``helmchart``
-   database field with ``--create-namespace``, ``--wait``, and the configured
-   timeout.  Applications without a ``helmchart`` skip steps 1–2 and launch
-   the one-shot pod only.
+Namespace resolution order: ``MULTIFLEXI_K8S_NAMESPACE`` → Helm namespace
+(default ``multiflexi`` when a chart is configured) → cluster default.
 
-3. **Pod creation** – Runs ``kubectl run`` with ``--restart=Never --attach``
-   to create a one-shot pod using the application's OCI image.  Environment
-   variables from the runtemplate configuration are passed via ``--env`` flags.
-   The command executed inside the pod is the application's ``executable`` with
-   its ``cmdparams``.  Namespace comes from ``MULTIFLEXI_K8S_NAMESPACE``, else
-   the Helm namespace (default ``multiflexi``), else the cluster default.
+Verification
+------------
 
-4. **Output capture** – The pod's stdout and stderr are streamed back through
-   the ``kubectl --attach`` connection and captured by the executor.  Helper
-   commands (Helm, ``kubectl cp``, delete) do not overwrite that captured
-   output.
-
-5. **Artifact collection** (if configured) – Every comma-separated path in the
-   application ``artifacts`` field is copied from the pod with ``kubectl cp``
-   and stored in the MultiFlexi file store (field name = file basename).
-
-6. **Pod cleanup** – The pod is deleted unless ``keepPodOnFailure`` is true and
-   the job failed (non-zero exit code).  When no artifacts are configured,
-   ``kubectl run --rm`` removes the pod automatically.
-
-7. **Database storage** – The captured stdout, stderr, exit code, and command
-   line are saved to the job record.  The ``job.stdout`` column contains the
-   full standard output from the pod execution.
-
-Verifying Execution
--------------------
-
-Check the job result:
+Packages and files on the host:
 
 .. code-block:: bash
 
-   multiflexi-cli job:get --id=159907 --format=json
+   dpkg -l multiflexi-executor multiflexi-executor-k8s
+   sudo grep -E '^(KUBECONFIG|MULTIFLEXI_K8S_NAMESPACE)=' /etc/multiflexi/multiflexi.env
+   sudo ls -la /var/lib/multiflexi/.kube/config
+   systemctl is-active multiflexi-executor
 
-Key fields to verify:
-
-- ``executor`` – Should be ``Kubernetes``
-- ``exitcode`` – ``0`` for success
-- ``stdout`` – Contains the captured pod output
-- ``command`` – Shows the ``kubectl run`` command that was executed
-
-Check pods in the cluster:
+Cluster access as the daemon user:
 
 .. code-block:: bash
 
-   kubectl -n multiflexi get pods
-   helm -n multiflexi list
+   sudo -u multiflexi \
+     KUBECONFIG=/var/lib/multiflexi/.kube/config \
+     kubectl get pods -n multiflexi
+
+   sudo -u multiflexi \
+     KUBECONFIG=/var/lib/multiflexi/.kube/config \
+     helm -n multiflexi list
+
+After a scheduled job:
+
+.. code-block:: bash
+
+   multiflexi-cli job:get --id=<JOB_ID> --format=json
+
+Check:
+
+- ``executor`` is ``Kubernetes``
+- ``exitcode`` is ``0`` on success
+- ``stdout`` contains pod output
+- ``command`` shows the ``kubectl run`` line
 
 Troubleshooting
 ---------------
 
-Helm Pre-deployment Fails
+Permission denied / Forbidden
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Confirm RBAC was applied in the same namespace you use in
+  ``MULTIFLEXI_K8S_NAMESPACE``.
+- Confirm the kubeconfig user is SA ``multiflexi-executor``, not an unrelated
+  account.
+- ``kubectl get namespace multiflexi`` may return Forbidden for the SA (the
+  Role is namespaced and does not grant Namespace get). Listing pods in that
+  namespace is the right smoke test.
+
+Helm pre-deployment fails
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **"path not found"** – The ``helmchart`` value points to a path the daemon
-  user cannot access.  Use a path readable by the ``multiflexi`` user or an OCI
-  chart reference.
-- **OCI registry 404/403** – The OCI chart doesn't exist or requires
-  authentication.  Run ``helm registry login`` as the multiflexi user, or use a
-  local chart path.
-- **"cluster unreachable"** – The kubeconfig is missing or has wrong
-  permissions.  Verify ``/var/lib/multiflexi/.kube/config`` exists and is owned
-  by ``multiflexi:multiflexi``.
+- **"path not found"** — ``helmchart`` is not readable by ``multiflexi``.
+- **OCI 404/403** — chart missing or needs ``helm registry login`` as
+  ``multiflexi``.
+- **"cluster unreachable"** — missing kubeconfig, wrong mode/owner, or wrong
+  ``KUBECONFIG`` in ``multiflexi.env``.
 
 ImagePullBackOff
 ~~~~~~~~~~~~~~~~
 
-The container image tag in ``values.yaml`` doesn't exist on the registry.
-Override the tag during Helm install:
+Fix the image tag or registry credentials used by the chart / ``ociimage``.
 
-.. code-block:: bash
+Empty stdout
+~~~~~~~~~~~~
 
-   helm upgrade --install my-app ./helm --set image.tag=latest -n multiflexi
+1. Confirm the app writes to stdout (not only to files).
+2. Inspect job ``stderr``.
+3. Ensure you run a Kubernetes executor build that preserves job stdout across
+   helper ``kubectl``/``helm`` calls (``jobStdout`` / ``jobStderr`` fields).
 
-Pod Fails to Start
-~~~~~~~~~~~~~~~~~~
+Executor not recognized (falls back to Native)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Check pod events:
+- ``multiflexi-cli run-template:get --id=<ID> --format=json`` — ``executor``
+  must be ``Kubernetes``
+- ``/usr/share/php/MultiFlexi/Executor/Kubernetes.php`` must exist (package
+  ``multiflexi-executor-k8s``)
+- ``sudo systemctl restart multiflexi-executor``
 
-.. code-block:: bash
+Token expired
+~~~~~~~~~~~~~
 
-   kubectl -n multiflexi describe pod <pod-name>
-   kubectl -n multiflexi get events --sort-by=.lastTimestamp
-
-Empty stdout in Job Record
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If the job completes but ``stdout`` is empty:
-
-1. Verify the application writes output to stdout (not just to files)
-2. Check the ``stderr`` field for error messages
-3. Ensure the Kubernetes executor version includes the stdout capture fix
-   (``jobStdout``/``jobStderr`` instance variables in ``Kubernetes.php``)
-
-Executor Not Recognized
-~~~~~~~~~~~~~~~~~~~~~~~
-
-If scheduling reports ``Executor: Native`` despite setting ``Kubernetes``:
-
-- Verify the runtemplate was updated: ``multiflexi-cli run-template:get --id=<ID> --format=json``
-- Ensure ``Kubernetes.php`` is deployed at
-  ``/usr/share/php/MultiFlexi/Executor/Kubernetes.php``
-- Restart the executor daemon: ``sudo systemctl restart multiflexi-executor``
+Regenerate the SA token (step 5), reinstall the kubeconfig (step 6), and
+restart the daemon (step 8).
