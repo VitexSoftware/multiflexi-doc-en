@@ -20,10 +20,14 @@ When a runtemplate uses this executor, the ``multiflexi-executor`` daemon:
 
 1. Optionally deploys the application's Helm chart (only when ``helmchart`` is
    set and the release is not already present)
-2. Launches a one-shot pod with ``kubectl run --restart=Never --attach``
-3. Captures stdout/stderr into the job record
-4. Optionally copies every path listed in the application ``artifacts`` field
-   out of the pod with ``kubectl cp``
+2. Remaps host ``MULTIFLEXI_TMP`` (and env values under it) to ``/tmp`` inside
+   the pod
+3. Launches a one-shot pod (``--attach --rm``, or a hold-and-``kubectl cp``
+   path when the application declares ``artifacts``)
+4. Captures stdout/stderr into the job record
+5. Copies files matching ``app_artifacts`` path patterns into host
+   ``MULTIFLEXI_TMP`` so ``Job::runEnd()`` can store them in the ``artifacts``
+   table (same path as the Native executor)
 
 This page is the full deployment and configuration guide.
 
@@ -381,15 +385,24 @@ When the daemon picks up a job with the Kubernetes executor:
 1. **Helm status** (only if ``helmchart`` is set) — ``helm status <release>``
 2. **Helm pre-deploy** (if needed) — ``helm upgrade --install`` with
    ``--create-namespace``, ``--wait``, and the configured timeout
-3. **Pod create** — ``kubectl run --restart=Never --attach`` with ``--env``
-   for each runtemplate environment variable
-4. **Output capture** — stdout/stderr from attach; helper commands (Helm,
+3. **Path remap** — host ``MULTIFLEXI_TMP`` (and env values under that
+   directory) are rewritten to ``/tmp`` inside the pod; originals are restored
+   after collection so ``Job::runEnd()`` sees host paths
+4. **Pod create** — without artifacts: ``kubectl run --restart=Never --attach
+   --rm``; with artifacts from application.json ``artifacts`` /
+   ``app_artifacts``: create the pod without attach, run the command, write an
+   exit marker, then ``sleep`` so the pod stays ``Running`` long enough for
+   ``kubectl cp``
+5. **Output capture** — attach streams stdout/stderr directly; artifact mode
+   uses ``kubectl logs`` after the exit marker appears. Helper commands (Helm,
    ``kubectl cp``, delete) use a quiet runner and do not overwrite job output
-5. **Artifacts** — every comma-separated path from ``artifacts`` via
-   ``kubectl cp`` into FileStore
-6. **Cleanup** — delete the pod unless ``keepPodOnFailure`` is true and the
+6. **Artifacts** — list pod ``/tmp``, match every ``app_artifacts.path``
+   pattern (same regex rules as ``Application::getResultFiles()``),
+   ``kubectl cp`` into host ``MULTIFLEXI_TMP``; ``Job::runEnd()`` then stores
+   them in the ``artifacts`` table
+7. **Cleanup** — delete the pod unless ``keepPodOnFailure`` is true and the
    job failed; without artifacts, ``kubectl run --rm`` removes the pod
-7. **Persist** — stdout, stderr, exit code, and command line on the job row
+8. **Persist** — stdout, stderr, exit code, and command line on the job row
 
 Namespace resolution order: ``MULTIFLEXI_K8S_NAMESPACE`` → Helm namespace
 (default ``multiflexi`` when a chart is configured) → cluster default.

@@ -80,79 +80,75 @@ matched.
 2. Node-RED → MultiFlexi: the API bearer token
 -------------------------------------------------
 
-Every node that calls the MultiFlexi REST API - ``multiflexi-runtemplate``
-(``POST /job/``) and ``multiflexi-map`` (``GET``/``POST``/``PUT
-/eventrule/``, catalog reads) - authenticates through a ``multiflexi-config``
-node. That config node now supports two credential modes:
+On a **MultiFlexi-hosted** Node-RED the connection is implicit. Set these
+environment variables on the Node-RED process (Ansible writes them to
+``/etc/default/node-red``):
 
-- **API Token** (recommended): a bearer token, sent as
-  ``Authorization: Bearer <token>``.
-- **Username/Password** (legacy): HTTP Basic auth with a real MultiFlexi user
-  account, used only when no token is configured.
+- ``MULTIFLEXI_URL`` — API root, e.g. ``http://127.0.0.1/multiflexi/api``
+- ``MULTIFLEXI_API_TOKEN`` — bearer token for a dedicated service account
+  (e.g. ``svc-nodered``)
 
-Prefer the token. It means Node-RED never has to hold a human user's
-password, and the token can be scoped to a dedicated low-privilege service
-account instead of an admin login.
+Run-template and map nodes then call ``POST /job/`` and related endpoints
+**without** a ``multiflexi-config`` node. The service account becomes
+``job.launched_by`` for automated event-driven runs (same idea as the
+scheduler's ``UnixUser``).
+
+For **standalone** Node-RED (talking to a remote MultiFlexi), keep using a
+``multiflexi-config`` node:
+
+- **API Token** (recommended): ``Authorization: Bearer <token>``.
+- **Username/Password** (legacy): HTTP Basic, only when no token is set.
 
 **Minting a token**
 
-Create a dedicated service account per environment (e.g. ``svc-nodered``) if
-one does not already exist, give it only the roles it actually needs
-(schedule jobs, read the app/run-template catalog, manage ``event_rule``
-bindings) via MultiFlexi's RBAC, then issue a token for it:
+Create a dedicated service account (e.g. ``svc-nodered``), give it the roles
+it needs (schedule jobs, read catalog, manage ``event_rule``) via MultiFlexi
+RBAC, then:
 
 .. code-block:: bash
 
     multiflexi-cli token:generate --login svc-nodered --ttl "+180 days"
-    # Token issued for user #7 (save it now, it will not be shown again):
-    # 8f3c1a9e2b7d4f6081ac...
-    # Expires: 2027-02-25 00:00:00
 
-The token is shown exactly once - copy it straight into the
-``multiflexi-config`` node's **API Token** field in the Node-RED editor.
-Omit ``--ttl`` for a token that never expires (only do this for a
-well-monitored service account).
+Put the token in ``MULTIFLEXI_API_TOKEN`` (hosted) or the config node's
+**API Token** field (standalone).
+
+**Ad-hoc launches from the editor**: tick **Record me as launcher** on a
+run-template node. The job then gets ``schedule_type=event`` and
+``launched_by`` = your MultiFlexi user id, while the Bearer token remains
+the service account.
+
+The **RunTemplate** field in the node editor autosuggests from
+``GET /nodered/catalog.json`` (match by numeric id or name). **Executor**
+is a drop-down of classes installed on the MultiFlexi host
+(``GET /nodered/executors.json`` / ``catalog.executors``); leave it blank
+to keep the RunTemplate's own default.
 
 **What happens on the server**: the API checks for a bearer token first. A
-valid, unexpired token belonging to an enabled user logs that user in for the
-request (equivalent to a successful Basic-auth login), so every downstream
-permission check behaves exactly as it would for that user logging in
-interactively. A present-but-invalid or expired token is rejected outright -
-it does not silently fall back to Basic auth. No token on the request at all
-falls through to Basic auth unchanged, so existing username/password
-``multiflexi-config`` nodes keep working.
-
-**Revoking access**: disabling the service account (or deleting its token
-row) immediately invalidates every request using that token - there is no
-separate revocation list to maintain.
+valid token logs that user in for the request. A present-but-invalid token
+is rejected; no token falls through to Basic auth.
 
 3. A person logging into the Node-RED editor
 -------------------------------------------------
 
-Where the deployment enables `multiflexi-auth.js` as Node-RED's
-``adminAuth`` (see the ``multiflexi_server`` Ansible role's
-``nodered.yml``), a person's Node-RED editor login is itself validated
-against MultiFlexi:
+Deployments should enable ``multiflexi-auth.js`` as Node-RED's ``adminAuth``
+(Ansible default when ``multiflexi_server_nodered_multiflexi_auth`` is true):
 
-- The username/password they type is checked against MultiFlexi's real
-  ``/login`` endpoint (the same password check the API itself uses).
+- Username/password is checked against MultiFlexi's ``/login`` endpoint.
+- The API token from that login is **kept** in the editor session and used to
+  call ``GET /nodered/catalog.json``, which returns only companies /
+  run-templates / credentials the user may see (``company_user`` + admin
+  bypass), plus the host's installed ``executors`` list. Generic node
+  editors (RunTemplate / Company) use that list for autosuggest.
 - A successful login is **not** granted full Node-RED admin rights by
-  default - every MultiFlexi user who authenticates this way gets read-only
-  editor access. The single account configured with full edit rights is the
-  one set up by the deployment (``multiflexi_server_nodered_admin_user`` /
-  ``_admin_password_hash`` in the Ansible role), independent of this dynamic
-  MultiFlexi-backed login path.
-- A login session is remembered for a short time (5 minutes) before it must
-  be re-validated; nothing is ever granted to a username that has not just
-  authenticated successfully.
+  default — MultiFlexi users get read-only editor access unless the
+  deployment grants broader permissions separately.
+- Session TTL is short (5 minutes, sliding on activity).
 
 .. note::
 
-   Mapping specific MultiFlexi RBAC roles onto Node-RED editor permissions
-   (so, for example, a MultiFlexi admin automatically gets Node-RED edit
-   rights too) needs a REST endpoint exposing a user's roles, which does not
-   exist yet. Until then, read-only is the deliberate safe default for every
-   MultiFlexi-authenticated login.
+   Mapping MultiFlexi RBAC roles onto Node-RED editor ``*`` permissions is
+   still a future enhancement. Until then, read-only is the safe default for
+   MultiFlexi-authenticated logins.
 
 Worked example: one chained job, end to end
 ------------------------------------------------

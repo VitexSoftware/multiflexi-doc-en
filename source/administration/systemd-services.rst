@@ -187,8 +187,10 @@ Node-RED catalog feed
 Beyond forwarding events, ``multiflexi-eventor`` can publish the MultiFlexi
 *configuration catalog* — every company, every enabled run-template and every
 credential — to the ``node-red-contrib-multiflexi`` **catalog** node. The
-catalog node then builds one Node-RED palette node per entity, each carrying the
-same icon it has in MultiFlexi.
+catalog node caches that list for autosuggest in the generic editor nodes
+(``multiflexi-runtemplate``, ``multiflexi-company``). It does **not** create one
+palette entry per entity — place a generic node and pick the identity in its
+settings.
 
 Set these in ``/etc/multiflexi/multiflexi.env``:
 
@@ -200,13 +202,28 @@ Set these in ``/etc/multiflexi/multiflexi.env``:
 
 The ``NODERED_TOKEN`` shared secret, when set, is also sent with the catalog push.
 
-Icons are **not** embedded in the push. The catalog node fetches each entity's
-icon from the MultiFlexi web image endpoints — ``appimage.php`` (apps),
-``companylogo.php`` and ``credentialimage.php`` — which are public (no login).
-On the catalog node, set **App URL** (``MULTIFLEXI_APP_URL``, default
-``/multiflexi/``) to where the MultiFlexi web UI is reachable from Node-RED.
-The ``node-red-contrib-multiflexi`` package also ships a systemd drop-in that
-adds ``/usr/share/node-red`` to the Node-RED service ``NODE_PATH``.
+Icons are **not** embedded in the push. When you pick an identity in a
+generic node's settings (``multiflexi-runtemplate``, ``multiflexi-company``,
+``multiflexi-application``, ``multiflexi-credential``), the editor calls
+``GET /multiflexi/icon/:kind`` and Node-RED fetches the image from the
+MultiFlexi web endpoints — ``appimage.php`` (apps), ``companylogo.php`` and
+``credentialimage.php`` — which are public (no login). RunTemplate icons are
+a diagonal composite (company logo underneath, application icon on top);
+that requires ``imagemagick`` on the Node-RED host.
+
+Set these on the Node-RED process (for example under
+``/etc/systemd/system/node-red.service.d/``):
+
+- **MULTIFLEXI_APP_URL**: base URL of the MultiFlexi web UI as seen from
+  Node-RED (default ``http://127.0.0.1/multiflexi/``).
+- **MULTIFLEXI_APP_HOST**: optional ``Host`` header for loopback fetches when
+  Apache serves several vhosts on the same IP (otherwise ``127.0.0.1`` may
+  hit the wrong site).
+
+On the catalog node, **App URL** is still used by the catalog ingest path
+(default ``/multiflexi/``). The ``node-red-contrib-multiflexi`` package also
+ships a systemd drop-in that adds ``/usr/share/node-red`` to the Node-RED
+service ``NODE_PATH``.
 
 Exposing the editor over HTTPS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

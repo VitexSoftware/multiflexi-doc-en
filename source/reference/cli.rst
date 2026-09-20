@@ -111,6 +111,42 @@ Examples:
     multiflexi-cli application:export-json --id=1 --file=app.json
     multiflexi-cli application:show-config --id=1
 
+conffield
+---------
+
+Manage application configuration field definitions (the same records edited in
+the web UI at ``conffield.php?app_id=N``).
+
+Options:
+  --app_id       Application ID (required for list/create)
+  --id           Configuration field ID (required for get/update/delete)
+  --keyname      Environment / config keyword
+  --type         Field type: string, text, integer, float, email, url,
+                 password, bool, file-path, set
+  --description  Description
+  --hint         Hint shown to users
+  --note         Internal note
+  --defval       Default value
+  --required     Required flag (true/false)
+  --secret       Secret flag (true/false)
+  --multiline    Multiline flag (true/false)
+  --expiring     Expiring flag (true/false)
+  --limit        Limit number of results
+  --offset       Offset for pagination
+  --order        Sort order: A (ascending) or D (descending)
+  --fields       Comma-separated list of fields to display
+  -f, --format   Output format: text or json (default: text)
+
+Examples:
+
+.. code-block:: bash
+
+    multiflexi-cli conffield:list --app_id=2
+    multiflexi-cli conffield:get --id=11464
+    multiflexi-cli conffield:create --app_id=2 --keyname=MY_VAR --type=string --description="Example"
+    multiflexi-cli conffield:update --id=11464 --hint="Updated hint" --required=true
+    multiflexi-cli conffield:delete --id=11464
+
 company-app
 -----------
 
@@ -473,6 +509,30 @@ Examples:
     multiflexi-cli user:create --login="jsmith" --firstname="John" --lastname="Smith" --email="jsmith@example.com" --plaintext="secret"
     multiflexi-cli user:update --id=1 --email="john.smith@example.com"
     multiflexi-cli user:delete --id=1
+
+user-role
+---------
+
+List and set system RBAC roles for a user (``rbac_roles`` / ``rbac_user_roles``).
+
+Available role names typically include: ``super_admin``, ``admin``, ``editor``, ``user``, ``viewer``.
+
+Options:
+  --user_id       User ID
+  --login         User login (alternative to --user_id)
+  --email         User email (alternative to --user_id)
+  --roles         Comma-separated role names (``user-role:set`` only)
+  --replace       Replace existing roles (true/false, default true; ``set`` only)
+  --assigned_by   Assigned-by user ID (``set`` only)
+  -f, --format    Output format: text or json (default: text)
+
+Examples:
+
+.. code-block:: bash
+
+    multiflexi-cli user-role:list --user_id=1 --format=json
+    multiflexi-cli user-role:set --login=jsmith --roles=admin,viewer --replace=true
+    multiflexi-cli user-role:set --user_id=3 --roles=admin --replace=false
 
 user:data-erasure
 -----------------

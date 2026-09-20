@@ -624,7 +624,7 @@ multiflexi-tui
 
 **Location**: https://github.com/VitexSoftware/multiflexi-tui
 
-**Purpose**: A modern terminal UI frontend for ``multiflexi-cli``, built with the `Charmbracelet Bubbletea <https://github.com/charmbracelet/bubbletea>`_ framework (Go).
+**Purpose**: A modern terminal UI frontend for ``multiflexi-cli``, built with the `Charmbracelet Bubbletea <https://github.com/charmbracelet/bubbletea>`_ framework (Go). It drives the hyphenated ``entity:action`` CLI (for example ``run-template:list``, ``company-app:assign``, ``task:list``, ``conffield:list``) and covers companies, applications (including config-field CRUD matching web ``conffield.php``), run templates, jobs, tasks, credentials, tokens, users, artifacts, credential types/prototypes, company–app assignments, queue, and event sources/rules.
 
 **Install**:
 
