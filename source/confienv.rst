@@ -90,10 +90,13 @@ Integrations
   over the Node-RED bridge (default: ``true``).
 - **NODERED_CATALOG_URL**: ``multiflexi-eventor`` catalog feed endpoint. When set, the event
   processor publishes all companies, enabled run-templates and credentials to the
-  ``node-red-contrib-multiflexi`` catalog node, which builds one palette node per entity.
+  ``node-red-contrib-multiflexi`` catalog node, which caches them for editor autosuggest
+  on the generic nodes (RunTemplate / Company).
   Use a path distinct from ``NODERED_WEBHOOK_URL``. Leave empty to disable.
 - **NODERED_CATALOG_INTERVAL**: How often (seconds) the catalog is republished; an unchanged
   catalog (content-hashed) is not resent (default: ``300``).
+- **MULTIFLEXI_URL**: API root for a MultiFlexi-hosted Node-RED process (implicit connection).
+- **MULTIFLEXI_API_TOKEN**: Bearer token for the Node-RED service account used by flow nodes.
 
 - **ZABBIX_URL**: Base URL of the Zabbix web frontend (e.g., ``https://zabbix.example.com/zabbix``).
   When set, a Zabbix entry is added to the **Integrations** menu. This is separate from
@@ -104,6 +107,16 @@ Integrations
   ``https://grafana.example.com``). When set and ``OTEL_ENABLED`` is true, an OpenTelemetry entry
   is added to the **Integrations** menu. This is separate from ``OTEL_EXPORTER_OTLP_ENDPOINT``
   (see *Logging & Telemetry*), which is the OTLP ingest endpoint and is not a browsable UI.
+
+Executor — Kubernetes
+---------------------
+
+- **KUBECONFIG**: Path to the kubeconfig used by the Kubernetes executor
+  (default: ``~/.kube/config`` for the daemon user).
+- **MULTIFLEXI_K8S_NAMESPACE**: Target Kubernetes namespace for one-shot pods and
+  Helm operations. When unset, the Helm chart namespace is used (default
+  ``multiflexi`` when a ``helmchart`` is configured); otherwise the cluster
+  default namespace is used. See :ref:`kubernetes-integration`.
 
 Other
 -----

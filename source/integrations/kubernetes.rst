@@ -27,28 +27,43 @@ The following must be available on the machine that runs the
 ``multiflexi-executor`` daemon:
 
 - **kubectl** – Kubernetes command-line tool, accessible in ``$PATH``
-- **helm** (v3+) – Helm package manager, accessible in ``$PATH``
+- **helm** (v3+) – Required only when applications declare a ``helmchart``
 - **kubeconfig** – A valid kubeconfig file at ``~/.kube/config`` (relative to
   the daemon user's ``$HOME``) or referenced via the ``KUBECONFIG`` environment
   variable
 
 The daemon typically runs as the ``multiflexi`` system user whose home
-directory is ``/var/lib/multiflexi/``.  Make sure the kubeconfig is placed at
-``/var/lib/multiflexi/.kube/config`` with owner ``multiflexi`` and permissions
-``0600``:
+directory is ``/var/lib/multiflexi/``.  Prefer a least-privilege ServiceAccount
+kubeconfig (not cluster-admin) at ``/var/lib/multiflexi/.kube/config`` with
+owner ``multiflexi`` and permissions ``0600``.
 
-.. code-block:: bash
+Namespace and RBAC
+~~~~~~~~~~~~~~~~~~
 
-   sudo mkdir -p /var/lib/multiflexi/.kube
-   sudo cp /path/to/admin.kubeconfig /var/lib/multiflexi/.kube/config
-   sudo chown -R multiflexi:multiflexi /var/lib/multiflexi/.kube
-   sudo chmod 600 /var/lib/multiflexi/.kube/config
-
-A Kubernetes namespace (default ``multiflexi``) must exist in the cluster:
+Create the namespace (once):
 
 .. code-block:: bash
 
    kubectl create namespace multiflexi
+
+Apply the Role / RoleBinding / ServiceAccount shipped by the
+``multiflexi-executor-k8s`` package (or from the source tree
+``k8s/multiflexi-executor-rbac.yaml``):
+
+.. code-block:: bash
+
+   kubectl apply -f /usr/share/multiflexi/k8s/multiflexi-executor-rbac.yaml
+
+Override the target namespace with ``MULTIFLEXI_K8S_NAMESPACE`` when it should
+differ from the Helm default (``multiflexi``) or the cluster default.
+
+Install a kubeconfig for ServiceAccount ``multiflexi-executor``:
+
+.. code-block:: bash
+
+   sudo mkdir -p /var/lib/multiflexi/.kube
+   sudo install -o multiflexi -g multiflexi -m 0600 ./multiflexi-executor.kubeconfig \
+     /var/lib/multiflexi/.kube/config
 
 Application Configuration
 -------------------------
@@ -168,31 +183,35 @@ Execution Flow
 When the ``multiflexi-executor`` daemon picks up a job with the Kubernetes
 executor, the following steps occur:
 
-1. **Helm status check** – Runs ``helm status <releaseName> --namespace <ns>``
-   to determine whether the application's Helm release is already deployed in
-   the cluster.
+1. **Helm status check** (only when ``helmchart`` is set) – Runs
+   ``helm status <releaseName> --namespace <ns>`` to determine whether the
+   application's Helm release is already deployed in the cluster.
 
 2. **Helm pre-deployment** (if needed) – If the release is not found, runs
    ``helm upgrade --install`` using the chart path from the ``helmchart``
    database field with ``--create-namespace``, ``--wait``, and the configured
-   timeout.
+   timeout.  Applications without a ``helmchart`` skip steps 1–2 and launch
+   the one-shot pod only.
 
 3. **Pod creation** – Runs ``kubectl run`` with ``--restart=Never --attach``
    to create a one-shot pod using the application's OCI image.  Environment
    variables from the runtemplate configuration are passed via ``--env`` flags.
    The command executed inside the pod is the application's ``executable`` with
-   its ``cmdparams``.
+   its ``cmdparams``.  Namespace comes from ``MULTIFLEXI_K8S_NAMESPACE``, else
+   the Helm namespace (default ``multiflexi``), else the cluster default.
 
 4. **Output capture** – The pod's stdout and stderr are streamed back through
-   the ``kubectl --attach`` connection and captured by the executor.
+   the ``kubectl --attach`` connection and captured by the executor.  Helper
+   commands (Helm, ``kubectl cp``, delete) do not overwrite that captured
+   output.
 
-5. **Artifact collection** (if configured) – If ``artifacts.enabled`` is true
-   in the kubernetes config, ``kubectl cp`` is used to copy the output file
-   from the pod to the local filesystem and store it in the MultiFlexi file
-   store.
+5. **Artifact collection** (if configured) – Every comma-separated path in the
+   application ``artifacts`` field is copied from the pod with ``kubectl cp``
+   and stored in the MultiFlexi file store (field name = file basename).
 
 6. **Pod cleanup** – The pod is deleted unless ``keepPodOnFailure`` is true and
-   the job failed (non-zero exit code).
+   the job failed (non-zero exit code).  When no artifacts are configured,
+   ``kubectl run --rm`` removes the pod automatically.
 
 7. **Database storage** – The captured stdout, stderr, exit code, and command
    line are saved to the job record.  The ``job.stdout`` column contains the

@@ -38,6 +38,15 @@ Timezone
   timezone your schedules are defined in — an undetected mismatch shows scheduled
   times and countdowns offset by the difference from UTC.
 
+Kubernetes Executor
+~~~~~~~~~~~~~~~~~~~
+
+- **KUBECONFIG**: Path to kubeconfig for the Kubernetes executor (default
+  ``~/.kube/config`` for the daemon user).
+- **MULTIFLEXI_K8S_NAMESPACE**: Override the target namespace for one-shot pods
+  and Helm operations. When unset, uses the Helm chart namespace (default
+  ``multiflexi``) or the cluster default. See :ref:`kubernetes-integration`.
+
 Security Options
 ~~~~~~~~~~~~~~~~
 
@@ -120,8 +129,10 @@ Integrations
 - **NODERED_WEBHOOK_URL**: ``multiflexi-eventor`` Node-RED bridge endpoint. When set, the event processor forwards webhook changes and finished jobs to this Node-RED HTTP-in URL. Leave empty to disable the bridge. Configurable at install time via ``dpkg-reconfigure multiflexi-eventor``.
 - **NODERED_TOKEN**: Optional shared secret sent as the ``X-MultiFlexi-Token`` header with each Node-RED bridge request.
 - **NODERED_FORWARD_CHANGES**: Forward incoming webhook changes in addition to finished jobs over the Node-RED bridge (default: ``true``).
-- **NODERED_CATALOG_URL**: ``multiflexi-eventor`` catalog feed endpoint. When set, the event processor publishes all companies, enabled run-templates and credentials to the ``node-red-contrib-multiflexi`` catalog node, which builds one palette node per entity. Use a path distinct from ``NODERED_WEBHOOK_URL``. Leave empty to disable.
+- **NODERED_CATALOG_URL**: ``multiflexi-eventor`` catalog feed endpoint. When set, the event processor publishes all companies, enabled run-templates and credentials to the ``node-red-contrib-multiflexi`` catalog node, which caches them for editor autosuggest on the generic nodes (RunTemplate / Company). Use a path distinct from ``NODERED_WEBHOOK_URL``. Leave empty to disable.
 - **NODERED_CATALOG_INTERVAL**: How often (seconds) the catalog is republished; an unchanged catalog (content-hashed) is not resent (default: ``300``).
+- **MULTIFLEXI_URL**: API root used by a MultiFlexi-hosted Node-RED process for the implicit connection (e.g. ``http://127.0.0.1/multiflexi/api``). Set on the Node-RED service, not only in ``multiflexi.env``.
+- **MULTIFLEXI_API_TOKEN**: Bearer token for the Node-RED service account (``svc-nodered``). Used by flow nodes for ``POST /job/`` and related calls; editor login uses a separate per-user token from ``multiflexi-auth``.
 
 - **ZABBIX_URL**: Base URL of the Zabbix web frontend (e.g., ``https://zabbix.example.com/zabbix``). When set, a Zabbix entry is added to the **Integrations** menu. This is separate from ``ZABBIX_SERVER`` (see *Logging & Telemetry*), which is the trapper/proxy host used for sending metrics and is not necessarily reachable as a web frontend.
 - **OTEL_DASHBOARD_URL**: Base URL of the observability dashboard (e.g., ``https://grafana.example.com``). When set and ``OTEL_ENABLED`` is true, an OpenTelemetry entry is added to the **Integrations** menu. This is separate from ``OTEL_EXPORTER_OTLP_ENDPOINT`` (see *Logging & Telemetry*), which is the OTLP ingest endpoint and is not a browsable UI.

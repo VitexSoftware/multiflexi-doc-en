@@ -57,31 +57,38 @@ Kubernetes Executor
 -------------------
 
 The Kubernetes executor runs tasks as one-shot pods inside a Kubernetes
-cluster.  It integrates with Helm to manage application deployments and
-uses ``kubectl run --attach`` to execute the job command.
+cluster.  When an application declares a ``helmchart``, Helm manages the
+in-cluster deployment first; otherwise only the one-shot pod is launched.
+Jobs use ``kubectl run --attach``.
 
 Features:
 
 - Runs tasks in isolated Kubernetes pods
-- Automatic Helm chart deployment when the application isn't already in the
-  cluster
-- Artifact collection from pods via ``kubectl cp``
+- Optional Helm chart deployment when ``helmchart`` is set and the release is
+  not already in the cluster
+- Artifact collection from pods via ``kubectl cp`` (every path listed in the
+  application ``artifacts`` field)
 - Pod cleanup after execution (configurable)
-- Requires ``kubectl`` and ``helm`` binaries in ``$PATH``
+- Requires ``kubectl`` in ``$PATH`` (and ``helm`` when using Helm charts)
 - Requires a valid kubeconfig accessible by the daemon user
+- Namespace override via ``MULTIFLEXI_K8S_NAMESPACE``
 
-The executor reads the ``helmchart`` and ``ociimage`` fields from the
-application record.  Environment variables are passed to the pod via
-``--env`` flags on ``kubectl run``.
+The executor reads the ``ociimage`` (required), ``helmchart`` (optional), and
+``artifacts`` (optional, comma-separated paths) fields from the application
+record.  Environment variables are passed to the pod via ``--env`` flags on
+``kubectl run``.
 
 **Execution flow:**
 
-1. Check if Helm release exists (``helm status``)
-2. Deploy via ``helm upgrade --install`` if needed
-3. Create pod via ``kubectl run --restart=Never --attach``
-4. Capture stdout/stderr from the pod
-5. Collect artifacts (optional)
-6. Delete the pod
+1. If ``helmchart`` is set: check Helm release (``helm status``), then
+   ``helm upgrade --install`` when missing
+2. Create pod via ``kubectl run --restart=Never --attach``
+3. Capture stdout/stderr from the pod
+4. Collect every configured artifact path (optional)
+5. Delete the pod
+
+The ``multiflexi-executor-k8s`` package ships RBAC manifests at
+``/usr/share/multiflexi/k8s/multiflexi-executor-rbac.yaml``.
 
 For a complete setup guide, see :ref:`kubernetes-integration`.
 
