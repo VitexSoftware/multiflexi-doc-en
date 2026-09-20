@@ -283,9 +283,11 @@ Required and optional application fields
        is missing. When empty, only the one-shot pod is launched.
    * - ``artifacts``
      - No
-     - Comma-separated paths **inside the pod**. Every path is copied with
-       ``kubectl cp`` and stored in the job file store (field name = file
-       basename).
+     - Declared in application.json as an array of ``{name, path, type}``
+      (stored in ``app_artifacts``; legacy comma-separated ``apps.artifacts``
+      is a fallback). Path patterns are matched against files in the pod
+      ``/tmp`` after remap; matches are copied into host ``MULTIFLEXI_TMP``
+      and stored by ``Job::runEnd()`` in the ``artifacts`` table.
    * - ``executable`` / ``cmdparams``
      - As for Native
      - Command run inside the pod after ``--`` on ``kubectl run``
