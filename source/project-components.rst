@@ -562,11 +562,22 @@ multiflexi-mcp-server
 
     pip install multiflexi-mcp-server
 
-**Configure** (``MULTIFLEXI_HOST`` environment variable):
+**Configure** (``MULTIFLEXI_HOST`` must include the full API base path):
 
 .. code-block:: bash
 
-    export MULTIFLEXI_HOST=https://multiflexi.example.com
+    export MULTIFLEXI_HOST=https://multiflexi.example.com/api/VitexSoftware/MultiFlexi/1.0.0
+    export MULTIFLEXI_USERNAME=demo
+    export MULTIFLEXI_PASSWORD=demo
+
+**Live capability check** (from the ``multiflexi-mcp-server`` checkout):
+
+.. code-block:: bash
+
+    python tests/live_capability_scenario.py \
+      --host "$MULTIFLEXI_HOST" \
+      --username "$MULTIFLEXI_USERNAME" \
+      --password "$MULTIFLEXI_PASSWORD"
 
 **Features**: Tools for apps, jobs, companies, users, run templates, credentials, credential
 types, topics, event sources, event rules, tasks, and GDPR data exports — including full

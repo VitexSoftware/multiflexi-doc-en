@@ -8,7 +8,16 @@ API
    :caption: API Sections
 
 
-API calls are handled by the `api/index.php` file. This file is responsible for routing the request to the appropriate controller and method. The API is designed to be flexible and easy to use. It is built on top of the `MultiFlexi` class, which provides a simple interface for creating and managing API endpoints.
+API calls are handled by the ``api/index.php`` entry point (package
+``php-vitexsoftware-multiflexi-server``, typically aliased at ``/api``).
+That bootstrap loads ``/etc/multiflexi/multiflexi.env`` and
+``/etc/multiflexi/database.env`` (merged) so ``BasicAuthenticator`` and other
+core classes can reach the database without Apache ``SetEnv`` workarounds.
+
+Most collection endpoints return an **id-keyed JSON object** (for example
+``{"12": {...}, "15": {...}}``), not a bare array. Empty App ``environment``
+and ``exitCodes`` maps are encoded as ``{}`` objects. Nested Task job
+``env`` values are decoded to objects when the stored value is PHP-serialized.
 
 The endpoints
 
@@ -49,7 +58,7 @@ This endpoint is for managing jobs within the system. You can create new jobs, r
 
 - **GET /job/{jobId}.{suffix}**: Get job by ID
 - **POST /job/**: Create or Update job record
-- **GET /jobs.{suffix}**: Show All jobs
+- **GET /jobs.{suffix}**: Show All jobs (id-keyed object)
 
 /user/
 ------
