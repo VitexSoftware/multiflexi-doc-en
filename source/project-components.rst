@@ -570,6 +570,12 @@ multiflexi-mcp-server
     export MULTIFLEXI_USERNAME=demo
     export MULTIFLEXI_PASSWORD=demo
 
+If ``MULTIFLEXI_HOST`` is not set the server still starts and answers ``tools/list``
+(so registries such as mcprack see its tools), but every tool call returns a
+"MULTIFLEXI_HOST is required" error. When registered in mcprack, set the variables
+on the server instance (``mcprack server create mcp-server-multiflexi --set-env
+MULTIFLEXI_HOST=...``); keep the password out of the non-secret env.
+
 **Live capability check** (from the ``multiflexi-mcp-server`` checkout):
 
 .. code-block:: bash
