@@ -99,7 +99,7 @@ You interact with MultiFlexi through whichever interface fits your workflow:
 
 **CLI** (``multiflexi-cli``) — full-featured command-line tool for scripting, CI/CD pipelines, and headless administration.
 
-**TUI** (``multiflexi-tui``) — interactive terminal interface built with Bubbletea (Go) for keyboard-driven management.
+**TUI** (``multiflexi-tui``) — interactive Turbo Vision (C++) terminal interface for keyboard-driven management, including wizards and live job streaming.
 
 **REST API** — JSON/XML/YAML endpoints with HTTP Basic and token authentication for programmatic integration.
 

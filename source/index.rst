@@ -24,7 +24,7 @@ Key Features
 
   - Web UI (`MultiFlexi <https://github.com/VitexSoftware/MultiFlexi/>`_) — Bootstrap 5, real-time dashboard
   - CLI (`multiflexi-cli <https://github.com/VitexSoftware/multiflexi-cli/>`_) — full management from the terminal
-  - TUI (`multiflexi-tui <https://github.com/VitexSoftware/multiflexi-tui/>`_) — interactive terminal UI (Bubbletea/Go)
+  - TUI (`multiflexi-tui <https://github.com/VitexSoftware/multiflexi-tui/>`_) — interactive Turbo Vision (C++) terminal UI
   - REST API — JSON/XML/YAML/HTML output formats, HTTP Basic + token auth
   - MCP Server (`multiflexi-mcp-server <https://github.com/VitexSoftware/multiflexi-mcp-server/>`_) — AI agent integration
 

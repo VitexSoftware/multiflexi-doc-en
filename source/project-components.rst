@@ -641,7 +641,7 @@ multiflexi-tui
 
 **Location**: https://github.com/VitexSoftware/multiflexi-tui
 
-**Purpose**: A modern terminal UI frontend for ``multiflexi-cli``, built with the `Charmbracelet Bubbletea <https://github.com/charmbracelet/bubbletea>`_ framework (Go). It drives the hyphenated ``entity:action`` CLI (for example ``run-template:list``, ``company-app:assign``, ``task:list``, ``conffield:list``) and covers companies, applications (including config-field CRUD matching web ``conffield.php``), run templates, jobs, tasks, credentials, tokens, users, artifacts, credential types/prototypes, company–app assignments, queue, and event sources/rules.
+**Purpose**: A terminal UI frontend for ``multiflexi-cli``, built with `Turbo Vision (tvision) <https://github.com/magiblot/tvision>`_ in C++ (same stack as ``abraflexi-tui``). It shells out to the hyphenated ``entity:action`` CLI (for example ``run-template:list``, ``company-app:assign``, ``task:list``, ``conffield:list``) and covers companies, applications (including config-field CRUD matching web ``conffield.php``), run templates, jobs, tasks, credentials, tokens, users, artifacts, credential types/prototypes, company–app assignments, queue, event sources/rules, GDPR deletion requests, activation/credential wizards, and live job stdout/stderr streaming via polled ``job:get``.
 
 **Install**:
 
