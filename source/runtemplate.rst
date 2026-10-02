@@ -379,6 +379,16 @@ summarising the task history for this RunTemplate:
 
 Each card links to ``tasks.php`` filtered by the corresponding state.
 
+Job History Graph
+-----------------
+
+The RunTemplate page also shows a **Job History Graph** — a compact pixel grid
+of recent job exit codes for that template (green = success, red = failure,
+yellow = missing executable, blue = waiting). The image is served by
+``jobgraph.php`` and is scoped with ``runtemplate_id``. The same widget appears
+on company, company+application, application, jobs list, dashboard, home, and
+status pages with the matching ``company_id`` / ``app_id`` filters.
+
 Advanced Configuration
 ----------------------
 

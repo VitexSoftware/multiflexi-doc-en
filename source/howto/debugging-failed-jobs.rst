@@ -21,7 +21,9 @@ Step 1: Find the Failed Job
 
 1. Go to **Jobs** in the top navigation
 2. Filter by **Status = Failed** (or by company/application)
-3. Click the job to open its detail page
+3. Use the **Job History Graph** above the list for a quick visual of recent
+   exit codes in the current filter scope (red cells indicate failures)
+4. Click the job to open its detail page
 
 **Via CLI:**
 

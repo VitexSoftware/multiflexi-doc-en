@@ -34,6 +34,10 @@ Upon login, the dashboard presents:
 - **System Status**: Real-time health metrics.
 - **Recent Jobs**: Status of recently executed tasks.
 - **Upcoming Schedule**: Timeline of planned executions.
+- **Job History Graph**: A pixel grid of recent job exit codes (green = success,
+  red = failure, blue = waiting). The same widget appears on the home page,
+  company, company+application, application, RunTemplate, jobs list, and status
+  pages, scoped to the current context.
 
 A welcome banner, quick-action buttons, and summary statistics stay at the top.
 The detail sections below — **Recent Jobs**, **My Recent Activity Log**, **Account
