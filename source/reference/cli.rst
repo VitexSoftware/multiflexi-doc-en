@@ -63,7 +63,8 @@ The MultiFlexi CLI provides the following main commands:
 - **artifact:\***        - Manage job artifacts
 - **encryption:\***      - Manage encryption keys
 - **queue:\***           - Job queue operations
-- **status**             - System status information (encryption, Zabbix, OpenTelemetry)
+- **status**             - System status information (encryption, Zabbix, OpenTelemetry, services)
+- **service:start/stop** - Start or stop ``executor`` / ``scheduler`` / ``housekeeper`` systemd units
 - **telemetry:test**     - Test OpenTelemetry metrics export
 - **describe**           - List all available commands and their parameters
 - **prune**              - Prune logs and jobs, keeping only the latest N records (default: 1000)
@@ -118,7 +119,7 @@ Manage application configuration field definitions (the same records edited in
 the web UI at ``conffield.php?app_id=N``).
 
 Options:
-  --app_id       Application ID (required for list/create)
+  --app_id       Application ID (required for create; optional filter for list)
   --id           Configuration field ID (required for get/update/delete)
   --keyname      Environment / config keyword
   --type         Field type: string, text, integer, float, email, url,
@@ -141,6 +142,7 @@ Examples:
 
 .. code-block:: bash
 
+    multiflexi-cli conffield:list --format=json --limit=40
     multiflexi-cli conffield:list --app_id=2
     multiflexi-cli conffield:get --id=11464
     multiflexi-cli conffield:create --app_id=2 --keyname=MY_VAR --type=string --description="Example"
@@ -856,12 +858,13 @@ Prune logs and jobs, keeping only the latest N records (default: 1000).
 
 .. code-block:: bash
 
-    multiflexi-cli prune [--logs] [--jobs] [--keep=N]
+    multiflexi-cli prune [--logs] [--jobs] [--keep=N] [--format=text|json]
 
 Options:
   --logs         Prune logs table
   --jobs         Prune jobs table
   --keep         Number of records to keep (default: 1000)
+  --format       Output format: ``text`` (default) or ``json``
 
 Examples:
 
@@ -870,6 +873,7 @@ Examples:
     multiflexi-cli prune --logs
     multiflexi-cli prune --jobs --keep=500
     multiflexi-cli prune --logs --jobs --keep=2000
+    multiflexi-cli prune --logs --jobs --keep=1000 --format=json
 
 completion
 ----------
@@ -906,10 +910,33 @@ status
 
 Show current MultiFlexi system status, including version, database, PHP, OS, resource usage, monitoring systems (Zabbix, OpenTelemetry), encryption, and service health.
 
+Service lines in the JSON/text output:
+
+- ``executor`` — ``multiflexi-executor.service``
+- ``scheduler`` — ``multiflexi-scheduler.service``
+- ``housekeeper`` — ``multiflexi-housekeeper.timer`` (periodic maintenance; the oneshot ``.service`` is started by the timer)
+
 .. code-block:: bash
 
     multiflexi-cli status
     multiflexi-cli status --format json
+
+service:start / service:stop
+----------------------------
+
+Start or stop a MultiFlexi systemd unit. Names match the ``status`` service lines.
+Members of the ``multiflexi`` group can run these without a password (via the
+packaged sudoers snippet).
+
+.. code-block:: bash
+
+    multiflexi-cli service:start --name=scheduler
+    multiflexi-cli service:stop --name=executor
+    multiflexi-cli service:start --name=housekeeper --format=json
+
+Options:
+  --name         ``scheduler``, ``executor``, or ``housekeeper``
+  -f, --format   Output format: text or json (default: text)
 
 Sample output:
 

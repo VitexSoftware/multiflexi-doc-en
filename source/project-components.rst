@@ -643,6 +643,11 @@ multiflexi-tui
 
 **Purpose**: A terminal UI frontend for ``multiflexi-cli``, built with `Turbo Vision (tvision) <https://github.com/magiblot/tvision>`_ in C++ (same stack as ``abraflexi-tui``). It shells out to the hyphenated ``entity:action`` CLI (for example ``run-template:list``, ``company-app:assign``, ``task:list``, ``conffield:list``) and covers companies, applications (including config-field CRUD matching web ``conffield.php``), run templates, jobs, tasks, credentials, tokens, users, artifacts, credential types/prototypes, company–app assignments, queue, event sources/rules, GDPR deletion requests, activation/credential wizards, and live job stdout/stderr streaming via polled ``job:get``.
 
+.. image:: _static/images/screenshots/multiflexi-tui.png
+   :alt: multiflexi-tui Turbo Vision interface
+   :align: center
+   :width: 100%
+
 **Install**:
 
 .. code-block:: bash
