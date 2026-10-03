@@ -435,10 +435,10 @@ RunTemplate, per the passing-data-between-jobs design
 
 **Verification — Web UI (Selenium)**
 
-No web UI or Selenium coverage exists for event rules yet (**TODO** —
-depends on Phase 4 of the passing-data-between-jobs design, the Node-RED
-mapping GUI described in ``passing_data_between_jobs.md``; not a
-``multiflexi-web5`` gap, the feature's own admin UI is not yet built).
+Open ``eventrules.php`` to list rules and ``eventrule.php`` / ``eventrule.php?id=…``
+to create or edit a binding (Event Source or Source RunTemplate trigger, target
+RunTemplate with application logo, ``env_mapping`` JSON). Automated Selenium
+coverage for this page is still a **TODO**.
 
 **Verification — API (integration test)**
 

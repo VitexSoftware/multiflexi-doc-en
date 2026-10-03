@@ -270,7 +270,11 @@ command.
 
 You manage bindings through:
 
-- **Node-RED** ``multiflexi-map`` node (recommended for visual editing — see below).
+- **Web UI** ``eventrules.php`` / ``eventrule.php`` — list and edit rules with
+  RunTemplate pickers (application logo + name), Event Source or Source
+  RunTemplate triggers, and ``env_mapping`` JSON.
+- **Node-RED** ``multiflexi-map`` node (recommended for visual field pairing —
+  see below).
 - **CLI** ``multiflexi-cli event-rule:create`` / ``event-rule:update`` for scripted
   management.
 - **REST API** ``POST /api/.../event-rule/`` for programmatic setup.
