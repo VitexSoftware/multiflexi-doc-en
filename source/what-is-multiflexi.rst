@@ -95,7 +95,7 @@ Multiple Interfaces
 
 You interact with MultiFlexi through whichever interface fits your workflow:
 
-**Web UI** — Bootstrap 5 dashboard with real-time metrics, company/application/credential management, job history, and live output streaming via WebSocket.
+**Web UI** — Bootstrap 5 dashboard with real-time metrics, company/application/credential management, job history, and live job output streaming via Server-Sent Events (SSE).
 
 **CLI** (``multiflexi-cli``) — full-featured command-line tool for scripting, CI/CD pipelines, and headless administration.
 

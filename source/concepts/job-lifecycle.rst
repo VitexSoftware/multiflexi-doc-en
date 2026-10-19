@@ -166,8 +166,10 @@ Phase 4: Job Execution
    - Process launched
    - Output streams captured in real-time:
      
-     - stdout → buffered
-     - stderr → buffered
+     - stdout / stderr → stored line-by-line in ``job_output_lines``
+     - Web UI ``job.php`` opens an SSE stream (``jobstream.php``) while the
+       job is running and appends new lines into the black terminal panel
+       (``#live-output``); the Download button stays below that panel
    
    - Progress monitoring (for long-running jobs)
 
