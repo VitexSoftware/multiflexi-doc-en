@@ -472,6 +472,24 @@ Metrics Not Appearing in Prometheus
 
    OTel metrics may be renamed by the Prometheus exporter (dots → underscores)
 
+Failure Resilience
+------------------
+
+An unreachable OTLP collector (Grafana Agent, OpenTelemetry Collector, etc.)
+**must not** abort job execution. ``OtelMetricsExporter`` treats export failures
+as soft errors:
+
+* Export exceptions and ``forceFlush()`` returning ``false`` are caught and logged
+  as MultiFlexi warnings — never as uncaught fatals.
+* After the first flush failure in a process, further OTEL export attempts are
+  disabled for that process to avoid repeated connection timeouts.
+* OpenTelemetry SDK internal stderr stack traces for export failures are suppressed;
+  use MultiFlexi status messages (or ``APP_DEBUG=true``) to diagnose connectivity.
+
+Job exit code ``75`` (``EX_TEMPFAIL``) is used when a **credential availability**
+check fails (for example AbraFlexi unreachable). That is unrelated to OTEL/Grafana
+downtime.
+
 Performance Impact
 ------------------
 
