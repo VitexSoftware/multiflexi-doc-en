@@ -96,6 +96,22 @@ a different user, apply the same ACL manually::
    setfacl -m u:zabbix:r-- /etc/multiflexi/multiflexi.env
    systemctl restart zabbix-agent2
 
+Unreachable Zabbix Server
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MultiFlexi never waits long for the Zabbix server. The sender connects with a
+3-second timeout. After a failed connection it skips Zabbix for 60 seconds and
+then tries again. Job scheduling and execution continue while Zabbix is down;
+the metrics for that period are not sent.
+
+.. note::
+
+   Older versions had no connect timeout. If the Zabbix server port 10051 was
+   unreachable, each job creation blocked for about two minutes and the
+   scheduler queue filled very slowly. Upgrade ``php-vitexsoftware-multiflexi-core``
+   to fix this. As a workaround, comment out ``ZABBIX_SERVER`` in
+   ``/etc/multiflexi/multiflexi.env`` and restart ``multiflexi-scheduler``.
+
 Company-Specific Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
