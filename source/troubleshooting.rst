@@ -152,6 +152,16 @@ No New Jobs Being Created
    systemctl status multiflexi-scheduler
    multiflexi-cli run-template:list  # check Active column
 
+**Cause:** Scheduler crashed with ``Allowed memory size exhausted`` (status ``255/EXCEPTION``).
+Older versions (before the log-buffer fix) accumulated every log message in memory.
+
+.. code-block:: bash
+
+   journalctl -u multiflexi-scheduler | grep -E "Allowed memory size|status=255"
+
+Update ``multiflexi-scheduler``. Current versions release the log buffers after every tick and
+restart themselves cleanly before the memory limit is reached.
+
 Job Fails Immediately (exit code non-zero)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

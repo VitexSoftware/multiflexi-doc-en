@@ -110,8 +110,9 @@ multiflexi-scheduler
 Scans RunTemplates in the database and creates Job records when a scheduled run time is due. Runs continuously as a simple PHP daemon.
 
 - **Binary**: ``/usr/lib/multiflexi-scheduler/daemon.php``
-- **Restarts automatically**: yes (``Restart=always``, 10 s delay)
-- **No memory ceiling** (scheduler is lightweight)
+- **Restarts automatically**: yes (``Restart=always``, 15 s delay)
+- **Graceful shutdown**: on ``SIGTERM`` or ``SIGINT`` (for example ``systemctl restart``) the daemon finishes the scheduling tick in progress, so every job it started creating is written to the database, and then exits. systemd waits up to 120 s (``TimeoutStopSec``) before it kills the process.
+- **Memory safeguard**: the daemon leaves cleanly, in the same way, when its memory use reaches 75 % of the PHP ``memory_limit`` (256 MB by default on PHP 8.3), and systemd starts a fresh process. Older versions kept every log message in memory and died with ``PHP Fatal error: Allowed memory size ... exhausted`` after about a day.
 
 multiflexi-executor
 ~~~~~~~~~~~~~~~~~~~~
@@ -147,6 +148,7 @@ log table, recalculates RunTemplate job counters, and checks credential health.
 - **Package**: ``multiflexi-housekeeper``
 - **Timer**: ``multiflexi-housekeeper.timer`` (``OnCalendar=hourly``, ``Persistent=true``)
 - **Service**: ``multiflexi-housekeeper.service`` (``Type=oneshot``)
+- **Graceful shutdown**: ``SIGTERM`` lets the running duty finish (``TimeoutStopSec=120``); see :doc:`housekeeper`
 - **Binary**: ``/usr/lib/multiflexi-housekeeper/housekeeper.php``
 - **Jitter**: up to 5 minutes (``RandomizedDelaySec=300``) — prevents thundering-herd on multi-server deployments
 - **Dry-run**: ``sudo -u multiflexi multiflexi-housekeeper --dry-run``

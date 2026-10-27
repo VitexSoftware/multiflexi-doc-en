@@ -151,6 +151,22 @@ Then start (and keep running) via the service unit:
    When ``MULTIFLEXI_DAEMONIZE=true``, disable the timer to avoid running both at
    the same time: ``sudo systemctl disable --now multiflexi-housekeeper.timer``
 
+Graceful Shutdown
+-----------------
+
+The HouseKeeper handles ``SIGTERM`` and ``SIGINT`` (for example ``systemctl stop`` or
+a package upgrade) without interrupting a duty half-way:
+
+1. The duty that is running finishes and its result is logged as usual.
+2. The remaining duties of the cycle are **not started**. The log contains a warning
+   ``Shutdown requested — duty [...] and the following ones not started``.
+3. In daemon mode the waiting pause between cycles ends at once and the process exits.
+
+systemd waits up to 120 seconds (``TimeoutStopSec``) before it sends ``SIGKILL``.
+The duties skipped this way run again in the next cycle, which the timer starts
+within the hour. The handler needs the PHP ``pcntl`` extension; without it, a
+signal ends the process immediately as before.
+
 Configuration
 -------------
 
