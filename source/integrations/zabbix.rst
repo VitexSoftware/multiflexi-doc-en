@@ -346,6 +346,28 @@ You can override the default key in the Zabbix action configuration:
 
    zabbix_action[custom-metric-name]
 
+**Failure alerting:**
+
+The Zabbix template discovers every RunTemplate that has the Zabbix action enabled
+(``multiflexi.action.lld``). A failure is reported as a problem of that RunTemplate
+when its *fail* action sends data to Zabbix: the trigger
+``<company> - <app>: RunTemplate <name> failed`` fires while a value arrived on the
+failure item within ``{$MULTIFLEXI.ACTION.FAIL.WINDOW}`` (default ``26h``).
+
+When a failed job has an empty standard output, the action sends the exit code and
+the tail of the job's error output (up to 1000 characters) instead, so the failure
+item carries the concrete reason (for example a DNS resolution error).
+
+.. note::
+
+   Configure a **different key** for the *success* and the *fail* action of the
+   RunTemplate. When both use the same (or the default) key, the failure item is not
+   discovered, because it would collide with the success item.
+
+   The key actually sent to the Zabbix trapper is ``zabbix_action-[<key>]``;
+   when the key is empty, the default ``<COMPANY_SLUG>-<APP_CODE>-<RUNTEMPLATE_ID>-data``
+   is used.
+
 Sending Metrics
 ~~~~~~~~~~~~~~~
 
