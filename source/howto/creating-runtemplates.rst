@@ -48,6 +48,15 @@ Creating a RunTemplate via the Web Interface
         - No
         - Seconds to delay execution after the scheduled time
 
+.. note::
+
+   The delay is a *phase offset* within one schedule period (for example ``21600`` for
+   "daily at 06:00"). If it is equal to or longer than the gap between two cron ticks
+   (a ``*/15 * * * *`` RunTemplate with a delay of ``2460``), the scheduler keeps only the
+   part that fits into the period (``2460 mod 900 = 660`` s) and logs a warning. Before this
+   rule, such a RunTemplate silently ran every second tick only, which Zabbix reported as
+   ``scheduled window skipped`` on every other run.
+
 5. Fill in any application-specific **configuration fields** shown below the main form
 6. Click **"Save"**
 

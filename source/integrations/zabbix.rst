@@ -957,3 +957,14 @@ The MultiFlexi Zabbix integration source code:
 
 For development and customization examples, refer to the source code repository.
 
+
+"scheduled window skipped" Fires Every Other Run
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The per-RunTemplate trigger ``job-[...] - schedulled window skipped`` fires when the
+``begin-in-seconds`` of two consecutive jobs differ by more than ``interval_seconds + 60``. When it
+fires regularly (and clears two seconds later, when the job's second metric arrives) the RunTemplate
+really runs at half the configured cadence. The usual cause is a **delay** (``run-template:get`` field
+``delay``) that is not shorter than the cron period, for example ``*/15 * * * *`` with ``delay=2460``:
+jobs started at :11 and :41 instead of every 15 minutes. Newer scheduler releases reduce the delay
+modulo the period automatically; on older versions set the delay below the period yourself.
