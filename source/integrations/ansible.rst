@@ -150,6 +150,30 @@ Modules
 - ``credential`` - Manage authentication credentials
 - ``credential_type`` - Define credential types
 
+**Event-driven automation:**
+
+- ``eventsource`` - Manage event sources (for example the AbraFlexi webhook acceptor database)
+- ``eventrule`` - Manage event rules that start a run template when an event matches
+
+Both modules are idempotent. ``eventsource`` finds an existing source by ``name``
+and ``eventrule`` finds an existing rule by its event source, run template,
+``evidence`` and ``operation``, so a playbook can be run repeatedly without
+creating duplicates. The ``operation`` of a rule is ``any``, ``create``,
+``update``, ``delete`` or an invoice state emitted by the webhook acceptor:
+``settled`` (paid), ``remind1``, ``remind2``, ``remind3``, ``penalised``,
+``storno`` or ``inventory``.
+
+.. code-block:: yaml
+
+   - name: React to a fully paid invoice
+     vitexus.multiflexi.eventrule:
+       state: present
+       eventsource_id: 1
+       runtemplate_id: 55
+       evidence: "faktura-vydana"
+       operation: "settled"
+       env_mapping: '{"INVOICE_ID": "recordid"}'
+
 **System Information:**
 
 - ``multiflexi_info`` - Gather system status and facts
