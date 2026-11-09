@@ -113,6 +113,7 @@ Contents
    integrations/docker-executor
    integrations/node-red-authentication
    integrations/node-red-flows
+   integrations/invoice-item-dispatch
 
 .. toctree::
    :maxdepth: 2
