@@ -73,3 +73,36 @@ company with ``server_url`` and their own rules and RunTemplates:
 
 Without ``server_url`` a source sees the changes of **all** companies stored by the acceptor.
 All tenants' hooks point to the same acceptor URL with ``?company=<code>``.
+
+Acceptor settings for several companies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The acceptor reads the paid invoice and its items from AbraFlexi to detect the *settled*
+state. It uses the server and the credentials from ``/etc/abraflexi-webhook-acceptor/.env``
+and reads the invoice from the company that sent the change. Because the webhook address
+is controlled by the caller, only the company name is taken from the request and it must be
+listed in ``WHA_ALLOWED_COMPANIES``:
+
+.. code-block:: ini
+
+   ABRAFLEXI_URL=https://abraflexi.example.com:5434
+   ABRAFLEXI_COMPANY=company_a
+   WHA_ALLOWED_COMPANIES=company_a,company_b
+
+List every company the acceptor serves, including the one in ``ABRAFLEXI_COMPANY``. Without
+``WHA_ALLOWED_COMPANIES`` the acceptor works with the single company from the ``.env`` file.
+
+Cursor and cache of an event source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The cursor ``last_processed_id`` of an event source is compared with the change *version* of
+its AbraFlexi company (``inversion``), not with the row id in the acceptor cache. Versions
+of two companies overlap, so set the cursor of a new source to the current version of its
+own company. A cursor that is too low replays the whole history of the company, including
+other event rules and flows that react to it.
+
+A processed change is removed from the acceptor cache by its own row id, so processing one
+tenant never deletes unprocessed changes of another.
+
+Event Tasks are started by the eventor in a second step after the changes are expanded.
+Check them with ``multiflexi-cli task:list``; an open Task is started on the next cycle.
