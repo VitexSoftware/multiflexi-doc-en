@@ -104,5 +104,9 @@ other event rules and flows that react to it.
 A processed change is removed from the acceptor cache by its own row id, so processing one
 tenant never deletes unprocessed changes of another.
 
+The eventor ships its own ``MultiFlexi\EventSource`` that implements this tenant scope. Its
+autoloader is registered with priority over the older copy in ``php-vitexsoftware-multiflexi-core``,
+so the tenant-aware class is the one that runs.
+
 Event Tasks are started by the eventor in a second step after the changes are expanded.
 Check them with ``multiflexi-cli task:list``; an open Task is started on the next cycle.
