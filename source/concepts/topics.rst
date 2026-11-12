@@ -219,10 +219,13 @@ Web UI Indicators
   - ℹ️ ``unknown`` — blue (no check implemented)
 
 **Credential configuration form**
-  When no custom UI helper exists for the credential type, the form renders a
-  universal availability panel (alert + optional details list) after the field
-  inputs. Credential types with a dedicated UI helper (e.g. mServer) render
-  their own availability section instead.
+  When no custom UI helper exists for the credential type, a
+  **Check availability** button is shown below the form. The check contacts the
+  external service, so it runs only when you click the button (a separate
+  CSRF-protected request), never when the form is merely opened. The result is
+  shown as a universal availability panel (alert + optional details list).
+  Credential types with a dedicated UI helper (e.g. mServer) render their own
+  availability section instead.
 
 **Job list**
   Jobs blocked by a failed credential check appear with exit code ``75`` and an
