@@ -119,6 +119,12 @@ an actual stored value.
 On the credential edit form such a field is rendered as a password input.
 Leave it blank to keep the stored value; enter a new value to replace it.
 
+In the credential type editor, every user-defined field has a **Required** and
+a **Secret** checkbox. A required field must be filled in before the credential
+is usable. A secret field is masked in the UI, API and CLI exactly like a field
+of type ``password``. Fields declared by the credential prototype keep the
+flags the prototype defines; the editor can only add to them.
+
 Localization Support:
 ---------------------
 
