@@ -116,6 +116,9 @@ UI, REST API, or CLI output — see :doc:`concepts/credential-management` for
 the masking convention and the sole (CLI-only, audit-logged) way to reveal
 an actual stored value.
 
+On the credential edit form such a field is rendered as a password input.
+Leave it blank to keep the stored value; enter a new value to replace it.
+
 Localization Support:
 ---------------------
 
