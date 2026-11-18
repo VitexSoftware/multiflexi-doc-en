@@ -526,6 +526,32 @@ configuration ("Create Credential type" in its requirements panel), the
 saved, it is assigned to that RunTemplate for the requirement and you are
 returned to the RunTemplate page.
 
+Return to the originating form
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Every place that offers to create a Credential Type or a Credential passes a
+``return`` link, so you always come back to where you started:
+
+* **Activation Wizard** (step 4) returns to ``activation-wizard.php?step=4``.
+* **RunTemplate** (requirements panel) returns to ``runtemplate.php?id=<id>``
+  with the new Credential already assigned.
+* **Credential form** ("new credential type") returns to the same credential
+  form with the new Credential Type preselected.
+* **Company credentials list** returns to ``companycreds.php?company_id=<id>``.
+
+Both forms show a "Back to the previous form" button while a ``return`` link is
+active. The link accepts only a relative ``*.php`` address.
+
+The same mechanism works for the Activation Wizard. In step 4 ("Assign
+Credentials") a missing Credential Type or Credential offers a button that
+opens the creation form with a ``return`` link back to
+``activation-wizard.php?step=4`` and the wizard's ``runtemplate_id``. After you
+save, the new Credential is assigned to the RunTemplate and you land on step 4
+again with it preselected. The ``return`` value accepts only a relative link to
+a local ``*.php`` page. Step 4 cannot be left while any credential required by
+the application is still unassigned, so every selected application ends with a
+RunTemplate that can run.
+
 See Also:
 ---------
 - :doc:`reference/cli`
