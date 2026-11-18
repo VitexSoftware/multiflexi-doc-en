@@ -26,8 +26,11 @@ Select the company where you want to activate the application.
 
 ### Step 2: Choose Application
 
-Select the application to activate for the chosen company.
+Select one or more applications to activate for the chosen company.
 
+- Tick the checkbox on each application card (or click the card) to select it; at least one is required
+- When several applications are selected, steps 3-7 run once per application, in order. Each application gets its own RunTemplate and the step indicator shows the progress (for example `2/3`)
+- Selected applications not yet assigned to the company are assigned automatically
 - Shows only enabled applications
 - Displays application icons and descriptions
 - Filters based on company context
@@ -76,7 +79,10 @@ Wizard data is stored in `$_SESSION['activation_wizard']` with the following str
 ```php
 [
     'company_id' => int|null,
-    'app_id' => int|null,
+    'app_id' => int|null,          // application currently being processed
+    'app_queue' => int[],          // applications still waiting after the current one
+    'apps_total' => int,           // number of applications selected in step 2
+    'completed' => array,          // [['app_id' => int, 'runtemplate_id' => int], ...]
     'runtemplate_name' => string|null,
     'runtemplate_id' => int|null,
     'configuration' => array,
@@ -126,7 +132,7 @@ Custom styles provide:
 ### Completing the Wizard
 
 1. **Choose Company**: Click on a company card to select it, then click "Next"
-2. **Choose Application**: Click on an application card to select it, then click "Next"
+2. **Choose Application**: Click on one or more application cards to select them, then click "Next" (steps 3-7 repeat for each selected application)
 3. **Create RunTemplate**: Enter a name and select scheduling interval, then click "Next"
 4. **Configure**: Fill in required configuration fields, then click "Finish & Activate"
 5. You will be redirected to the RunTemplate configuration page
@@ -152,7 +158,7 @@ Using the browser back button is safe - the wizard maintains state in the sessio
 ### Validation
 
 - Company selection is required in Step 1
-- Application selection is required in Step 2
+- At least one application must be selected in Step 2
 - RunTemplate name is required in Step 3
 - Required configuration fields are enforced in Step 4
 
