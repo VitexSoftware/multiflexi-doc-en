@@ -66,6 +66,20 @@ Benefits of Three-Tier System
   - Standardized field definitions across companies
   - Consistent validation and schema enforcement
 
+**Browsing from a prototype to its types**
+  In the web interface, the *Code* column of the Credential Prototypes list
+  (``credentialprototypes.php``) is a link. It opens the Credential Types list
+  (``credentialtypes.php?prototype=<code>``) narrowed to the types based on that
+  prototype and only for the companies you can access. A *Prototype* label above
+  the table shows the active filter, and *Show all credential types* clears it.
+
+  In the Credential Types list itself, the *Prototype* column shows the type's
+  logo and prototype code and links to that prototype's page
+  (``credentialprototype.php?id=<id>``).
+
+  The prototype's own page shows how many credential types use it (counting
+  only types of companies you can access) and links to the filtered list.
+
 **Company Isolation**
   - Each company has its own CredentialType instances
   - Company-specific customizations and business logic
