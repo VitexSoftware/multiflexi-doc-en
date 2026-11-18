@@ -506,6 +506,26 @@ The ``ttl`` value in ``CredentialCheckResult`` controls how long the executor ca
 result per credential to avoid re-probing on rapid successive jobs (important for rate-limited
 APIs such as Fio Bank).
 
+Credential Type page (web UI)
+-----------------------------
+
+When you open ``credentialtype.php?prototype=<Name>``, the page first shows an
+overview of the selected Credential Prototype: name, description, class, UUID,
+version, URL, tags, whether it implements a live availability check, and
+tables of the fields it provides and its own settings.
+
+The editor for remapping fields or adding custom fields, together with the
+**Test** and **Remove** buttons, is collapsed. Expand
+"Field mapping, custom fields, test and removal" to use it. **Apply** stays
+visible.
+
+After you create a **new** Credential Type, the UI continues straight to the
+new-credential form for that type. If you started from a RunTemplate
+configuration ("Create Credential type" in its requirements panel), the
+``runtemplate_id`` is carried through both steps: once the first Credential is
+saved, it is assigned to that RunTemplate for the requirement and you are
+returned to the RunTemplate page.
+
 See Also:
 ---------
 - :doc:`reference/cli`
