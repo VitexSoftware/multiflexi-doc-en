@@ -389,6 +389,12 @@ yellow = missing executable, blue = waiting). The image is served by
 on company, company+application, application, jobs list, dashboard, home, and
 status pages with the matching ``company_id`` / ``app_id`` filters.
 
+On the main page the graph shows **all** jobs, not only the latest 200. It calls
+``jobgraph.php?all=1``, which sizes the grid from the number of jobs (capped at
+1500×1500 cells, newest jobs first). In ``multiflexi-web`` this covers all
+companies. In ``multiflexi-web5`` it covers only the companies available to the
+logged-in user.
+
 Advanced Configuration
 ----------------------
 
