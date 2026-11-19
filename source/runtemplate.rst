@@ -63,6 +63,76 @@ RunTemplates can define custom environment variables that will be available to t
 - Feature flags and operational parameters
 - Debugging and logging levels
 
+.. _runtemplate-date-macros:
+
+Date Macros
+~~~~~~~~~~~
+
+A text configuration value can contain date macros written in lowercase, for
+example ``{yesterday}``. MultiFlexi resolves them when it creates the Job,
+before it stores the job environment. The RunTemplate keeps the macro, and each
+Job stores the concrete value.
+
+Example: a RunTemplate sets ``REPORT_SCOPE={yesterday}``. A Job created on
+2026-11-19 runs with ``REPORT_SCOPE=2026-11-18``, and the job detail shows that
+date.
+
+.. code-block:: bash
+
+   REPORT_SCOPE={yesterday}                          # 2026-11-18
+   IMPORT_SCOPE={last_month_start}>{last_month_end}  # 2026-10-01>2026-10-31
+   OUTPUT_FILE=statement-{yesterday|Ymd}.xml         # statement-20261118.xml
+
+Macros use the server time zone and the time of job creation. By default they
+produce SQL dates (``Y-m-d``). The values below assume a job created on
+Thursday 2026-11-19 at 14:05.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 45 55
+
+   * - Macro
+     - Value
+   * - ``{today}`` / ``{yesterday}`` / ``{tomorrow}``
+     - 2026-11-19 / 2026-11-18 / 2026-11-20
+   * - ``{now}`` / ``{timestamp}``
+     - 2026-11-19 14:05:00 / Unix timestamp
+   * - ``{week_start}`` / ``{week_end}`` (ISO, Monday–Sunday)
+     - 2026-11-16 / 2026-11-22
+   * - ``{last_week_start}`` / ``{last_week_end}``
+     - 2026-11-09 / 2026-11-15
+   * - ``{month_start}`` / ``{month_end}``
+     - 2026-11-01 / 2026-11-30
+   * - ``{last_month_start}`` / ``{last_month_end}``
+     - 2026-10-01 / 2026-10-31
+   * - ``{quarter_start}`` / ``{quarter_end}``
+     - 2026-10-01 / 2026-12-31
+   * - ``{last_quarter_start}`` / ``{last_quarter_end}``
+     - 2026-07-01 / 2026-09-30
+   * - ``{year_start}`` / ``{year_end}``
+     - 2026-01-01 / 2026-12-31
+   * - ``{last_year_start}`` / ``{last_year_end}``
+     - 2025-01-01 / 2025-12-31
+   * - ``{year}`` / ``{month}`` / ``{day}``
+     - 2026 / 11 / 19
+   * - ``{last_month}`` (VAT period)
+     - 2026-10
+   * - ``{quarter}`` / ``{week}`` (ISO week number)
+     - 4 / 47
+   * - ``{prev_workday}`` (previous Monday–Friday; public holidays are not skipped)
+     - 2026-11-18
+
+Modifiers:
+
+- **Day offset** — ``{today-7}`` gives 2026-11-12. ``{yesterday+1}`` gives 2026-11-19.
+- **Format** — ``{yesterday|d.m.Y}`` gives 18.11.2026. The format uses PHP
+  `date() <https://www.php.net/manual/en/datetime.format.php>`_ characters.
+- **Both** — ``{today-1|Ymd}`` gives 20261118.
+
+Uppercase references such as ``{ACCOUNT_NUMBER}`` still insert the value of
+another environment field. MultiFlexi leaves unknown lowercase names, such as
+``{foo}``, unchanged.
+
 Documentation and Notes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
