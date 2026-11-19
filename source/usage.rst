@@ -34,8 +34,11 @@ Upon login, the dashboard presents:
 - **System Status**: Real-time health metrics.
 - **Recent Jobs**: Status of recently executed tasks.
 - **Upcoming Schedule**: Timeline of planned executions.
-- **Job History Graph**: A spiral of recent jobs, one pixel per job, newest in
-  the centre and older ones fading outwards (green = success, red = failure,
+- **Job History Graph**: A spiral of recent jobs, one pixel per job. It is a
+  timeline running outwards: the oldest job shown is in the centre and the
+  newest, brightest one at the outer end. Going back in time, jobs blend more
+  and more into the background, so the past recedes into the distance like a
+  tunnel, and as new jobs arrive the oldest drop out in the middle (green = success, red = failure,
   yellow = not runnable (exit code 127), purple = exception (255), grey =
   waiting). The same widget appears on the home page, company,
   company+application, application, RunTemplate, jobs list, and status pages,
@@ -61,8 +64,10 @@ the whole web interface. From top to bottom it shows:
 - **Summary**: runs, success rate, failures and queued jobs for the last 30
   days. Waiting jobs do not count against the success rate.
 - **Companies**: one card per company you can access, with its success rate,
-  a success/failure bar and the applications that failed most often. Click a
-  card to open that company's page (``company.php``). The summary, charts and
+  a success/failure bar and the run templates that failed most often. Each run
+  template name links to that run template, shown with the name it was saved
+  under. Click elsewhere on a card to open that company's page
+  (``company.php``). The summary, charts and
   queue always cover all companies you can access.
 - **Runs per day** and **Job history**: stacked bars of job states per day and
   the job history spiral described above, with counts per state.
@@ -98,6 +103,26 @@ one company:
   (``showOnly`` URL parameter). *Schedule* queues the run template again and
   *Cancel* withdraws a scheduled job.
 
+**Filtering by Application Tags**
+
+Applications declare tags in their definition (the ``tags`` array of the
+``*.app.json`` file, for example ``Bank``, ``Statements`` or ``Pohoda``). The
+**Jobs** (``jobs.php``), **Run templates** (``runtemplates.php``) and
+**Tasks** (``tasks.php``) pages show an *Application tags* picker above the
+list:
+
+- With no tag picked, the list shows everything.
+- Each tag you pick narrows the list to records of applications that have
+  **all** picked tags. Tags are matched regardless of letter case.
+- *Clear* removes the tag filter.
+
+The selection is stored in the page address as ``apptags`` (for example
+``jobs.php?filter=failed&apptags=Bank,Statements``), so you can bookmark or
+share a filtered view. It combines with the other filters on the page, such as
+the job state buttons on **Jobs** or the state buttons on **Tasks**. The tag filter
+narrows the lists only: the job history chart on **Jobs** and the summary
+cards and charts on **Tasks** still cover all applications.
+
 **Common Actions**
 
 - **Manage Companies**: Configure tenants (companies) that MultiFlexi will interact with.
@@ -126,6 +151,8 @@ from the side instead of taking the user to a new page:
   it without leaving the current view.
 - **Help**: A floating ``?`` button in the lower-right corner opens a help drawer
   with links to the documentation, the About page, and the project source.
+  When the REST API is installed, the drawer also links to the current page's
+  data in the API (HTML, JSON, XML, YAML and CSV).
 
 Click the close button, press *Esc*, or click outside the drawer to dismiss it.
 
